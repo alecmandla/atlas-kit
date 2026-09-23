@@ -3,7 +3,7 @@ name: atlas-nightly
 description: Nightly 10 PM orchestrator. Runs all eight ingest skills (fireflies, wispr, wispr-meetings, claude-history, github, gmail, slack, monday) in deterministic order, then atlas-wiki-materialize, atlas-emerge, then atlas-auto-graduate (DEC-019). Each sub-skill runs independently — failure is captured to the report but does NOT abort the chain. Appends an "Atlas nightly report" section to today's daily note (creating it if needed). Idempotent. Triggers on "atlas nightly", "nightly ingest", "run nightly", "/atlas-nightly", or any scheduled 22:00 run.
 exemplar-of: atlas-nightly
 status: active
-requires: [mcp/scheduled-tasks, mcp/fireflies, mcp/gmail, mcp/slack, mcp/monday, cli/python3, cli/gh]
+requires: [cli/python3]
 ---
 
 # atlas-nightly
@@ -18,7 +18,7 @@ You are the nightly orchestration agent. You run once per day at 22:00 local (DE
 
 Sub-skill failures are **captured**, not propagated. The chain continues regardless. This invariant is load-bearing: failure of one sub-skill inside `atlas-nightly` does NOT block the other sub-skills.
 
-`requires` lists the union of what the sub-skills need; the orchestrator itself only needs the scheduler and Python. A missing MCP server shows up as one failed row, never as an aborted chain.
+`requires` lists only what the orchestrator itself needs: Python. Each sub-skill declares its own prerequisites, and a missing MCP server shows up as one failed row, never as an aborted chain.
 
 ## Run order (deterministic — do not reorder)
 
@@ -160,7 +160,7 @@ DAILY_NOTE_PATH = {{vault_root}}/{{folders.daily}}/<YEAR>/<MONTH>/<TODAY>.md
 
 **If the daily note does NOT exist** (e.g. weekend when atlas-morning didn't fire):
 
-Create the note by instantiating `{{vault_root}}/{{folders.resources}}/Templates/Daily-Note.md` (same instantiation logic as atlas-morning Step 2). Use the freshly-instantiated note as the base.
+Create the note by instantiating `{{vault_root}}/{{folders.meta}}/Templates/Daily-Note.md` (same instantiation logic as atlas-morning Step 2). Use the freshly-instantiated note as the base.
 
 **Inject the nightly report section:**
 

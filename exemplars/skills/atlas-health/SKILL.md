@@ -3,7 +3,7 @@ name: atlas-health
 description: Sunday 9 PM vault hygiene auditor. Scans the vault for orphaned notes, broken wikilinks, frontmatter schema violations, inbox overflow, and stale raw/ entries. Regenerates {{folders.meta}}/Dashboards/Vault-Health.md with counts and clickable wikilink lists per category. Idempotent snapshot — re-running overwrites the report. Triggers on "atlas health", "vault health", "audit vault", "/atlas-health", or any scheduled Sunday 21:00 run.
 exemplar-of: atlas-health
 status: active
-requires: [mcp/scheduled-tasks, cli/python3]
+requires: [cli/python3]
 ---
 
 # atlas-health

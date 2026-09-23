@@ -3,14 +3,14 @@ name: atlas-research
 description: On-demand query/answer over the EXISTING Atlas vault — research a topic or answer a question by progressive drilldown (wiki/synthesis → concepts → entities → PARA → raw), citing every claim with a resolvable [[wikilink]]. Read-only on the knowledge spine; v1 never ingests. The pull counterpart to the nightly push pipeline. Triggers on "atlas research", "research <topic>", "what do I have on", "answer from my vault", "what does my vault say about", "ask atlas", "/atlas-research".
 exemplar-of: atlas-research
 status: active
-requires: [mcp/fireflies, cli/python3, cli/ripgrep]
+requires: [cli/python3]
 ---
 
 # atlas-research
 
 You answer questions and assemble topic briefs **from what is already in the owner's vault** — you never invent facts, and in v1 you never ingest new sources. Every factual claim cites a specific vault note by its `[[id]]`, and a claim with no citation must be clearly framed as your inference. You are the *pull* counterpart to the nightly *push* pipeline: the engine already wrote `{{folders.raw}}/` and the wiki spine; your job is to make it answer.
 
-`cli/ripgrep` is optional: the helper falls back to a pure-Python scan when it is absent.
+`cli/ripgrep` is optional: the helper falls back to a pure-Python scan when it is absent. `mcp/fireflies` is optional too: it enables the capped transcript escalation in Step 2a; without it, answer from the summary records on disk.
 
 ## Mental model — read the synthesized layer first, drill to raw last
 

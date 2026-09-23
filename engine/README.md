@@ -138,12 +138,12 @@ MCP server connected; the script itself only reads what the session fetched.
 
 | Prerequisite | Scripts |
 |---|---|
-| `mcp/fireflies` | fireflies-ingest (`summary_record.py`), research (transcript fetch) |
+| `mcp/fireflies` | fireflies-ingest (`summary_record.py`); optional for research (transcript escalation) |
 | `mcp/gmail` | gmail-ingest |
 | `mcp/slack` | slack-ingest |
 | `mcp/monday` | monday-ingest |
 | `mcp/apple-notes` | apple-notes-ingest |
-| `mcp/scheduled-tasks` | the SKILL-only briefing skills (morning, weekly, health, nightly, synthesize) |
+| `mcp/scheduled-tasks` | none as a hard requirement; the desktop scheduler is one of three ways to run the session skills (morning, weekly, health, nightly, synthesize) |
 | `cli/gh` | github-ingest |
 | `cli/ripgrep` | research (optional; pure-Python fallback) |
 | `cli/python3` 3.9+ | everything |

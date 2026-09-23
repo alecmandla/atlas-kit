@@ -66,6 +66,7 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
 | Spine | `atlas-wiki-materialize` | `python3` 3.10+ | `entity_seeds.json` |
 | Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.10+ | none |
+| Spine | `atlas-synthesize` | `python3` 3.10+; a Claude session writes the prose | none |
 | Query | `atlas-research`, `atlas-distill` | none (Fireflies MCP optional for transcript escalation) | none |
 | Briefing | `atlas-morning` | a daily-note template in the vault; calendar MCP optional | none |
 | Briefing | `atlas-weekly` | none | none |
@@ -83,7 +84,9 @@ user anything the machine can answer.
 
 1. **Vault path.** In order: the invocation argument; `$ATLAS_CONFIG` or
    `~/.config/atlas/config.json` if one exists (read `vault_root`); then
-   `ls -d ~/*Obsidian* ~/Documents/*Obsidian* ~/*[Vv]ault* 2>/dev/null`. Zero candidates means
+   `find "$HOME" "$HOME/Documents" -maxdepth 1 -mindepth 1 -type d \( -iname '*obsidian*' -o -iname '*vault*' \) 2>/dev/null`
+   (a `find`, not a glob: under zsh an unmatched glob aborts the whole command, and
+   `2>/dev/null` does not help). Zero candidates means
    "new vault" and the interview asks where to create it. More than one means the
    interview asks which.
 2. **Obsidian installed.** macOS: `ls /Applications/Obsidian.app` or
@@ -189,25 +192,35 @@ so a failure in one is reported, not fatal to the rest.
 3. **Skills.** For each selected capability, read its exemplar in full and write
    `<repo>/skills/<name>/SKILL.md` adapted to this vault: replace every folder placeholder
    with the config key reference or the real folder name, replace the owner placeholder,
-   point script invocations at `<repo>/engine/`, remove steps for sources the user did not
+   point script invocations at `<repo>/engine/` (and the state, routing, and suppression
+   files an exemplar places under `{{skills_root}}/<name>/` at `<repo>/engine/<name>/`, where
+   the scripts read and write them), remove steps for sources the user did not
    select, and encode the accepted non-negotiables and the no-nudge list in a
    `## Guardrails` section. Frontmatter must carry `derived-from: <exemplar name>` and a
    `description` that keeps the exemplar's trigger phrases. Skip anything whose
    prerequisite was not detected.
 4. **Routing configs.** For each selected source with a config, copy
-   `exemplars/configs/<file>.example.<ext>` to `<repo>/configs/<file>.<ext>` and replace
+   `exemplars/configs/<file>.example.<ext>` to `<repo>/engine/<script-dir>/<file>.<ext>`, next
+   to the script that reads it (`atlas-github-ingest/github-repos.yaml`,
+   `atlas-wiki-materialize/entity_seeds.json`, `atlas-gmail-ingest/mailbox-routing.yaml`,
+   `atlas-slack-ingest/slack-routing.yaml`, `atlas-monday-ingest/monday-boards.yaml`,
+   `atlas-fireflies-ingest/meeting-routing.yaml`; the engine has no config-path flag), and replace
    the fictional entries with the user's real values from §Sources and routing. Keep the
    file's comments; they document the format. `entity_seeds.json` gets the user's product
    and technology seeds, or the example's structure with an empty list.
 5. **Vault scaffold.** Copy `${CLAUDE_PLUGIN_ROOT}/vault-scaffold/` into the vault,
-   renaming folders per the config. Rules: create folders that do not exist; skip any
+   renaming folders per the config. Rules: create folders that do not exist (the
+   scaffold's `.gitkeep` markers are never copied); skip any
    folder that exists and has content; copy `.obsidian/` files only when the vault has no
    `.obsidian/` directory (otherwise write them to `<vault>/60 - Meta/atlas-obsidian-config/`
    equivalent under `{{folders.meta}}` and tell the user to merge by hand); write
    templates only if the destination file is absent. Rewrite the folder names inside
    `.obsidian/plugins/*/data.json` and `.obsidian/app.json` to the config values. Copy
-   `exemplars/vault/*.md.template` into the vault root with placeholders filled, again only
-   if absent.
+   `exemplars/vault/{AGENTS,Guide,Getting-Started,Onboarding-Playbook}.md.template` into
+   the vault root with placeholders filled, again only if absent. `raw-README.md.template`
+   and `wiki-index.md.template` are not copied: the scaffold already placed `raw/README.md`
+   and `wiki/index.md`, and the template versions show the populated shape the
+   materializer produces, not first-run content.
 6. **Plugin checklist.** Copy `vault-scaffold/PLUGIN-CHECKLIST.md` into
    `<vault>/{{folders.meta}}/PLUGIN-CHECKLIST.md`, marking each plugin already present in
    `community-plugins.json` as installed and pruning plugins no selected capability needs

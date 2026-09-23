@@ -144,7 +144,7 @@ On older macOS releases `launchctl load <plist>` replaces `bootstrap`. To remove
 `launchctl bootout gui/$(id -u)/local.atlas.<job>` then delete the plist.
 
 Verify by artifacts: new files under `{{vault_root}}/{{folders.raw}}/`, a fresh
-`skills/<name>/last-run.md`, a report section in today's daily note. `launchctl list`
+`skills/<name>/last-run.md` for session jobs or `engine/<name>/last-run.md` for script jobs, a report section in today's daily note. `launchctl list`
 shows the last exit status, which is more honest than a timestamp but still not proof
 that the run wrote what you expected.
 

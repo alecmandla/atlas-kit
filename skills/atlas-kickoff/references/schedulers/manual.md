@@ -43,7 +43,7 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 ### <each script job>
 - **Run:** `python3 engine/<name>/<script>.py --execute`
 - **Writes:** ...
-- **Verify:** `cat skills/<name>/last-run.md`
+- **Verify:** `cat engine/<name>/last-run.md` (scripts write state next to themselves)
 - **Cadence:** ...
 
 ### <each session job>
@@ -59,7 +59,7 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 | synthesize | `/atlas-synthesize` (session) | every evening, after nightly |
 | morning | `/atlas-morning` (session) | every morning |
 | weekly | `/atlas-weekly` (session) | Friday evening |
-| health | `python3 engine/atlas-health/health.py --execute` or `/atlas-health` | Sunday evening |
+| health | `/atlas-health` (session; there is no engine script) | Sunday evening |
 | lint | `python3 engine/atlas-lint/lint.py report` | Sunday evening or before a synthesis batch |
 | materialize | `python3 engine/atlas-wiki-materialize/materialize.py --execute` | evening, if not using nightly |
 | emerge | `python3 engine/atlas-emerge/emerge.py` | evening, after materialize |

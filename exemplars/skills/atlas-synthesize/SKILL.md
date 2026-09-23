@@ -3,7 +3,7 @@ name: atlas-synthesize
 description: Cross-source thread synthesis agent (DEC-020). Separate scheduled agent firing ~22:45, after atlas-nightly. For each #thread/<slug> whose evidence has changed, weaves a living, cited narrative page at wiki/synthesis/<slug>.md — current state, how-it-evolved timeline, key decisions, open questions, key people — from a token-bounded evidence bundle gathered by synthesize.py. Change-detected (only re-writes changed threads). Idempotent. Triggers on "atlas synthesize", "synthesize threads", "rebuild synthesis", "/atlas-synthesize", or any scheduled 22:45 run.
 exemplar-of: atlas-synthesize
 status: active
-requires: [mcp/scheduled-tasks, cli/python3]
+requires: [cli/python3]
 ---
 
 # atlas-synthesize

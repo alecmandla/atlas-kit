@@ -3,7 +3,7 @@ name: atlas-weekly
 description: Friday 6 PM weekly review agent. Generates a narrative weekly review at {{folders.areas}}/Weekly-Reviews/<ISO-week>.md from the Weekly-Review.md template, populated with: this week's meetings the owner attended, shipped tasks (completed this week), open action items still unticked, threads with new activity this week, and threads gone quiet for ≥ 14 days. Idempotent — re-runs the same Friday overwrite the file (it's a snapshot). Triggers on "atlas weekly", "weekly review", "/atlas-weekly", or any scheduled Friday 18:00 run.
 exemplar-of: atlas-weekly
 status: active
-requires: [mcp/scheduled-tasks, cli/python3]
+requires: [cli/python3]
 ---
 
 # atlas-weekly
@@ -279,7 +279,7 @@ Verified mechanically: two consecutive runs on the same Friday with no hand-edit
 
 - **Run on a non-Friday** (manual invocation, or DST shift): proceed normally. The ISO-week filename is whatever week `TODAY` falls in. If two manual runs happen in the same week, they overwrite the same file.
 - **Empty week** (no meetings, no shipped tasks, no thread activity): write the review anyway with the by-the-numbers showing zeros. The needs-attention bar lowers per Step 3's fallback rules.
-- **Weekly-Review.md template missing**: hard-fail with a clear error. Surface: `"Weekly-Review.md template not found at {{vault_root}}/{{folders.resources}}/Templates/Weekly-Review.md"`.
+- **Weekly-Review.md template missing**: hard-fail with a clear error. Surface: `"Weekly-Review.md template not found at {{vault_root}}/{{folders.meta}}/Templates/Weekly-Review.md"`.
 - **`[[{{owner_slug}}]]` wikilink absent across the vault**: very unlikely once `atlas-people-extract` has run; the meeting-attendance filter returns empty. Surface the count = 0 and continue.
 - **ISO-week edge cases around year boundary**: `date.isocalendar()` handles W52/W53 → W01 transitions correctly. Use the stdlib, don't reinvent.
 

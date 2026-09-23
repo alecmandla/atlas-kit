@@ -143,8 +143,8 @@ written as {{fill-me}} and listed again in §9. Sources without a config get one
 <!-- AUTHOR: schedule_mode is "scheduled" or "on-demand only". For on-demand, the table
 still lists suggested cadences and the scheduler is "manual". "Needs a Claude session"
 is yes for anything that calls an MCP or writes prose (ingests via MCP, morning, weekly,
-synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
-lint, health, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
+health, synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
+lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
 morning 08:00, weekly Fri 18:00, health Sun 21:00. Practice capabilities never appear
 here. -->
 
@@ -164,7 +164,7 @@ docs/DECISIONS.md
 docs/RUNBOOK.md                  (manual scheduler, or always as a fallback)
 README.md                        (new, or a section appended)
 engine/                          (copied from the plugin; stdlib-only)
-configs/<one per selected source>
+engine/<script-dir>/<routing config, one per selected source>
 skills/<one per selected capability>/SKILL.md
 schedulers/<plists or task prompts, per §6>
 vault: <folders created>, .obsidian/ (only if absent), {{folders.meta}}/Templates/*,
@@ -188,8 +188,8 @@ grep -L '^derived-from:' skills/*/SKILL.md   # must print nothing
 ```
 
 <!-- AUTHOR: verification_commands holds the engine's health or lint invocation in
-read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py report
---vault "{{vault_root}}"), else a comment saying the engine has not landed. -->
+read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py
+--vault "{{vault_root}}" report; the flag goes before the subcommand), else a comment saying the engine has not landed. -->
 
 # 9. Manual steps
 
@@ -200,7 +200,7 @@ read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py re
    (Settings, Community plugins, Browse). This cannot be automated.
 2. Scheduler-specific steps from the chosen references/schedulers/ guide (create desktop
    tasks from this directory; launchctl load each plist; or nothing for manual).
-3. Fill every {{fill-me}} in configs/.
+3. Fill every {{fill-me}} in the routing configs under engine/<script-dir>/.
 4. Grant Full Disk Access to the runner if voice memos was selected.
 5. Run the first job by hand and check its artifacts (raw/ file count, last-run.md),
    not its timestamp.
