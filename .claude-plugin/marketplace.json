@@ -1,0 +1,29 @@
+{
+  "name": "atlas-kit",
+  "description": "Marketplace for atlas-kit: set up an Obsidian second brain with an automated knowledge pipeline from Claude Code.",
+  "owner": {
+    "name": "alecmandla"
+  },
+  "plugins": [
+    {
+      "name": "atlas-kit",
+      "source": "./",
+      "description": "Set up an Obsidian second brain with an automated knowledge pipeline: an interview-driven kickoff skill that generates vault-specific ingest, wiki, and briefing skills from scrubbed exemplars, plus a stdlib-only Python engine and a vault scaffold.",
+      "version": "0.1.0",
+      "author": {
+        "name": "alecmandla"
+      },
+      "license": "MIT",
+      "keywords": [
+        "obsidian",
+        "second-brain",
+        "knowledge-pipeline",
+        "para",
+        "wiki",
+        "ingest",
+        "kickoff",
+        "scaffold"
+      ]
+    }
+  ]
+}
