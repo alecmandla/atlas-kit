@@ -241,6 +241,11 @@ Save it as `scripts/scrub-gate.sh` in your own checkout if you like; the
 repository does not ship it as a file so the section above stays the single
 authoritative copy.
 
-The kickoff skill runs the same gate over its generated output before handing
-it to the recipient, with the recipient's own name, employer, and domain added
-to their local pattern file.
+The kickoff skill runs an adapted gate over its generated output before handing
+it to the recipient (its `SKILL.md`, Phase 5 step 4): rules 1 and 2 over every
+generated file, where the recipient's own name, employer, and domain are
+expected and not banned; rule 3, as `/Users/`, `/home/`, and `file:///`, only
+over files derived from an exemplar, a vault template, or the scaffold, which
+carry `~/...` roots by construction. The recipient's own `atlas.config.json`,
+kickoff, runbook, and scheduler files hold their absolute roots on purpose and
+are never checked for paths.

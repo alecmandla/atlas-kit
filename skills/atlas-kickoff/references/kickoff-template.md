@@ -35,7 +35,7 @@ question is the acceptance test for the whole pipeline. -->
 - **Owner:** {{owner_name}} (`[[{{owner_slug}}]]` in the vault); email, organization, domain: {{identity_extras}}
 - **Vault:** `{{vault_root}}` ({{vault_state}})
 - **Scheme:** {{layout_scheme}}
-- **Target repo:** `{{repo_root}}` (`{{skills_root}}` in the exemplars: `skills/<name>/SKILL.md` and `engine/<name>/` live under it)
+- **Target repo:** `{{repo_root}}` (the value the exemplars call `skills_root`; `skills/<name>/SKILL.md` and `engine/<name>/` live under it)
 - **Runtime:** {{runtime}} ({{claude_cli_state}})
 
 <!-- AUTHOR: vault_state is one of "existing, N top-level folders" or "new, will be

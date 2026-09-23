@@ -109,7 +109,7 @@ prints the full flag list.
 | `atlas-graduate/graduate.py` | `python3 graduate.py --slug <slug> --target {concept,project,area,resource} [--dry-run]` | none |
 | `atlas-synthesize/synthesize.py` | `python3 synthesize.py --list`, `--stale-only`, or `--thread <slug>` | none (the SKILL.md does the writing) |
 | `atlas-lint/lint.py` | `python3 lint.py report` or `python3 lint.py worklist` | none |
-| `atlas-frontmatter-migrate/migrate.py` | `python3 migrate.py` (dry run) then `--execute` | one-off migration of `attendees:` to `participants:` |
+| `atlas-frontmatter-migrate/migrate.py` | `python3 migrate.py` (dry run) then `--execute` | one-off migration of the legacy attendees email list to `participants:` wikilinks plus `attendee_emails:` |
 
 ### Briefing and notes
 

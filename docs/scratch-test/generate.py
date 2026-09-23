@@ -133,6 +133,14 @@ def edit(text: str, old: str, new: str, label: str, regex: bool = False, count: 
     return out
 
 
+def home_rel(p: Path, home: Path) -> str:
+    """Home-relative form for derived files (template section 10); absolute when not under HOME."""
+    try:
+        return "~/" + p.relative_to(home).as_posix()
+    except ValueError:
+        return str(p)
+
+
 def fill(text: str, values: dict[str, str]) -> str:
     for k, v in values.items():
         text = text.replace("{{" + k + "}}", v)
@@ -153,13 +161,15 @@ def main() -> int:
     skills_dir = repo / "skills"
     engine_root = repo / "engine"
 
+    # Values for derived files (skills, DECISIONS, vault documents): roots are home-relative.
+    # The kickoff document, config, and runbook hold the absolute roots (template section 10).
     values = {f"folders.{k}": v for k, v in F.items()}
     values.update({
         "owner_name": PROFILE["owner_name"], "owner_slug": PROFILE["owner_slug"],
         # left blank in the interview (no meeting or email source): every use becomes {{fill-me}}
         "owner_email": "{{fill-me}}", "employer": "{{fill-me}}", "employer_domain": "{{fill-me}}",
-        "timezone": PROFILE["timezone"], "vault_root": str(vault),
-        "skills_root": str(repo), "repo_root": str(repo),
+        "timezone": PROFILE["timezone"], "vault_root": home_rel(vault, home),
+        "skills_root": home_rel(repo, home), "repo_root": str(repo),
     })
 
     # ---------------------------------------------------------------- Phase 3: kickoff doc
@@ -234,6 +244,7 @@ def main() -> int:
         **values,
         # the config block holds the raw values (blank when not given); the identity line says so in words
         "owner_email": "", "employer": "", "employer_domain": "", "identity_extras": "not given",
+        "vault_root": str(vault), "skills_root": str(repo),
         "date": TODAY, "n_rounds": "3", "mission_paragraph": PROFILE["mission"],
         "vault_state": "existing, empty (0 top-level folders)", "layout_scheme": PROFILE["layout_scheme"],
         "runtime": "Claude Code CLI", "claude_cli_state": "claude 2.1.280 on PATH",
@@ -296,7 +307,7 @@ def main() -> int:
         # {{skills_root}} is the repo root; the exemplars already say engine/<name>/ for scripts and
         # state and skills/<name>/SKILL.md for skill references. Bare last-run.md mentions get the
         # engine path too so every skill's state lives in one place.
-        text = text.replace("`last-run.md`", f"`{engine_root}/{name}/last-run.md`")
+        text = text.replace("`last-run.md`", f"`{values['skills_root']}/engine/{name}/last-run.md`")
         # scheduler wording: manual runbook, no scheduled-tasks MCP
         text = re.sub(r"\(scheduled via `mcp__scheduled-tasks`\)", "(run by hand from `docs/RUNBOOK.md`; no scheduler is configured)", text)
         text = re.sub(r"scheduled via `mcp__scheduled-tasks`", "run by hand from `docs/RUNBOOK.md`; no scheduler is configured", text)
@@ -310,7 +321,7 @@ def main() -> int:
                         "| 2 | `atlas-github-ingest` | `{{skills_root}}/skills/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |\n"
                         "| 3 | `atlas-wiki-materialize` | `{{skills_root}}/skills/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |\n"
                         "| 4 | `atlas-emerge` | `{{skills_root}}/skills/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |\n"
-                        f"| 5 | `atlas-auto-graduate` | `{engine_root}/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{{{folders.meta}}}}/Dashboards/Thread-Review-Queue.md` |\n",
+                        "| 5 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |\n",
                         "nightly run-order table", regex=True)
             text = edit(text, r"\nIf the owner also runs `atlas-apple-notes-ingest`.*?contract\.\n", "\n", "nightly optional-ingests paragraph", regex=True)
             text = edit(text, "Run the eight ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")

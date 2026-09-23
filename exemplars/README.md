@@ -38,9 +38,11 @@ must obey too, are in `../docs/SCRUB-RULES.md`.
 5. `decisions/DECISIONS.md` becomes the recipient's `docs/DECISIONS.md`. Any
    decision the recipient rejected during the interview is marked `superseded`,
    never deleted, so citations still resolve.
-6. The kickoff runs the verification gate (below) over its output, with the
-   recipient's own name, employer, and domain appended to gate 1, before handing
-   the result over.
+6. The kickoff runs an adapted verification gate over its output before handing
+   the result over: the banned-name and identifier rules over every file (the
+   recipient's own name, employer, and domain are expected there, not banned)
+   and the path rule only over files derived from an exemplar or template; see
+   `../docs/SCRUB-RULES.md` section 7.
 
 Only the placeholders in `SCRUB-RULES.md` section 2 are substituted. Any other
 `{{...}}` token (the meeting-note template's `{{fireflies_id}}`, for example) is
@@ -89,5 +91,5 @@ categories in section 1 before running it.
 
 Run the script from the repository root before every commit that touches this
 tree. It must print `gate clean` and exit 0; anything else blocks the commit.
-The kickoff runs the same gate over its generated output, with the recipient's
-own name, employer, and domain added to the local pattern file.
+The kickoff runs the adapted form described in section 7 over its generated
+output.
