@@ -66,6 +66,7 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
 | Spine | `atlas-wiki-materialize` | `python3` 3.10+ | `entity_seeds.json` |
 | Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.10+ | none |
+| Spine | `atlas-synthesize` | `python3` 3.10+; a Claude session writes the prose | none |
 | Query | `atlas-research`, `atlas-distill` | none (Fireflies MCP optional for transcript escalation) | none |
 | Briefing | `atlas-morning` | a daily-note template in the vault; calendar MCP optional | none |
 | Briefing | `atlas-weekly` | none | none |
