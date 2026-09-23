@@ -39,7 +39,7 @@ SORT due ASC
 ## Recent meetings
 
 ```dataview
-TABLE date, attendees
+TABLE date, participants
 FROM #meeting
 WHERE project = this.file.name OR contains(file.outlinks, this.file.link)
 SORT date DESC

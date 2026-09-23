@@ -32,7 +32,7 @@ tags: [person]
 ```dataview
 TABLE date, title
 FROM #meeting
-WHERE contains(attendees, this.file.link) OR contains(file.outlinks, this.file.link)
+WHERE contains(participants, this.file.link) OR contains(file.outlinks, this.file.link)
 SORT date DESC
 LIMIT 10
 ```
