@@ -102,7 +102,7 @@ A session job swaps `ProgramArguments` for:
 <array>
   <string>{{claude_path}}</string>
   <string>-p</string>
-  <string>Run the {{capability}} skill: execute every step in {{repo_root}}/skills/{{capability}}/SKILL.md unattended. Read {{repo_root}}/atlas.config.json for the vault path. Do not ask questions; skip ambiguous items and note them in last-run.md. Finish by writing {{repo_root}}/skills/{{capability}}/last-run.md.</string>
+  <string>Run the {{capability}} skill: execute every step in {{repo_root}}/skills/{{capability}}/SKILL.md unattended. Read {{repo_root}}/atlas.config.json for the vault path. Do not ask questions; skip ambiguous items and note them in last-run.md. Finish by writing {{repo_root}}/engine/{{capability}}/last-run.md.</string>
   <string>--allowedTools</string>
   <string>Read,Write,Edit,Bash,Glob,Grep,{{mcp_tool_patterns}}</string>
 </array>
@@ -144,7 +144,8 @@ On older macOS releases `launchctl load <plist>` replaces `bootstrap`. To remove
 `launchctl bootout gui/$(id -u)/local.atlas.<job>` then delete the plist.
 
 Verify by artifacts: new files under `{{vault_root}}/{{folders.raw}}/`, a fresh
-`skills/<name>/last-run.md` for session jobs or `engine/<name>/last-run.md` for script jobs, a report section in today's daily note. `launchctl list`
+`engine/<name>/last-run.md` (every job, script or session, records its run there), a
+report section in today's daily note. `launchctl list`
 shows the last exit status, which is more honest than a timestamp but still not proof
 that the run wrote what you expected.
 

@@ -108,7 +108,7 @@ The path is derived deterministically from the meeting id, so an update overwrit
 ## Invocation
 
 ```bash
-cd {{skills_root}}/atlas-wispr-meetings-ingest
+cd {{skills_root}}/engine/atlas-wispr-meetings-ingest
 
 # Dry run (default — writes nothing)
 python3 ingest.py

@@ -32,13 +32,20 @@ question is the acceptance test for the whole pipeline. -->
 
 # 2. Vault layout and config
 
+- **Owner:** {{owner_name}} (`[[{{owner_slug}}]]` in the vault); email, organization, domain: {{identity_extras}}
 - **Vault:** `{{vault_root}}` ({{vault_state}})
 - **Scheme:** {{layout_scheme}}
-- **Target repo:** `{{repo_root}}`
+- **Target repo:** `{{repo_root}}` (the value the exemplars call `skills_root`; `skills/<name>/SKILL.md` and `engine/<name>/` live under it)
 - **Runtime:** {{runtime}} ({{claude_cli_state}})
 
 <!-- AUTHOR: vault_state is one of "existing, N top-level folders" or "new, will be
-created". runtime is "Claude desktop app" or "Claude Code CLI". -->
+created". runtime is "Claude desktop app" or "Claude Code CLI". repo_root comes from the
+invocation (--repo, else the current directory) and is the value substituted for every
+{{skills_root}} in the exemplars; it is never asked in the interview. owner_slug is
+derived from owner_name (kebab-case, capitalization kept: "Jordan Vale" -> "Jordan-Vale").
+identity_extras holds owner_email, employer, and employer_domain from the optional round 2
+follow-ups as "<email>, <organization>, <domain>", with "not given" in place of any the
+user left blank. -->
 
 | Key | Folder | Exists | Notes |
 |---|---|---|---|
@@ -54,6 +61,9 @@ The config the engine reads, written to `~/.config/atlas/config.json` and commit
 {
   "vault_root": "{{vault_root}}",
   "owner_name": "{{owner_name}}",
+  "owner_email": "{{owner_email}}",
+  "employer": "{{employer}}",
+  "employer_domain": "{{employer_domain}}",
   "timezone": "{{timezone}}",
   "folders": {
     "inbox": "{{folders.inbox}}",
@@ -74,7 +84,13 @@ The config the engine reads, written to `~/.config/atlas/config.json` and commit
 
 <!-- AUTHOR: every key is present even when the name equals the default; the engine's
 defaults exist for the maintainer's private checkout, not for users. vault_root may use
-a leading ~ ; the engine expands it. -->
+a leading ~ ; the engine expands it. Folder values are the top-level folder names only;
+the subfolders below them (Clients/, People/, Dashboards/, Templates/, entities/) are
+engine conventions. In particular `crm` names the parent folder and person notes live
+at `<crm>/People/`, so `crm` must not itself be `People`. owner_email, employer, and
+employer_domain are written as empty strings when the user left them blank; the engine
+ignores them (they feed the routing configs and exemplar prose through substitution,
+where a blank becomes {{fill-me}}). -->
 
 # 3. Non-negotiable constraints
 
@@ -143,8 +159,8 @@ written as {{fill-me}} and listed again in §9. Sources without a config get one
 <!-- AUTHOR: schedule_mode is "scheduled" or "on-demand only". For on-demand, the table
 still lists suggested cadences and the scheduler is "manual". "Needs a Claude session"
 is yes for anything that calls an MCP or writes prose (ingests via MCP, morning, weekly,
-health, synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
-lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
+health, synthesize, nightly); no for pure engine scripts (people-extract, materialize,
+emerge, auto-graduate, lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
 morning 08:00, weekly Fri 18:00, health Sun 21:00. Practice capabilities never appear
 here. -->
 
@@ -209,7 +225,16 @@ read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py
 # 10. Tone for generated files
 
 Plain, declarative, no filler, no emojis, American English. Headings for navigation,
-tables for comparison, lists for enumeration. Code fenced with language tags. Paths
-relative to the repo root or the vault root, never absolute.
+tables for comparison, lists for enumeration. Code fenced with language tags.
+
+Paths: `atlas.config.json` (and its copy under `~/.config/atlas/`), this kickoff, the
+runbook, and any scheduler files hold the absolute vault and repo roots; that is where
+they belong (a leading `~` is fine in the config, which the engine expands; launchd
+plists need the expanded form). Everything derived from an exemplar, a vault template,
+or the scaffold (generated `SKILL.md` prose, `DECISIONS.md`, the vault documents, the
+routing configs) never carries an expanded absolute path: vault paths are written
+relative to the vault root, repo paths relative to the repo root, and where a root
+itself must appear (the exemplars' `{{vault_root}}` and `{{skills_root}}`) it is
+written home-relative (`~/Vault`, `~/atlas`) whenever it lies under the home directory.
 
 # TEMPLATE ENDS

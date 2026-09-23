@@ -37,13 +37,13 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 ### nightly
 - **Run:** in a Claude Code session here, `/atlas-nightly`
 - **Writes:** `{{folders.raw}}/<source>/` files, wiki pages, the emerging-patterns dashboard, a report section in today's daily note
-- **Verify:** `find "{{vault_root}}/{{folders.raw}}" -newer skills/atlas-nightly/last-run.md -type f | wc -l` is greater than zero on a day with new source activity
+- **Verify:** `find "{{vault_root}}/{{folders.raw}}" -newer engine/atlas-nightly/last-run.md -type f | wc -l` is greater than zero on a day with new source activity
 - **Cadence:** every evening
 
 ### <each script job>
 - **Run:** `python3 engine/<name>/<script>.py --execute`
 - **Writes:** ...
-- **Verify:** `cat engine/<name>/last-run.md` (scripts write state next to themselves)
+- **Verify:** `cat engine/<name>/last-run.md` (every job, script or session, records its run there)
 - **Cadence:** ...
 
 ### <each session job>
@@ -61,6 +61,7 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 | weekly | `/atlas-weekly` (session) | Friday evening |
 | health | `/atlas-health` (session; there is no engine script) | Sunday evening |
 | lint | `python3 engine/atlas-lint/lint.py report` | Sunday evening or before a synthesis batch |
+| people-extract | `python3 engine/atlas-people-extract/extract.py --execute` | evening, before materialize; only useful once meeting notes exist |
 | materialize | `python3 engine/atlas-wiki-materialize/materialize.py --execute` | evening, if not using nightly |
 | emerge | `python3 engine/atlas-emerge/emerge.py` | evening, after materialize |
 | auto-graduate | `python3 engine/atlas-graduate/auto_graduate.py --execute` | evening, after emerge |

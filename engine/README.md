@@ -50,7 +50,9 @@ Copy `atlas.config.example.json` to `~/.config/atlas/config.json` and edit
 `crm`, `clippings`, `raw`, `wiki`) are fixed; the values are the bare folder
 names directly under `vault_root`. Subfolders below those (`Clients/`,
 `People/`, `entities/`, `Dashboards/`) are engine conventions and are not
-configurable. Scripts that take `--vault` still do; the flag moves the root
+configurable. `crm` therefore names the parent folder: person notes are
+written to `<crm>/People/`, so set it to `CRM` or `Contacts`, never to
+`People`, which would nest the subfolder under a folder of the same name. Scripts that take `--vault` still do; the flag moves the root
 for one run and does not rename the layout. The full contract, the public API,
 and the validation rules are in `CONFIG-LAYER.md`.
 
@@ -107,7 +109,7 @@ prints the full flag list.
 | `atlas-graduate/graduate.py` | `python3 graduate.py --slug <slug> --target {concept,project,area,resource} [--dry-run]` | none |
 | `atlas-synthesize/synthesize.py` | `python3 synthesize.py --list`, `--stale-only`, or `--thread <slug>` | none (the SKILL.md does the writing) |
 | `atlas-lint/lint.py` | `python3 lint.py report` or `python3 lint.py worklist` | none |
-| `atlas-frontmatter-migrate/migrate.py` | `python3 migrate.py` (dry run) then `--execute` | one-off migration of `attendees:` to `participants:` |
+| `atlas-frontmatter-migrate/migrate.py` | `python3 migrate.py` (dry run) then `--execute` | one-off migration of the legacy attendees email list to `participants:` wikilinks plus `attendee_emails:` |
 
 ### Briefing and notes
 

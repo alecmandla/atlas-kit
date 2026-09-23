@@ -30,7 +30,7 @@ The `?mode=ro` flag is load-bearing: the ingest must survive concurrent Wispr wr
 
 ### 2. Load state
 
-`{{skills_root}}/atlas-wispr-ingest/state.json`:
+`{{skills_root}}/engine/atlas-wispr-ingest/state.json`:
 
 ```json
 {
@@ -95,7 +95,7 @@ These tables may be empty on a given install (they were empty on the reference i
 
 ### 6. Write the per-run summary
 
-`{{skills_root}}/atlas-wispr-ingest/last-run.md` + update `state.json`:
+`{{skills_root}}/engine/atlas-wispr-ingest/last-run.md` + update `state.json`:
 
 - `last_run_iso` = current run start time (ISO).
 - `last_run_count` = total History rows written across all runs to date (cumulative since first ingest).

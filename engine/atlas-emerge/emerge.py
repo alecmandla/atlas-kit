@@ -26,6 +26,11 @@ VAULT_DEFAULT = CFG.vault_root
 SKILL_DIR = Path(__file__).resolve().parent
 
 SOURCE_DIRS = ["fireflies", "wispr", "claude-history", "github", "gmail", "slack", "monday", "distill"]
+# Patterns a run is expected to surface before last-run.md carries a diagnostic. Small
+# on purpose: a new vault has little corpus, and zero patterns is a fact, not a failure.
+# Raise it with --min-patterns once the corpus is large enough that a low count means
+# the thresholds are too strict.
+MIN_PATTERNS_DEFAULT = 1
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 TITLE_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
@@ -483,16 +488,17 @@ def render_last_run(
     duration_seconds: float,
     report_path: str,
     today_iso: str,
+    min_patterns: int = MIN_PATTERNS_DEFAULT,
 ) -> str:
-    ac_met = "true" if patterns_surfaced >= 5 else "false"
+    met = "true" if patterns_surfaced >= min_patterns else "false"
     body = ""
-    if patterns_surfaced < 5:
+    if patterns_surfaced < min_patterns:
         body = (
             "\n## Diagnostic\n\n"
-            f"AC `≥ 5 patterns` unmet. Surfaced {patterns_surfaced} / candidates "
+            f"Fewer than {min_patterns} pattern(s) surfaced ({patterns_surfaced}); candidates "
             f"{candidates_after_dedup} after dedup ({candidates_extracted} pre-dedup). "
-            "Tune thresholds in `emerge.py` if signal is genuinely scarce; "
-            "extend `--window-days` if the window is too short.\n"
+            "A small corpus surfaces little; extend `--window-days` if the window is too short, "
+            "or lower `--min-items` / `--min-sources` if signal is genuinely scarce.\n"
         )
     return (
         "# atlas-emerge — last run\n"
@@ -505,7 +511,8 @@ def render_last_run(
         f"- candidates_after_dedup: {candidates_after_dedup}\n"
         f"- patterns_surfaced: {patterns_surfaced}\n"
         f"- duration_seconds: {duration_seconds:.2f}\n"
-        f"- ac_met: {ac_met}\n"
+        f"- min_patterns: {min_patterns}\n"
+        f"- min_patterns_met: {met}\n"
         f"- report_path: {report_path}\n"
         f"{body}"
     )
@@ -518,6 +525,8 @@ def main() -> int:
     ap.add_argument("--top", type=int, default=25, help="Max patterns to surface (default: 25)")
     ap.add_argument("--min-items", type=int, default=3, help="Minimum distinct items per cluster")
     ap.add_argument("--min-sources", type=int, default=2, help="Minimum distinct source types per cluster")
+    ap.add_argument("--min-patterns", type=int, default=MIN_PATTERNS_DEFAULT,
+                    help=f"Patterns expected per run; fewer adds a diagnostic to last-run.md (default: {MIN_PATTERNS_DEFAULT})")
     ap.add_argument("--dry-run", action="store_true", help="Print summary only; don't write files")
     ap.add_argument("--report-path", type=Path, default=None, help="Override report output path")
     ap.add_argument("--today", type=str, default=None, help="Override today date (YYYY-MM-DD)")
@@ -565,6 +574,7 @@ def main() -> int:
         duration_seconds=duration,
         report_path=str(report_path),
         today_iso=today_iso,
+        min_patterns=args.min_patterns,
     )
 
     if args.dry_run:

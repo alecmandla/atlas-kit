@@ -123,7 +123,7 @@ The tag goes inside the existing frontmatter block; the body is untouched. Forma
 
 Idempotent: if the row already exists for `<slug>`, no-op.
 
-### Step 7 — Write `{{skills_root}}/atlas-graduate/last-run.md`
+### Step 7 — Write `{{skills_root}}/engine/atlas-graduate/last-run.md`
 
 Captures: timestamp, slug, target, destination path, PARA notes tagged (count), AGENTS.md row added (true/false), duration.
 
@@ -180,7 +180,7 @@ CLI flags:
 
 - **Auto bar (Moderate):** passes all guards AND (`≥2 work sources` OR `≥5 items`) AND `persisted ≥2 nightly runs`. Work sources = `fireflies, gmail, slack, monday, github`; self sources = `claude-history, wispr`.
 - **Guards:** `person` (CRM stem / common-first-name), `known-entity` (existing wiki entity / client / area), `noise` (generic slugs + `suppress.txt`).
-- **Persistence ledger:** `{{skills_root}}/atlas-graduate/seen-ledger.json` (`{slug: [observation-dates]}`), advanced only on `--execute`.
+- **Persistence ledger:** `{{skills_root}}/engine/atlas-graduate/seen-ledger.json` (`{slug: [observation-dates]}`), advanced only on `--execute`.
 - **Modes:** default = plan (classify + write the review-queue dashboard, no graduations, ledger untouched); `--execute` = apply graduations + persist ledger (this is how `atlas-nightly` calls it).
 - **Per-run cap:** `MAX_AUTO_PER_RUN` (DEC-022) bounds how many slugs graduate in one night, so a burst of new evidence rolls out over several runs instead of tagging the vault all at once.
 

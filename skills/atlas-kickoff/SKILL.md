@@ -64,12 +64,13 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-wispr-meetings-ingest` | same file as above | none |
 | Ingest | `atlas-apple-notes-ingest` | Apple Notes MCP: `list_notes` and `get_note_content` | none |
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
+| Spine | `atlas-people-extract` | `python3` 3.10+; meeting notes carrying `attendee_emails:` (a meeting ingest, or notes written by hand from the meeting template). Materialize's org branch reads its output. | none |
 | Spine | `atlas-wiki-materialize` | `python3` 3.10+ | `entity_seeds.json` |
 | Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.10+ | none |
 | Spine | `atlas-synthesize` | `python3` 3.10+; a Claude session writes the prose | none |
 | Query | `atlas-research`, `atlas-distill` | none (Fireflies MCP optional for transcript escalation) | none |
 | Briefing | `atlas-morning` | a daily-note template in the vault; calendar MCP optional | none |
-| Briefing | `atlas-weekly` | none | none |
+| Briefing | `atlas-weekly` | a weekly-review template in the vault (the scaffold ships one) | none |
 | Orchestrator | `atlas-nightly` | at least one ingest selected and a scheduler chosen | none |
 | Capture | `atlas-book-summary` | web search available | none |
 | Practice | `atlas-monk` (reflection practice) | none; on-demand only, never scheduled | none |
@@ -131,10 +132,12 @@ without numbers, Zettelkasten, custom; timezone (default detected).
 **Round 2 — Folders, sources, and silence.** Confirm every folder key's name from the
 scheme chosen (present the full table, ask for edits, not a re-derivation); which sources
 to ingest, offering only capabilities whose prerequisites were detected and listing the
-blocked ones with what is missing; which non-ingest capabilities to enable (spine is on by
-default; briefings, research, capture are choices); the **no-nudge question**: which
-practices, folders, or tags must never appear on any nudge surface (morning report, weekly
-review, dashboards, scheduled output).
+blocked ones with what is missing, with a follow-up call for routing values and, when a
+meeting or email source is picked, the optional owner email and employer name and domain
+(blank is a valid answer; it becomes `{{fill-me}}` where used); which non-ingest
+capabilities to enable (spine is on by default; briefings, research, capture are choices);
+the **no-nudge question**: which practices, folders, or tags must never appear on any
+nudge surface (morning report, weekly review, dashboards, scheduled output).
 
 **Round 3 — Operation and non-negotiables.** On-demand only versus scheduled; scheduler
 choice among the options the runtime allows (desktop scheduled tasks, launchd, manual);
@@ -192,13 +195,19 @@ so a failure in one is reported, not fatal to the rest.
 3. **Skills.** For each selected capability, read its exemplar in full and write
    `<repo>/skills/<name>/SKILL.md` adapted to this vault: replace every folder placeholder
    with the config key reference or the real folder name, replace the owner placeholder,
-   point script invocations at `<repo>/engine/` (and the state, routing, and suppression
-   files an exemplar places under `{{skills_root}}/<name>/` at `<repo>/engine/<name>/`, where
-   the scripts read and write them), remove steps for sources the user did not
+   substitute `{{skills_root}}` with the target repo root (the exemplars already spell
+   `{{skills_root}}/engine/<name>/<script or state file>` and
+   `{{skills_root}}/skills/<name>/SKILL.md`, so scripts, state, and routing files
+   resolve to `<repo>/engine/<name>/`, where the scripts read and write them, and
+   skill references to `<repo>/skills/<name>/`), remove steps for sources the user did not
    select, and encode the accepted non-negotiables and the no-nudge list in a
    `## Guardrails` section. Frontmatter must carry `derived-from: <exemplar name>` and a
    `description` that keeps the exemplar's trigger phrases. Skip anything whose
-   prerequisite was not detected.
+   prerequisite was not detected. In every derived file (these skills, `DECISIONS.md`,
+   the vault documents, the routing configs) write `{{vault_root}}` and `{{skills_root}}`
+   in home-relative form (`~/Vault`, `~/atlas`) whenever the root lies under the home
+   directory; only the config, the kickoff, the runbook, and scheduler files hold the
+   expanded roots (template section 10).
 4. **Routing configs.** For each selected source with a config, copy
    `exemplars/configs/<file>.example.<ext>` to `<repo>/engine/<script-dir>/<file>.<ext>`, next
    to the script that reads it (`atlas-github-ingest/github-repos.yaml`,
@@ -250,9 +259,20 @@ no-nudge list. Write the config and DECISIONS yourself first so subagents can re
    `ATLAS_CONFIG=<repo>/atlas.config.json`, printing `vault_root` and each folder path, to
    prove the config resolves.
 3. Check every generated `SKILL.md` has `derived-from` naming an exemplar that exists.
-4. Run the scrub self-check on the generated tree from the plugin's `docs/SCRUB-RULES.md`
-   if present; the user's own names are expected in their repo, so this only catches
-   maintainer identifiers leaking from an exemplar.
+4. Scrub self-check over the generated tree, adapted from section 7 of the plugin's
+   `docs/SCRUB-RULES.md` (skip and say so if that file is absent). Two classes of file:
+   **derived** files came from an exemplar, a vault template, or the scaffold
+   (`skills/*/SKILL.md`, `docs/DECISIONS.md`, the routing configs under `engine/<dir>/`,
+   the vault's `AGENTS.md` and guides, `{{folders.meta}}/Templates/`, the plugin
+   checklist, `.obsidian/`); the **user's own** files hold their absolute roots on
+   purpose (`atlas.config.json` and its `~/.config/atlas/` copy, `docs/ATLAS-KICKOFF.md`,
+   `docs/RUNBOOK.md`, `schedulers/`, `README.md`). Check both classes against the
+   banned-name and identifier categories (section 7 rules 1 and 2); the user's own name,
+   employer, and domain are expected in their repo and are not banned. Apply the
+   home-path rule (an expanded macOS or Linux home prefix, or a local-file URL) to
+   derived files only: they carry `~/...` roots by construction, so a hit there is a leak from an exemplar or a
+   substitution done wrong. The repo gate's maintainer-specific home-relative patterns
+   and the user's own absolute paths never fail this step.
 5. Print the report: files generated by category with paths; capabilities blocked and why;
    and the manual steps that remain. Installing Obsidian community plugins is always
    manual: say so plainly and point at the checklist in the vault. Scheduler steps that

@@ -14,7 +14,7 @@ You bootstrap and maintain the owner's People CRM. Every person who has appeared
 
 The vault uses wikilink-based people attribution (DEC-003). Meetings reference people as `[[Person-Name]]`, not raw emails. To make those wikilinks resolve, every person needs a `{{folders.crm}}/People/<First-Last>.md` page, even an empty stub.
 
-The source of truth for "who is a person" is the `attendees:` (legacy) or `attendee_emails:` (current) frontmatter field on meeting notes in `{{folders.projects}}/` and `{{folders.areas}}/`. Every unique email there becomes one person note.
+The source of truth for "who is a person" is the `attendee_emails:` frontmatter field on meeting notes in `{{folders.projects}}/` and `{{folders.areas}}/` (the script also accepts the legacy email list under `attendees` from notes written before the migration to `participants:`). Every unique email there becomes one person note.
 
 **The skill bootstraps the tier signal but does not curate.** It assigns an initial tier from mention count and inserts a Tier-1 dossier skeleton on first promotion, but the actual personality (Bio prose, role notes, decision-style observations) is the owner's to write. Owner-curated body content is preserved verbatim across every re-run.
 
@@ -22,7 +22,7 @@ The source of truth for "who is a person" is the `attendees:` (legacy) or `atten
 
 ### 1. Walk the meeting corpus
 
-Scan `{{vault_root}}/{{folders.projects}}/**/*.md` and `{{vault_root}}/{{folders.areas}}/**/*.md`. For each markdown file with a YAML frontmatter block, extract the `attendees:` list (or `attendee_emails:` if migrated). Skip any file without a parseable frontmatter.
+Scan `{{vault_root}}/{{folders.projects}}/**/*.md` and `{{vault_root}}/{{folders.areas}}/**/*.md`. For each markdown file with a YAML frontmatter block, extract the `attendee_emails:` list (or the legacy `attendees` email list on unmigrated notes). Skip any file without a parseable frontmatter.
 
 Skip role addresses (`accounting@`, `billing@`, `support@`, `info@`, `hello@`, `team@`, `admin@`, `office@`, `sales@`, `contact@`, `noreply@`, `no-reply@`); these are not individual people.
 
@@ -99,7 +99,7 @@ Schema matches `{{folders.meta}}/Templates/Person-Note.md`; a person note create
 
 ### 6. Write the per-run summary
 
-After the walk completes, write `{{skills_root}}/atlas-people-extract/last-run.md` with:
+After the walk completes, write `{{skills_root}}/engine/atlas-people-extract/last-run.md` with:
 
 - Timestamp.
 - Mode (`execute` vs `dry-run`).

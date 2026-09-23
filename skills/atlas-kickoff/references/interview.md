@@ -14,10 +14,18 @@ can pick one in a word. Free-text is always allowed.
 
 - **Question:** "What should generated notes and briefings call you? (One name or a
   short handle. Used only inside your vault.)"
-- **Feeds:** `owner_name` in the config; `{{owner_name}}` in vault templates.
+- **Feeds:** `owner_name` in the config; `{{owner_name}}` in vault templates. Also
+  `{{owner_slug}}`, which is derived, never asked: the name in kebab-case with its
+  capitalization kept (`Jordan Vale` → `Jordan-Vale`), the same rule
+  `atlas-people-extract` uses for person-note filenames, so the owner's own person note
+  and `[[{{owner_slug}}]]` wikilinks resolve.
 - **Follow-up if vague:** none needed; any string works. If empty, use the system
   username and say so.
 - **Default:** the login name from `whoami`, offered for confirmation.
+
+Not asked in any round: `{{skills_root}}` is the target repo root from the invocation
+(`--repo <path>`, else the directory the skill runs in), recorded in the kickoff's §2.
+The interview never asks for a path the diagnostic already has.
 
 ### 1.2 Mission
 
@@ -66,7 +74,7 @@ can pick one in a word. Free-text is always allowed.
   | archive | `50 - Archive` | finished projects and retired areas |
   | meta | `60 - Meta` | templates, dashboards, the vault's own docs |
   | attachments | `99 - Attachments` | binary files |
-  | crm | `CRM` | person notes |
+  | crm | `CRM` | parent of the fixed `People/` subfolder that holds person notes |
   | clippings | `Clippings` | web clips |
   | raw | `raw` | append-only ingested source records |
   | wiki | `wiki` | regenerated entity, concept, and synthesis pages |
@@ -74,7 +82,10 @@ can pick one in a word. Free-text is always allowed.
 - **Feeds:** every `folders.<key>` in the config.
 - **Follow-up if vague:** for any key the user drops ("I don't use CRM"), keep the key
   with the default name and tell them the folder is created empty only if a selected
-  capability writes to it. Keys are not optional; names are.
+  capability writes to it. Keys are not optional; names are. If the user names `crm`
+  `People`, say that person notes land at `<crm>/People/` (the subfolder is an engine
+  convention, not configurable), so that name would produce `People/People/`; propose
+  `CRM` or `Contacts` for the parent instead.
 - **Default:** the table as shown for the numbered scheme; the same names without
   prefixes for the plain scheme; for Zettelkasten, `notes/` for projects, areas, and
   resources with a `type:` frontmatter field, and the rest unchanged.
@@ -99,10 +110,35 @@ can pick one in a word. Free-text is always allowed.
   dictation) on; MCP-backed sources off until named, because they write a lot on the
   first run.
 
+### 2.2a Owner email (optional; follow-up when meetings or email are picked)
+
+- **Question:** "Which email address is yours in meeting invites and mail? Leave blank
+  to skip." Asked in the same follow-up call as the routing questions, only when a
+  meeting or email source was picked; otherwise skipped and left blank.
+- **Feeds:** `owner_email` in the config; `{{owner_email}}` in the meeting-routing
+  owner fallback and wherever an exemplar must match the owner's own address.
+- **Follow-up if vague:** none. A blank answer writes `{{fill-me}}` at each use and a
+  line in manual steps; nothing else depends on it.
+- **Default:** blank.
+
+### 2.2b Employer and email domain (optional; same follow-up)
+
+- **Question:** "Your organization's name and its email domain, for telling internal
+  meetings and mail from client ones (for example `Harbor Lane Analytics`,
+  `harborlane.example`). Leave blank to skip." Asked with 2.2a, under the same
+  condition.
+- **Feeds:** `employer` and `employer_domain` in the config; `{{employer}}` and
+  `{{employer_domain}}` in the meeting and mailbox routing configs (the internal-domain
+  rules) and in the exemplars' prose about internal meetings.
+- **Follow-up if vague:** a name without a domain gets "What comes after the @ in your
+  work address?"; a domain without a name is fine (use the domain's label as the name
+  and say so). Blank writes `{{fill-me}}` at each use and a line in manual steps.
+- **Default:** blank.
+
 ### 2.3 Capabilities beyond ingest
 
-- **Question:** "The knowledge spine (materialize, emerge, graduate, synthesize, lint, health,
-  research, distill) is on by default. Which of these do you also want? Morning
+- **Question:** "The knowledge spine (people-extract, materialize, emerge, graduate,
+  synthesize, lint, health, research, distill) is on by default. Which of these do you also want? Morning
   briefing into the daily note; weekly review note; nightly orchestrator (runs all
   ingests in order); book summaries; a reflection practice folder that is never
   scheduled."

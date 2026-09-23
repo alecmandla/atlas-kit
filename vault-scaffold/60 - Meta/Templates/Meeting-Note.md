@@ -1,7 +1,8 @@
 <%*
 // Meeting note. The meetings ingest writes notes in this shape automatically; use the
 // template by hand for meetings that were not recorded. Keep the frontmatter keys: the
-// entity and people layers read `attendees`, `client`, and `date`.
+// entity and people layers read `participants` ([[First-Last]] wikilinks), `attendee_emails`
+// (the raw addresses the people extractor resolves), `client`, and `date`.
 const title = await tp.system.prompt("Meeting title");
 const date = tp.date.now("YYYY-MM-DD");
 await tp.file.rename(date + " " + title);
@@ -10,7 +11,8 @@ await tp.file.rename(date + " " + title);
 type: meeting
 date: <% date %>
 title: "<% title %>"
-attendees: []
+participants: []
+attendee_emails: []
 client: 
 project: 
 meeting_id: 
@@ -21,7 +23,7 @@ tags: [meeting]
 # <% title %>
 
 **Date:** <% date %>
-**Attendees:** 
+**Participants:** 
 
 ## Summary
 

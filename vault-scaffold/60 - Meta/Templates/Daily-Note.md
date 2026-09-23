@@ -1,7 +1,8 @@
 <%*
 // Daily note. Filename is the date (YYYY-MM-DD); Periodic Notes or the core Daily
 // notes plugin creates it. The morning and nightly skills append their report sections
-// under the headings below and never touch anything else in this file.
+// under the headings below and never touch anything else in this file. Scratch stays the
+// last section: the morning skill inserts its report ahead of it when the heading is missing.
 const d = tp.date.now("YYYY-MM-DD", 0, tp.file.title, "YYYY-MM-DD");
 -%>
 ---
@@ -33,3 +34,7 @@ tags: [daily]
 ## Atlas nightly report
 
 *Written by the nightly skill. Leave the heading in place.*
+
+## Scratch
+
+- 

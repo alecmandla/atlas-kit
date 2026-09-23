@@ -40,12 +40,12 @@ recipient's interview answers and `atlas.config.json`.
 | Placeholder | Meaning |
 |---|---|
 | `{{owner_name}}` | The vault owner's display name, e.g. `Jordan Vale`. |
-| `{{owner_slug}}` | Derived: `{{owner_name}}` in `First-Last` form, used for the owner's own person note and wikilink (`[[{{owner_slug}}]]`). |
-| `{{owner_email}}` | The owner's primary address. Used only where a real address must be matched (the meeting-routing owner fallback). |
-| `{{employer}}` | The owner's organization name. |
-| `{{employer_domain}}` | The organization's email domain, no `@`. |
+| `{{owner_slug}}` | Derived, never asked: `{{owner_name}}` in kebab-case with its capitalization kept (`Jordan Vale` → `Jordan-Vale`), the rule `atlas-people-extract` uses for person-note filenames. Used for the owner's own person note and wikilink (`[[{{owner_slug}}]]`). |
+| `{{owner_email}}` | The owner's primary address, from the optional interview follow-up (2.2a). Used only where a real address must be matched (the meeting-routing owner fallback). Blank in the interview means `{{fill-me}}` at each use. |
+| `{{employer}}` | The owner's organization name, from the optional follow-up (2.2b). Blank means `{{fill-me}}` at each use. |
+| `{{employer_domain}}` | The organization's email domain, no `@`, from the same follow-up. Blank means `{{fill-me}}` at each use. |
 | `{{vault_root}}` | Absolute path of the Obsidian vault. |
-| `{{skills_root}}` | Absolute path of the directory holding the generated `atlas-*` skill folders. |
+| `{{skills_root}}` | The target repo root, taken from the kickoff invocation (`--repo <path>`, else the directory `/atlas-kickoff` runs in); never asked in the interview. Under it, `skills/<name>/SKILL.md` holds each generated skill and `engine/<name>/` holds that skill's scripts together with their state files (`state.json`, `last-run.md`, `logs/`) and routing configs. Exemplars always spell out which half they mean: `{{skills_root}}/engine/<name>/...` or `{{skills_root}}/skills/<name>/SKILL.md`. |
 | `{{timezone}}` | IANA timezone, e.g. `America/Chicago`. |
 | `{{folders.inbox}}` | Folder name for unrouted captures (default `00 - Inbox`). |
 | `{{folders.daily}}` | Daily notes (default `10 - Daily Notes`). |
@@ -55,7 +55,7 @@ recipient's interview answers and `atlas.config.json`.
 | `{{folders.archive}}` | PARA archive (default `50 - Archive`). |
 | `{{folders.meta}}` | Vault-about-the-vault (default `60 - Meta`). |
 | `{{folders.attachments}}` | Binary assets (default `99 - Attachments`). |
-| `{{folders.crm}}` | People CRM (default `CRM`). |
+| `{{folders.crm}}` | Parent of the People CRM (default `CRM`). Person notes live in the fixed `People/` subfolder beneath it (`{{folders.crm}}/People/<First-Last>.md`), so the value names the parent, never `People` itself. |
 | `{{folders.clippings}}` | Web-clipper inbox (default `Clippings`). |
 | `{{folders.raw}}` | Append-only source layer (default `raw`). |
 | `{{folders.wiki}}` | Materialized wiki layer (default `wiki`). |
@@ -68,8 +68,13 @@ Rules of use:
   defaults belong to the config layer, not the prose.
 - Subfolders below the placeholder (`Clients/`, `Dashboards/`, `MOCs/`, `Templates/`,
   `People/`, `needs-decision/`) are part of the design and stay literal.
-- Skill-local files (`state.json`, `last-run.md`, `suppress.txt`) are written as
-  `{{skills_root}}/<skill-name>/<file>`.
+- Script invocations are written as `python3 {{skills_root}}/engine/<skill-name>/<script>.py`,
+  and skill-local files (`state.json`, `last-run.md`, `suppress.txt`, routing configs)
+  as `{{skills_root}}/engine/<skill-name>/<file>`, because that is where the scripts
+  read and write them. Session-only skills (morning, weekly, health, nightly) write
+  their `last-run.md` under `{{skills_root}}/engine/<skill-name>/` too, so every skill's
+  state lives in one place. A reference to another skill's instructions is
+  `{{skills_root}}/skills/<skill-name>/SKILL.md`.
 - A placeholder inside a fenced code block is still a placeholder; the kickoff
   substitutes inside code blocks too.
 - The kickoff substitutes **only** the tokens in the table above. Any other
@@ -236,6 +241,11 @@ Save it as `scripts/scrub-gate.sh` in your own checkout if you like; the
 repository does not ship it as a file so the section above stays the single
 authoritative copy.
 
-The kickoff skill runs the same gate over its generated output before handing
-it to the recipient, with the recipient's own name, employer, and domain added
-to their local pattern file.
+The kickoff skill runs an adapted gate over its generated output before handing
+it to the recipient (its `SKILL.md`, Phase 5 step 4): rules 1 and 2 over every
+generated file, where the recipient's own name, employer, and domain are
+expected and not banned; rule 3, as `/Users/`, `/home/`, and `file:///`, only
+over files derived from an exemplar, a vault template, or the scaffold, which
+carry `~/...` roots by construction. The recipient's own `atlas.config.json`,
+kickoff, runbook, and scheduler files hold their absolute roots on purpose and
+are never checked for paths.

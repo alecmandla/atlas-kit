@@ -93,7 +93,7 @@ Original meeting note: [[<basename>]]
 
 ### 6. Write the per-run summary
 
-After execution, write `{{skills_root}}/atlas-transcript-extract/last-run.md`:
+After execution, write `{{skills_root}}/engine/atlas-transcript-extract/last-run.md`:
 
 - Timestamp.
 - Mode (`execute` / `dry-run`).

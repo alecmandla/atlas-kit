@@ -14,7 +14,7 @@ You are the nightly orchestration agent. You run once per day at 22:00 local (DE
 2. After ingests, run `atlas-wiki-materialize`, `atlas-emerge`, then `atlas-auto-graduate` (DEC-019).
 3. Capture each sub-skill's outcome (success / failure with stack trace).
 4. Append an "Atlas nightly report" section to today's daily note.
-5. Write a per-run summary at `{{skills_root}}/atlas-nightly/last-run.md`.
+5. Write a per-run summary at `{{skills_root}}/engine/atlas-nightly/last-run.md`.
 
 Sub-skill failures are **captured**, not propagated. The chain continues regardless. This invariant is load-bearing: failure of one sub-skill inside `atlas-nightly` does NOT block the other sub-skills.
 
@@ -24,17 +24,17 @@ Sub-skill failures are **captured**, not propagated. The chain continues regardl
 
 | # | Sub-skill | SKILL.md path | What it produces |
 |---|---|---|---|
-| 1 | `atlas-fireflies-ingest` | `{{skills_root}}/atlas-fireflies-ingest/SKILL.md` | Routes new Fireflies meeting markdown into PARA folders |
-| 2 | `atlas-wispr-ingest` | `{{skills_root}}/atlas-wispr-ingest/SKILL.md` | `{{folders.raw}}/wispr/<id>.md` from Wispr SQLite |
-| 3 | `atlas-wispr-meetings-ingest` | `{{skills_root}}/atlas-wispr-meetings-ingest/SKILL.md` | `{{folders.raw}}/wispr/meetings/<date>-<slug>-<id8>.md` — Wispr Notetaker meetings: the owner's notes + full transcript |
-| 4 | `atlas-claude-history-ingest` | `{{skills_root}}/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |
-| 5 | `atlas-github-ingest` | `{{skills_root}}/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |
-| 6 | `atlas-gmail-ingest` | `{{skills_root}}/atlas-gmail-ingest/SKILL.md` | `{{folders.raw}}/gmail/<route>/<id>.md` |
-| 7 | `atlas-slack-ingest` | `{{skills_root}}/atlas-slack-ingest/SKILL.md` | `{{folders.raw}}/slack/<channel>/<ts>.md` |
-| 8 | `atlas-monday-ingest` | `{{skills_root}}/atlas-monday-ingest/SKILL.md` | `{{folders.raw}}/monday/<workspace>/<board>/<item>.md` |
-| 9 | `atlas-wiki-materialize` | `{{skills_root}}/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |
-| 10 | `atlas-emerge` | `{{skills_root}}/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |
-| 11 | `atlas-auto-graduate` | `{{skills_root}}/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |
+| 1 | `atlas-fireflies-ingest` | `{{skills_root}}/skills/atlas-fireflies-ingest/SKILL.md` | Routes new Fireflies meeting markdown into PARA folders |
+| 2 | `atlas-wispr-ingest` | `{{skills_root}}/skills/atlas-wispr-ingest/SKILL.md` | `{{folders.raw}}/wispr/<id>.md` from Wispr SQLite |
+| 3 | `atlas-wispr-meetings-ingest` | `{{skills_root}}/skills/atlas-wispr-meetings-ingest/SKILL.md` | `{{folders.raw}}/wispr/meetings/<date>-<slug>-<id8>.md` — Wispr Notetaker meetings: the owner's notes + full transcript |
+| 4 | `atlas-claude-history-ingest` | `{{skills_root}}/skills/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |
+| 5 | `atlas-github-ingest` | `{{skills_root}}/skills/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |
+| 6 | `atlas-gmail-ingest` | `{{skills_root}}/skills/atlas-gmail-ingest/SKILL.md` | `{{folders.raw}}/gmail/<route>/<id>.md` |
+| 7 | `atlas-slack-ingest` | `{{skills_root}}/skills/atlas-slack-ingest/SKILL.md` | `{{folders.raw}}/slack/<channel>/<ts>.md` |
+| 8 | `atlas-monday-ingest` | `{{skills_root}}/skills/atlas-monday-ingest/SKILL.md` | `{{folders.raw}}/monday/<workspace>/<board>/<item>.md` |
+| 9 | `atlas-wiki-materialize` | `{{skills_root}}/skills/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |
+| 10 | `atlas-emerge` | `{{skills_root}}/skills/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |
+| 11 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |
 
 If the owner also runs `atlas-apple-notes-ingest` and `atlas-voice-memos-ingest`, they slot in after step 8 and before step 9, in that order; both are soft-skip ingests and follow the same capture-not-abort contract.
 
@@ -45,7 +45,7 @@ few seconds. Concurrent nightly chains race on state files and the daily-note
 section edit, so the whole chain is mutual-exclusive:
 
 ```bash
-python3 {{skills_root}}/atlas-nightly/lock.py acquire
+python3 {{skills_root}}/engine/atlas-nightly/lock.py acquire
 ```
 
 - **Exit 0** — you hold the lock; proceed to Step 1.
@@ -69,7 +69,7 @@ For each sub-skill in the table above:
 
 1. Record `started_at = now()`.
 2. Read its SKILL.md.
-3. Execute the skill's documented invocation. **Flags are NOT uniform across skills — use the table in "Sub-skill invocation patterns" below, do not assume `--incremental` exists.** In brief: every Python ingest takes `--execute`; only `atlas-wispr-ingest` and `atlas-wispr-meetings-ingest` also accept `--incremental`; `wiki-materialize` defaults to dry-run and REQUIRES `--execute`; `emerge` writes by default and takes no flags; `atlas-auto-graduate` is `python3 {{skills_root}}/atlas-graduate/auto_graduate.py --execute`, which must run AFTER `emerge` since it consumes the freshly-written `Emerging-Patterns.md`.
+3. Execute the skill's documented invocation. **Flags are NOT uniform across skills — use the table in "Sub-skill invocation patterns" below, do not assume `--incremental` exists.** In brief: every Python ingest takes `--execute`; only `atlas-wispr-ingest` and `atlas-wispr-meetings-ingest` also accept `--incremental`; `wiki-materialize` defaults to dry-run and REQUIRES `--execute`; `emerge` writes by default and takes no flags; `atlas-auto-graduate` is `python3 {{skills_root}}/engine/atlas-graduate/auto_graduate.py --execute`, which must run AFTER `emerge` since it consumes the freshly-written `Emerging-Patterns.md`.
 4. Catch any error (subprocess non-zero exit, exception, missing dependency). On failure:
    - Capture the stack trace / stderr.
    - Set `status = "failed"`.
@@ -101,11 +101,11 @@ Where a skill doesn't have a Python entry point (e.g. it's instruction-only), fo
 
 ### Output capture conventions
 
-- **stdout**: capture last 200 lines per skill to `{{skills_root}}/atlas-nightly/logs/<TODAY>/<skill>.stdout.log`.
-- **stderr**: full capture to `{{skills_root}}/atlas-nightly/logs/<TODAY>/<skill>.stderr.log`.
+- **stdout**: capture last 200 lines per skill to `{{skills_root}}/engine/atlas-nightly/logs/<TODAY>/<skill>.stdout.log`.
+- **stderr**: full capture to `{{skills_root}}/engine/atlas-nightly/logs/<TODAY>/<skill>.stderr.log`.
 - **last-run.md from each sub-skill**: read and inspect for the `files_written:` / similar field; surface in the report.
 
-`mkdir -p {{skills_root}}/atlas-nightly/logs/<TODAY>/` before running.
+`mkdir -p {{skills_root}}/engine/atlas-nightly/logs/<TODAY>/` before running.
 
 ## Step 3 — Build the nightly report
 
@@ -132,7 +132,7 @@ After all sub-skills have run, build the report markdown:
 
 ### Failures
 
-- `atlas-github-ingest` — `429 Too Many Requests` on commits endpoint. Stack trace at `{{skills_root}}/atlas-nightly/logs/<TODAY>/atlas-github-ingest.stderr.log`. Retry next run.
+- `atlas-github-ingest` — `429 Too Many Requests` on commits endpoint. Stack trace at `{{skills_root}}/engine/atlas-nightly/logs/<TODAY>/atlas-github-ingest.stderr.log`. Retry next run.
 
 ### Summary
 
@@ -176,12 +176,12 @@ failed (failures are captured, and a held lock would block the next run until
 the stale timeout):
 
 ```bash
-python3 {{skills_root}}/atlas-nightly/lock.py release
+python3 {{skills_root}}/engine/atlas-nightly/lock.py release
 ```
 
 Then write last-run.md.
 
-`{{skills_root}}/atlas-nightly/last-run.md`:
+`{{skills_root}}/engine/atlas-nightly/last-run.md`:
 
 ```markdown
 # atlas-nightly — last run
@@ -198,7 +198,7 @@ Then write last-run.md.
 - failures:
   - skill: atlas-github-ingest
     error: "429 Too Many Requests"
-    log: {{skills_root}}/atlas-nightly/logs/<TODAY>/atlas-github-ingest.stderr.log
+    log: {{skills_root}}/engine/atlas-nightly/logs/<TODAY>/atlas-github-ingest.stderr.log
 ```
 
 ## Idempotency contract

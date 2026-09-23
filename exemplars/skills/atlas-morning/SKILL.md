@@ -185,7 +185,7 @@ Replace everything from `## Atlas morning report` to the next `## ` heading (or 
 
 ## Step 5 — Write last-run summary
 
-`{{skills_root}}/atlas-morning/last-run.md`:
+`{{skills_root}}/engine/atlas-morning/last-run.md`:
 
 ```markdown
 # atlas-morning — last run
@@ -224,7 +224,7 @@ When invoked manually (via Claude Code):
 3. Report: daily note path, whether note was created or already existed, counts for each list, any errors.
 
 When invoked by the scheduled task:
-- The scheduled task fires a Claude Code session with the prompt: `"Run atlas-morning — execute Steps 1–5 in {{skills_root}}/atlas-morning/SKILL.md."` (registered via DEC-008 / `mcp__scheduled-tasks__create_scheduled_task`).
+- The scheduled task fires a Claude Code session with the prompt: `"Run atlas-morning — execute Steps 1–5 in {{skills_root}}/skills/atlas-morning/SKILL.md."` (registered via DEC-008 / `mcp__scheduled-tasks__create_scheduled_task`).
 - The skill runs unattended; results appear in the daily note and `last-run.md`.
 
 ## Schedule

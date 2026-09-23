@@ -6,9 +6,9 @@ a scheduled task 10-16 times in a few seconds on wake-from-sleep. Concurrent
 nightly chains race on state files and daily-note section edits. This lock makes
 step 0 of atlas-nightly mutual-exclusive:
 
-    python3 <skills_root>/atlas-nightly/lock.py acquire   # exit 0 = you hold it
-    python3 <skills_root>/atlas-nightly/lock.py release
-    python3 <skills_root>/atlas-nightly/lock.py status
+    python3 <repo>/engine/atlas-nightly/lock.py acquire   # exit 0 = you hold it
+    python3 <repo>/engine/atlas-nightly/lock.py release
+    python3 <repo>/engine/atlas-nightly/lock.py status
 
 `acquire` exits 1 (and prints the holder's age) when a fresh lock is held —
 the caller must STOP and report "another nightly run is in progress", never

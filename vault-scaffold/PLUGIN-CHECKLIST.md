@@ -20,8 +20,8 @@ mode (once), Browse, search the name, Install, then Enable.
 These are needed by at least one generated skill. Without them, templates render as
 raw code or the briefings cannot find today's note.
 
-- [ ] **Templater** (`templater-obsidian`) — the daily, meeting, person, and project
-  templates use its syntax; folder templates apply the project and person templates
+- [ ] **Templater** (`templater-obsidian`) — the daily, meeting, person, project, and
+  weekly-review templates use its syntax; folder templates apply the project and person templates
   automatically.
 - [ ] **Dataview** (`dataview`) — the project and person templates and the dashboards
   embed Dataview queries.
@@ -44,7 +44,6 @@ Nothing breaks without these. Each helps one capability or is a convenience.
   graduated pattern gets a better name.
 - [ ] **Omnisearch** (`omnisearch`) — better full-text search when checking a research
   answer by hand.
-- [ ] **Chronos Timeline** (`chronos`) — timeline blocks in project notes. Visual only.
 - [ ] Core: **Bases** — table views over frontmatter, a lighter alternative to Dataview
   for simple lists.
 
@@ -56,7 +55,7 @@ Nothing breaks without these. Each helps one capability or is a convenience.
 - [ ] Open Settings, Periodic Notes, and confirm the daily-note folder and template
   paths point into your daily-notes and templates folders.
 - [ ] Create a new daily note (Command palette, "Open today's daily note"). It should
-  contain the Focus, Notes, Tasks, and two Atlas report headings.
+  contain the Focus, Notes, Tasks, two Atlas report, and Scratch headings.
 - [ ] Create a note inside the projects folder. Templater should apply the project
   template on its own; if not, Settings, Templater, Folder templates, check the mapping.
 

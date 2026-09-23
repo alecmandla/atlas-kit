@@ -83,7 +83,7 @@ Everything produced here goes in the `## Personal Connections` and `## Implement
 Show the owner the proposal: title, slug, depth, the people/projects/threads you'll link, and the source count. On confirmation (skip confirmation only for an explicit one-shot or scheduled run), call the helper to write the note:
 
 ```bash
-python3 {{skills_root}}/atlas-book-summary/book_summary.py --execute --input <spec.json>
+python3 {{skills_root}}/engine/atlas-book-summary/book_summary.py --execute --input <spec.json>
 # preview first with --dry-run; overwrite an existing note's generated region with --force
 ```
 
@@ -91,7 +91,7 @@ The agent does the judgment (research, verification, entity resolution, the pros
 
 ### 7. Record state
 
-The helper writes `{{skills_root}}/atlas-book-summary/state.json` (slug ledger, keyed for dedup) and `last-run.md` (timestamp, book, depth, source count, entities linked/flagged).
+The helper writes `{{skills_root}}/engine/atlas-book-summary/state.json` (slug ledger, keyed for dedup) and `last-run.md` (timestamp, book, depth, source count, entities linked/flagged).
 
 ## Output format
 

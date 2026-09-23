@@ -24,7 +24,7 @@
     "meta": "60 - Meta",
     "_doc_attachments": "Binary attachments; excluded from linting and search.",
     "attachments": "99 - Attachments",
-    "_doc_crm": "People and organization records (CRM/People/).",
+    "_doc_crm": "Parent of the People CRM. Person notes live in the fixed People/ subfolder beneath it (CRM/People/), so name the parent, not People.",
     "crm": "CRM",
     "_doc_clippings": "Web clippings saved by the Obsidian Web Clipper.",
     "clippings": "Clippings",

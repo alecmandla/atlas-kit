@@ -82,7 +82,7 @@ score = distinct_items × source_diversity_multiplier
 source_diversity_multiplier = 1.0 + (distinct_source_types - 1) × 0.5
 ```
 
-Pick the top N (default `--top 25`). If fewer than 5 patterns survive, the `≥ 5 patterns` bar is unmet — surface that in the report's summary and in `last-run.md` so the owner can tune thresholds.
+Pick the top N (default `--top 25`). If fewer than `--min-patterns` survive (default 1; raise it once the corpus is large enough that a low count means the thresholds are too strict), `last-run.md` carries a diagnostic with the candidate and dedup counts so the owner can tune thresholds.
 
 ### 6. Write the report
 
@@ -124,7 +124,7 @@ This is a regenerated projection of recurring topics in `raw/` that don't yet ha
 ## Notes
 
 - Hand-edit nothing in this file — it's regenerated on every run.
-- To suppress a false-positive cluster permanently, add its slug to `{{skills_root}}/atlas-emerge/suppress.txt` (one slug per line).
+- To suppress a false-positive cluster permanently, add its slug to `{{skills_root}}/engine/atlas-emerge/suppress.txt` (one slug per line).
 - To force-promote a pattern to a tracked surface, run `/atlas-graduate <slug>`.
 ```
 
@@ -132,7 +132,7 @@ The "Graduate" column is a clickable Markdown link of the form `[Graduate](/atla
 
 ### 7. Write per-run summary
 
-`{{skills_root}}/atlas-emerge/last-run.md` captures one run's metadata:
+`{{skills_root}}/engine/atlas-emerge/last-run.md` captures one run's metadata:
 
 ```markdown
 # atlas-emerge — last run
@@ -145,11 +145,12 @@ The "Graduate" column is a clickable Markdown link of the form `[Graduate](/atla
 - candidates_after_dedup: <N>
 - patterns_surfaced: <N>
 - duration_seconds: <float>
-- ac_met: <true | false>  # `≥ 5 patterns` bar
+- min_patterns: <N>  # the `--min-patterns` value for this run
+- min_patterns_met: <true | false>
 - report_path: {{folders.meta}}/Dashboards/Emerging-Patterns.md
 ```
 
-If `ac_met: false`, log the candidate count + dedup count in the body so the owner can see whether the gap is "not enough signal" vs "thresholds too strict".
+If `min_patterns_met: false`, log the candidate count + dedup count in the body so the owner can see whether the gap is "not enough signal" vs "thresholds too strict".
 
 ## Invocation
 
@@ -175,7 +176,7 @@ python3 emerge.py --vault /tmp/test-vault --report-path /tmp/test-report.md
 Re-running on the same corpus must:
 
 - **Always overwrite** `Emerging-Patterns.md` — no appended content; same generation produces the same report.
-- **Never create** files outside `{{vault_root}}/{{folders.meta}}/Dashboards/Emerging-Patterns.md` and `{{skills_root}}/atlas-emerge/last-run.md`.
+- **Never create** files outside `{{vault_root}}/{{folders.meta}}/Dashboards/Emerging-Patterns.md` and `{{skills_root}}/engine/atlas-emerge/last-run.md`.
 - **Not write** to `{{folders.raw}}/` (read-only invariant per DEC-009).
 - **Not touch** `{{folders.wiki}}/concepts/` or `{{folders.wiki}}/entities/` — promotion is `atlas-graduate`'s job.
 
@@ -183,7 +184,7 @@ Verified mechanically: two consecutive `--execute` runs against an unchanged cor
 
 ## Edge cases
 
-- **Empty corpus** — fewer than 5 items in the window: skill writes a report with a `0 patterns surfaced` summary and exits 0. The `≥ 5 patterns` bar requires non-trivial corpus content; emit the diagnostic in `last-run.md` so the owner can adjust the window.
+- **Empty corpus** — too few items in the window to form a cluster: skill writes a report with a `0 patterns surfaced` summary and exits 0. Surfacing patterns needs non-trivial corpus content; the diagnostic in `last-run.md` tells the owner whether to widen the window or wait for more ingests.
 - **Mono-source cluster** — a phrase appears 10× in `raw/fireflies/` and nowhere else: surface only if cross-source diversity adds a multiplier. Mono-source clusters often reflect transcription noise.
 - **Known entity variants** — "Ledgerline Cloud" and "ledgerline-cloud" both deny-listed under canonical_id `ledgerline-cloud`. Fuzzy comparison: lowercase, drop hyphens/spaces, prefix match.
 - **Stop-word collisions** — phrases that contain stopwords are kept if they're multi-token and the non-stopword part is meaningful (`rate plan audit` keeps `audit`; `the meeting today` is dropped).
@@ -191,7 +192,7 @@ Verified mechanically: two consecutive `--execute` runs against an unchanged cor
 
 ## Suppression list
 
-Maintain `{{skills_root}}/atlas-emerge/suppress.txt`:
+Maintain `{{skills_root}}/engine/atlas-emerge/suppress.txt`:
 
 - One kebab-slug per line.
 - Comments start with `#`.

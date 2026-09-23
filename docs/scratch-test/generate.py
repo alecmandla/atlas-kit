@@ -7,10 +7,10 @@ the target repo and the vault given on the command line.
 
     python3 generate.py --kit <atlas-kit root> --repo <target repo> --vault <vault> [--as-written]
 
---as-written follows the skill text literally where it disagrees with the engine
-(routing configs under <repo>/configs/, state paths under <repo>/skills/, every
-exemplars/vault/*.template dropped at the vault root). Without it, the harness applies the
-corrections the Track F fixes put into the kit. Every targeted edit asserts that its anchor
+--as-written follows the skill text literally where it disagreed with the engine before the
+Track F fixes (routing configs under <repo>/configs/, every exemplars/vault/*.template
+dropped at the vault root). Without it, the harness applies the corrections the fixes put
+into the kit. Every targeted edit asserts that its anchor
 text was found and prints EDIT-MISS otherwise, so exemplar drift becomes a finding.
 """
 from __future__ import annotations
@@ -40,7 +40,7 @@ PROFILE = {
     "folders": {
         "inbox": "Inbox", "daily": "Daily", "projects": "Projects", "areas": "Areas",
         "resources": "Resources", "archive": "Archive", "meta": "Meta",
-        "attachments": "Attachments", "crm": "People", "clippings": "Clippings",
+        "attachments": "Attachments", "crm": "CRM", "clippings": "Clippings",
         "raw": "raw", "wiki": "wiki",
     },
     "no_nudge": "Areas/Journal",
@@ -61,7 +61,7 @@ FOLDER_PURPOSE = {
     "archive": "finished projects and retired areas",
     "meta": "templates, dashboards, the vault's own docs",
     "attachments": "binary files",
-    "crm": "person notes",
+    "crm": "parent of the People/ subfolder that holds person notes",
     "clippings": "web clips",
     "raw": "append-only ingested source records",
     "wiki": "regenerated entity, concept, and synthesis pages",
@@ -71,6 +71,7 @@ FOLDER_PURPOSE = {
 SELECTED = [
     ("atlas-claude-history-ingest", "ingest", "~/.claude/projects/ non-empty (2 sessions in 1 project)", None, False),
     ("atlas-github-ingest", "ingest", "gh 2.96.0, `gh auth status` exit 0", "github-repos.yaml", False),
+    ("atlas-people-extract", "spine", "python3 3.11.7 (no meeting notes yet; writes nothing until they exist)", None, False),
     ("atlas-wiki-materialize", "spine", "python3 3.11.7", "entity_seeds.json", False),
     ("atlas-emerge", "spine", "python3 3.11.7", None, False),
     ("atlas-graduate", "spine", "python3 3.11.7", None, False),
@@ -80,7 +81,7 @@ SELECTED = [
     ("atlas-research", "query", "python3 3.11.7; ripgrep present (optional)", None, True),
     ("atlas-distill", "query", "python3 3.11.7", None, True),
     ("atlas-morning", "briefing", "daily-note template from the scaffold", None, True),
-    ("atlas-weekly", "briefing", "python3 3.11.7", None, True),
+    ("atlas-weekly", "briefing", "weekly-review template from the scaffold", None, True),
     ("atlas-nightly", "orchestrator", "2 ingests selected; scheduler = manual", None, True),
 ]
 BLOCKED = [
@@ -100,6 +101,7 @@ SCRIPT_JOBS = {
     # name -> (command from the repo root, writes, cadence)
     "atlas-claude-history-ingest": ("python3 engine/atlas-claude-history-ingest/ingest.py --execute", "raw/claude-history/<project>/<session>.md", "every evening (inside nightly)"),
     "atlas-github-ingest": ("python3 engine/atlas-github-ingest/ingest.py --execute --days 7", "raw/github/<owner>/<repo>/<kind>-<n>.md", "every evening (inside nightly)"),
+    "atlas-people-extract": ("python3 engine/atlas-people-extract/extract.py --execute", "CRM/People/<First-Last>.md stubs", "every evening, before materialize (once meeting notes exist)"),
     "atlas-wiki-materialize": ("python3 engine/atlas-wiki-materialize/materialize.py --execute", "wiki/entities/*.md, wiki/index.md", "every evening (inside nightly)"),
     "atlas-emerge": ("python3 engine/atlas-emerge/emerge.py", "Meta/Dashboards/Emerging-Patterns.md", "every evening, after materialize"),
     "atlas-graduate": ("python3 engine/atlas-graduate/auto_graduate.py --execute", "Meta/Dashboards/Thread-Review-Queue.md; graduated pages", "every evening, after emerge"),
@@ -131,6 +133,14 @@ def edit(text: str, old: str, new: str, label: str, regex: bool = False, count: 
     return out
 
 
+def home_rel(p: Path, home: Path) -> str:
+    """Home-relative form for derived files (template section 10); absolute when not under HOME."""
+    try:
+        return "~/" + p.relative_to(home).as_posix()
+    except ValueError:
+        return str(p)
+
+
 def fill(text: str, values: dict[str, str]) -> str:
     for k, v in values.items():
         text = text.replace("{{" + k + "}}", v)
@@ -148,14 +158,18 @@ def main() -> int:
     a = ap.parse_args()
     kit, repo, vault, home = a.kit.resolve(), a.repo.resolve(), a.vault.resolve(), a.home.resolve()
     F = PROFILE["folders"]
-    skills_root = repo / "skills"
+    skills_dir = repo / "skills"
     engine_root = repo / "engine"
 
+    # Values for derived files (skills, DECISIONS, vault documents): roots are home-relative.
+    # The kickoff document, config, and runbook hold the absolute roots (template section 10).
     values = {f"folders.{k}": v for k, v in F.items()}
     values.update({
         "owner_name": PROFILE["owner_name"], "owner_slug": PROFILE["owner_slug"],
-        "timezone": PROFILE["timezone"], "vault_root": str(vault),
-        "skills_root": str(skills_root), "repo_root": str(repo),
+        # left blank in the interview (no meeting or email source): every use becomes {{fill-me}}
+        "owner_email": "{{fill-me}}", "employer": "{{fill-me}}", "employer_domain": "{{fill-me}}",
+        "timezone": PROFILE["timezone"], "vault_root": home_rel(vault, home),
+        "skills_root": home_rel(repo, home), "repo_root": str(repo),
     })
 
     # ---------------------------------------------------------------- Phase 3: kickoff doc
@@ -224,11 +238,13 @@ def main() -> int:
         f"3. Fill every `{{{{fill-me}}}}` in `{cfg_dir}/github-repos.yaml` (owner, repo names).",
         "4. Full Disk Access: not needed (voice memos not selected).",
         f"5. Run the first job by hand (`python3 engine/atlas-claude-history-ingest/ingest.py --execute`) and check `{F['raw']}/claude-history/` and `engine/atlas-claude-history-ingest/last-run.md`, not the timestamp.",
-        f"6. The weekly review expects a `Weekly-Review.md` template under `{F['meta']}/Templates/`; the scaffold does not ship one. Create it before the first `/atlas-weekly` run.",
-        f"7. Reflection practice: `{PROFILE['no_nudge']}` is excluded from every nudge surface, but no practice skill was generated (see blocked list).",
+        f"6. Reflection practice: `{PROFILE['no_nudge']}` is excluded from every nudge surface, but no practice skill was generated (see blocked list).",
     ])
     kick = fill(body, {
         **values,
+        # the config block holds the raw values (blank when not given); the identity line says so in words
+        "owner_email": "", "employer": "", "employer_domain": "", "identity_extras": "not given",
+        "vault_root": str(vault), "skills_root": str(repo),
         "date": TODAY, "n_rounds": "3", "mission_paragraph": PROFILE["mission"],
         "vault_state": "existing, empty (0 top-level folders)", "layout_scheme": PROFILE["layout_scheme"],
         "runtime": "Claude Code CLI", "claude_cli_state": "claude 2.1.280 on PATH",
@@ -247,7 +263,8 @@ def main() -> int:
     print("phase3: docs/ATLAS-KICKOFF.md written; unresolved placeholders:", leftover or "none")
 
     # ---------------------------------------------------------------- Phase 4.1 config
-    config = {"vault_root": str(vault), "owner_name": PROFILE["owner_name"], "timezone": PROFILE["timezone"], "folders": F}
+    config = {"vault_root": str(vault), "owner_name": PROFILE["owner_name"], "owner_email": "", "employer": "",
+              "employer_domain": "", "timezone": PROFILE["timezone"], "folders": F}
     (repo / "atlas.config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     user_cfg = home / ".config/atlas/config.json"
     if user_cfg.exists():
@@ -273,7 +290,6 @@ def main() -> int:
         f"8. Skip `{PROFILE['no_nudge']}/` when scanning for tasks, tags, threads, or activity; never list it, never wire it to a scheduler. (DEC-042)",
         "",
     ])
-    engine_files = r"(state\.json|last-run\.md|auto-graduate-last-run\.md|seen-ledger\.json|suppress\.txt|github-repos\.yaml|entity_seeds\.json|thread-vocab\.yml|logs/|\.run\.lock)"
     for name, *_ in SELECTED:
         src = (kit / "exemplars/skills" / name / "SKILL.md").read_text(encoding="utf-8")
         fm, rest = src.split("\n---\n", 1)
@@ -288,12 +304,10 @@ def main() -> int:
                 new_fm.append(l)
         new_fm.append("---")
         text = rest
-        # script invocations always point at the copied engine
-        text = re.sub(r"\{\{skills_root\}\}/(atlas-[a-z-]+)/([A-Za-z_]+\.py)", rf"{engine_root}/\1/\2", text)
-        if not a.as_written:
-            # state, routing, and suppression files live where the engine reads and writes them
-            text = re.sub(r"\{\{skills_root\}\}/(atlas-[a-z-]+)/" + engine_files, rf"{engine_root}/\1/\2", text)
-            text = text.replace("`last-run.md`", f"`{engine_root}/{name}/last-run.md`")
+        # {{skills_root}} is the repo root; the exemplars already say engine/<name>/ for scripts and
+        # state and skills/<name>/SKILL.md for skill references. Bare last-run.md mentions get the
+        # engine path too so every skill's state lives in one place.
+        text = text.replace("`last-run.md`", f"`{values['skills_root']}/engine/{name}/last-run.md`")
         # scheduler wording: manual runbook, no scheduled-tasks MCP
         text = re.sub(r"\(scheduled via `mcp__scheduled-tasks`\)", "(run by hand from `docs/RUNBOOK.md`; no scheduler is configured)", text)
         text = re.sub(r"scheduled via `mcp__scheduled-tasks`", "run by hand from `docs/RUNBOOK.md`; no scheduler is configured", text)
@@ -303,11 +317,11 @@ def main() -> int:
         if name == "atlas-nightly":
             text = edit(text, r"\| # \| Sub-skill \| SKILL\.md path \| What it produces \|\n\|---\|---\|---\|---\|\n(?:\|[^\n]*\n)+",
                         "| # | Sub-skill | SKILL.md path | What it produces |\n|---|---|---|---|\n"
-                        "| 1 | `atlas-claude-history-ingest` | `{{skills_root}}/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |\n"
-                        "| 2 | `atlas-github-ingest` | `{{skills_root}}/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |\n"
-                        "| 3 | `atlas-wiki-materialize` | `{{skills_root}}/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |\n"
-                        "| 4 | `atlas-emerge` | `{{skills_root}}/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |\n"
-                        f"| 5 | `atlas-auto-graduate` | `{engine_root}/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{{{folders.meta}}}}/Dashboards/Thread-Review-Queue.md` |\n",
+                        "| 1 | `atlas-claude-history-ingest` | `{{skills_root}}/skills/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |\n"
+                        "| 2 | `atlas-github-ingest` | `{{skills_root}}/skills/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |\n"
+                        "| 3 | `atlas-wiki-materialize` | `{{skills_root}}/skills/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |\n"
+                        "| 4 | `atlas-emerge` | `{{skills_root}}/skills/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |\n"
+                        "| 5 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |\n",
                         "nightly run-order table", regex=True)
             text = edit(text, r"\nIf the owner also runs `atlas-apple-notes-ingest`.*?contract\.\n", "\n", "nightly optional-ingests paragraph", regex=True)
             text = edit(text, "Run the eight ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")
@@ -354,7 +368,7 @@ def main() -> int:
         new_fm = [fill(l, values) for l in new_fm]
         text = text.replace("{{owner_slug}}", PROFILE["owner_slug"])
         out = "\n".join(new_fm) + "\n" + text.rstrip("\n") + "\n" + guardrails
-        d = skills_root / name
+        d = skills_dir / name
         d.mkdir(parents=True, exist_ok=True)
         (d / "SKILL.md").write_text(out, encoding="utf-8")
     print(f"phase4.3: {len(SELECTED)} skills written")
@@ -421,7 +435,8 @@ def main() -> int:
 
     # ---------------------------------------------------------------- Phase 4.6 plugin checklist
     chk = (scaffold / "PLUGIN-CHECKLIST.md").read_text(encoding="utf-8")
-    chk = edit(chk, r"- \[ \] \*\*Chronos Timeline\*\*[^\n]*\n", "", "checklist: prune Chronos (needed by no capability)", regex=True)
+    # Every plugin in the scaffold's list is needed by at least one capability the profile selects
+    # or is a listed convenience, so nothing is pruned for this profile.
     (vault / F["meta"] / "PLUGIN-CHECKLIST.md").write_text(chk, encoding="utf-8")
     print("phase4.6: plugin checklist written")
 
@@ -448,7 +463,7 @@ def main() -> int:
           "| When the emerging-patterns dashboard shows something real | graduate <slug> |\n\n## Jobs\n"]
     for name, (cmd, writes, cadence) in SESSION_JOBS.items():
         rb.append(f"\n### {name}\n- **Run:** in a Claude Code session here, `{cmd}`\n- **Writes:** {writes}\n"
-                  f"- **Verify:** the artifacts above; `{name}` records its run in `engine/{name}/last-run.md` only if it has a script\n- **Cadence:** {cadence}\n")
+                  f"- **Verify:** the artifacts above and `cat engine/{name}/last-run.md` (every job records its run there)\n- **Cadence:** {cadence}\n")
     for name, (cmd, writes, cadence) in SCRIPT_JOBS.items():
         rb.append(f"\n### {name}\n- **Run:** `{cmd}`\n- **Writes:** {writes}\n- **Verify:** `cat engine/{name}/last-run.md`\n- **Cadence:** {cadence}\n")
     (repo / "docs/RUNBOOK.md").write_text("".join(rb), encoding="utf-8")

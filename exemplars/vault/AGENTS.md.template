@@ -5,7 +5,7 @@ locked: true
 
 # AGENTS.md — Vault constitution
 
-> Stable constitution for any human or AI working **inside** `{{vault_root}}/`. For the skill-side rules (how each `atlas-*` skill behaves), see the `SKILL.md` in each folder under `{{skills_root}}/`. For locked decisions, see `docs/DECISIONS.md` in the skills repository.
+> Stable constitution for any human or AI working **inside** `{{vault_root}}/`. For the skill-side rules (how each `atlas-*` skill behaves), see the `SKILL.md` in each folder under `{{skills_root}}/skills/`. For locked decisions, see `docs/DECISIONS.md` in the skills repository.
 
 This file is tool-agnostic: it applies to any AI agent (Claude Code, Codex, Cursor, a chat assistant with an Obsidian plugin) and to {{owner_name}}. It governs the vault's contents, not the repository that builds the vault.
 

@@ -41,7 +41,7 @@ This skill is **narrative-first and hybrid**, exactly like `atlas-weekly`:
 ## Step 1 — Build the worklist
 
 ```bash
-python3 {{skills_root}}/atlas-synthesize/synthesize.py --list --stale-only
+python3 {{skills_root}}/engine/atlas-synthesize/synthesize.py --list --stale-only
 ```
 
 This prints one slug per line for every thread that is `new` (no synthesis page yet) or `changed` (evidence moved since last run). Run without `--stale-only` to see the full status table while debugging.
@@ -54,7 +54,7 @@ This prints one slug per line for every thread that is `new` (no synthesis page 
 For each slug in the worklist:
 
 ```bash
-python3 {{skills_root}}/atlas-synthesize/synthesize.py --thread <slug>
+python3 {{skills_root}}/engine/atlas-synthesize/synthesize.py --thread <slug>
 ```
 
 Read the bundle it prints:
@@ -134,7 +134,7 @@ _Hand-add corrections, context, and decisions here. Preserved across regeneratio
 
 ## Step 4 — Write `last-run.md`
 
-`{{skills_root}}/atlas-synthesize/last-run.md`:
+`{{skills_root}}/engine/atlas-synthesize/last-run.md`:
 
 ```markdown
 # atlas-synthesize — last run

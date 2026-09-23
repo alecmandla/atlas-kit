@@ -26,7 +26,7 @@ Stdlib only (DEC-021, no PyYAML — frontmatter is carried verbatim from the
 template with Templater date tokens substituted, never built from a dict).
 
 ```bash
-python3 {{skills_root}}/atlas-monk/monk_scaffold.py <flow> [--date YYYY-MM-DD] [--force] [--print] [--vault PATH]
+python3 {{skills_root}}/engine/atlas-monk/monk_scaffold.py <flow> [--date YYYY-MM-DD] [--force] [--print] [--vault PATH]
 ```
 
 | flow | writes | from template |
@@ -48,7 +48,7 @@ Filenames are name-suffixed (`-monk`, `-page`, `-Sunday`) to dodge the reserved 
 frontmatter (the orchestrating session decides the values, the helper writes them):
 
 ```bash
-python3 {{skills_root}}/atlas-monk/monk_scaffold.py month \
+python3 {{skills_root}}/engine/atlas-monk/monk_scaffold.py month \
   --label 2026-07 --start 2026-06-29 --end 2026-08-05 \
   --theme "Surrender" --title "Bridge month (Jun 29 - Aug 5, 2026) - Monthly focus"
 ```

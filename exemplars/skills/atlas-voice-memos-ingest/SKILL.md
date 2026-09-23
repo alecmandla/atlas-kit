@@ -102,7 +102,7 @@ type: raw-voice-memo
 ## Workflow
 
 ```bash
-cd {{skills_root}}/atlas-voice-memos-ingest
+cd {{skills_root}}/engine/atlas-voice-memos-ingest
 
 # Diagnose (runs the helper --doctor exactly as the ingest does):
 python3 ingest.py --doctor
