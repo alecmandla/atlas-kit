@@ -4,6 +4,28 @@ All notable changes to atlas-kit are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- `atlas-gemini-meetings-ingest`: exemplar skill and engine script for Google Meet's
+  "Notes by Gemini" documents. Lists the docs in Google Drive through the Drive MCP (or
+  reads a folder of markdown exports), and writes one `raw/gemini/meetings/` record per
+  meeting with the summary, decisions, next steps, details, quick notes, and attendee
+  emails. The transcript stays in the doc and is fetched on demand (DEC-032). Cross-links
+  to Fireflies and Wispr records of the same call. Rewrites a record when the doc changes.
+  Ships with a stdlib test suite. `atlas-nightly` runs it fourth, after the Wispr meetings
+  ingest; the kickoff catalog, engine README, and raw-layer READMEs list it.
+- `atlas-teams-meetings-ingest`: exemplar skill and engine script for Microsoft Teams
+  meeting transcripts. Reads exported `.vtt` and `.docx` files from the folders listed in
+  `teams-sources.json` (a download folder or a synced OneDrive Recordings folder), with no
+  MCP required, because Graph access to transcripts is off by default in most tenants.
+  Writes one `raw/teams/meetings/` record per meeting with the full transcript (an
+  explicit exception to DEC-032, since no API can be relied on to re-fetch it) and an
+  optional notes sidecar for a pasted Copilot recap. Cross-links to Fireflies, Wispr, and
+  Gemini records. Ships `exemplars/configs/teams-sources.example.json` and a stdlib test
+  suite. `atlas-nightly` runs it fifth.
+
 ## 0.1.0 - 2026-09-22
 
 First public release.

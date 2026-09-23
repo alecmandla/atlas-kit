@@ -94,6 +94,8 @@ BLOCKED = [
     ("atlas-apple-notes-ingest", "Apple Notes MCP not connected (declined)"),
     ("atlas-wispr-ingest", "no Wispr Flow store under ~/Library"),
     ("atlas-wispr-meetings-ingest", "no Wispr Flow store under ~/Library"),
+    ("atlas-gemini-meetings-ingest", "Google Drive MCP not connected (declined)"),
+    ("atlas-teams-meetings-ingest", "no Teams transcript folder (declined)"),
     ("atlas-voice-memos-ingest", "experimental; Full Disk Access not confirmed (declined)"),
     ("atlas-book-summary", "declined in the interview"),
     ("atlas-transcript-extract", "status: retired"),
@@ -327,7 +329,7 @@ def main() -> int:
                         "| 5 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |\n",
                         "nightly run-order table", regex=True)
             text = edit(text, r"\nIf the owner also runs `atlas-apple-notes-ingest`.*?contract\.\n", "\n", "nightly optional-ingests paragraph", regex=True)
-            text = edit(text, "Run the eight ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")
+            text = edit(text, "Run the ten ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")
             text = edit(text, r"\| Skill \| Nightly invocation \| Notes \|\n\|---\|---\|---\|\n(?:\|[^\n]*\n)+",
                         "| Skill | Nightly invocation | Notes |\n|---|---|---|\n"
                         "| `atlas-claude-history-ingest` | `ingest.py --execute` | also takes `--limit`; **no** `--incremental` |\n"
@@ -343,13 +345,13 @@ def main() -> int:
                         "| 4 | `atlas-emerge` | ok | 7s | 1 report | 12 patterns surfaced |\n"
                         "| 5 | `atlas-auto-graduate` | ok | 3s | 1 queue | 1 auto, 2 pending, 6 review |\n",
                         "nightly example report table", regex=True)
-            text = edit(text, "Sub-skills succeeded: <N> / 11", "Sub-skills succeeded: <N> / 5", "nightly succeeded count")
-            text = edit(text, "Sub-skills succeeded: 11 / 11", "Sub-skills succeeded: 5 / 5", "nightly idempotent count")
-            text = edit(text, "sub_skills_run: 11", "sub_skills_run: 5", "nightly last-run count")
-            text = edit(text, "each of the eight ingest skills", "both ingest skills", "nightly upstream wording")
-            text = edit(text, "sole nightly trigger for all eight ingests", "sole nightly trigger for both ingests", "nightly DEC-013 wording")
-            text = edit(text, "All eight run at 22:00, full stop (DEC-013).", "Both run at 22:00, full stop (DEC-013).", "nightly anti-goal wording")
-            new_fm = [l.replace("Runs all eight ingest skills (fireflies, wispr, wispr-meetings, claude-history, github, gmail, slack, monday)", "Runs the two selected ingests (claude-history, github)") for l in new_fm]
+            text = edit(text, "Sub-skills succeeded: <N> / 13", "Sub-skills succeeded: <N> / 5", "nightly succeeded count")
+            text = edit(text, "Sub-skills succeeded: 13 / 13", "Sub-skills succeeded: 5 / 5", "nightly idempotent count")
+            text = edit(text, "sub_skills_run: 13", "sub_skills_run: 5", "nightly last-run count")
+            text = edit(text, "each of the ten ingest skills", "both ingest skills", "nightly upstream wording")
+            text = edit(text, "sole nightly trigger for all ten ingests", "sole nightly trigger for both ingests", "nightly DEC-013 wording")
+            text = edit(text, "All ten run at 22:00, full stop (DEC-013).", "Both run at 22:00, full stop (DEC-013).", "nightly anti-goal wording")
+            new_fm = [l.replace("Runs all ten ingest skills (fireflies, wispr, wispr-meetings, gemini-meetings, teams-meetings, claude-history, github, gmail, slack, monday)", "Runs the two selected ingests (claude-history, github)") for l in new_fm]
         if name == "atlas-morning":
             text = edit(text, r"### 3a — Today's calendar\n.*?(?=### 3b)",
                         "### 3a — Today's calendar\n\nNo calendar source is configured for this vault (no meeting ingest, no dictation ingest, no calendar MCP). Write:\n\n```markdown\n### Today's calendar\n\n*(No calendar source configured.)*\n```\n\nIf a calendar source is connected later, re-run `/atlas-kickoff --resume` so this section is regenerated from the exemplar.\n\n",

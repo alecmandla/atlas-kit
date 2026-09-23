@@ -66,7 +66,8 @@ Two kinds of file live beside a script and neither is shipped here:
   `../exemplars/configs/`: `atlas-gmail-ingest/mailbox-routing.yaml`,
   `atlas-slack-ingest/slack-routing.yaml`, `atlas-monday-ingest/monday-boards.yaml`,
   `atlas-github-ingest/github-repos.yaml`,
-  `atlas-fireflies-ingest/meeting-routing.yaml`, and
+  `atlas-fireflies-ingest/meeting-routing.yaml`,
+  `atlas-teams-meetings-ingest/teams-sources.json`, and
   `atlas-wiki-materialize/entity_seeds.json`. `atlas-emerge/suppress.txt`
   (one slug per line) is optional.
 - **Runtime state**, which the scripts create: `state.json`, `last-run.md`,
@@ -97,6 +98,8 @@ prints the full flag list.
 | `atlas-claude-history-ingest/ingest.py` | `python3 ingest.py --execute [--limit N]` | reads `~/.claude/projects/` |
 | `atlas-wispr-ingest/ingest.py` | `python3 ingest.py --execute --incremental` | **macOS only**: reads the Wispr Flow SQLite store under `~/Library` |
 | `atlas-wispr-meetings-ingest/ingest.py` | `python3 ingest.py --execute --incremental` | **macOS only**: same store, meetings table |
+| `atlas-gemini-meetings-ingest/ingest.py` | `python3 ingest.py --print-query --incremental`, then `python3 ingest.py --input-json <doc.json>... --execute --incremental` (or `--input-dir <markdown exports>`) | `mcp/google-drive` lists and fetches the "Notes by Gemini" docs; no config file |
+| `atlas-teams-meetings-ingest/ingest.py` | `python3 ingest.py --execute --incremental`; one-off `--input-dir <folder>` or `--input <file>` | exported `.vtt`/`.docx` transcripts in the folders listed in `teams-sources.json`; no MCP |
 | `atlas-voice-memos-ingest/ingest.py` | `python3 ingest.py --doctor` first, then `python3 ingest.py --execute --incremental` | **macOS only**: Voice Memos container, Full Disk Access, and the built `helper/atlas-transcribe` |
 | `atlas-distill/distill.py` | `python3 distill.py --input <exchange.md> --execute` | none |
 
@@ -146,6 +149,7 @@ MCP server connected; the script itself only reads what the session fetched.
 | `mcp/slack` | slack-ingest |
 | `mcp/monday` | monday-ingest |
 | `mcp/apple-notes` | apple-notes-ingest |
+| `mcp/google-drive` | gemini-meetings-ingest (`search_drive_files`, `get_doc_as_markdown`); not needed when feeding it markdown exports with `--input-dir` |
 | `mcp/scheduled-tasks` | none as a hard requirement; the desktop scheduler is one of three ways to run the session skills (morning, weekly, health, nightly, synthesize) |
 | `cli/gh` | github-ingest |
 | `cli/ripgrep` | research (optional; pure-Python fallback) |
@@ -185,6 +189,8 @@ with temp directories only, and never touches a real vault:
 (cd atlas-graduate && python3 test_graduate.py)
 (cd atlas-people-extract && python3 test_extract.py)
 (cd atlas-gmail-ingest && python3 test_ingest.py)
+(cd atlas-gemini-meetings-ingest && python3 test_ingest.py)
+(cd atlas-teams-meetings-ingest && python3 test_ingest.py)
 (cd atlas-slack-ingest && python3 -m pytest -q test_ingest.py)
 (cd atlas-voice-memos-ingest && python3 -m pytest -q test_ingest.py)
 ```

@@ -85,6 +85,8 @@ and offers only those.
 | Source | Prerequisite |
 |---|---|
 | Meeting transcripts | Fireflies MCP server |
+| Meeting notes from Google Meet (Gemini) | Google Drive MCP server, or markdown exports of the notes docs |
+| Microsoft Teams meeting transcripts | a folder of exported `.vtt` or `.docx` transcripts, or a synced OneDrive Recordings folder |
 | Email | Gmail MCP server |
 | Chat | Slack MCP server |
 | Boards | Monday.com MCP server |

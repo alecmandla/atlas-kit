@@ -1,0 +1,7 @@
+{
+  "_doc": "atlas-teams-meetings-ingest source folders. Copy to engine/atlas-teams-meetings-ingest/teams-sources.json. Every .vtt and .docx under each folder (recursively) is read as one Teams meeting transcript. A .md or .txt file with the same name as a transcript is attached as that meeting's notes (paste a Copilot recap there). Keys starting with an underscore are ignored.",
+  "_doc_export_dirs": "Absolute or ~-relative folders. A synced OneDrive folder works: point it at the organizer's Recordings folder and new transcripts arrive without a manual download.",
+  "export_dirs": [
+    "~/Documents/Teams-Transcripts"
+  ]
+}

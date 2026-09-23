@@ -184,7 +184,7 @@ requires: [mcp/<server>, cli/<tool>]   # prerequisites the kickoff gates on
 ```
 
 `requires` values use `mcp/<server>` for MCP servers (`mcp/fireflies`,
-`mcp/gmail`, `mcp/slack`, `mcp/monday`, `mcp/apple-notes`, `mcp/scheduled-tasks`)
+`mcp/gmail`, `mcp/slack`, `mcp/monday`, `mcp/google-drive`, `mcp/apple-notes`, `mcp/scheduled-tasks`)
 and `cli/<tool>` for command-line tools (`cli/python3`, `cli/gh`, `cli/ripgrep`).
 List only what the skill itself calls. Skills that are pure Python over the vault
 list `cli/python3`.

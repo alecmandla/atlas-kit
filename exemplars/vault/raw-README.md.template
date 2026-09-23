@@ -14,6 +14,8 @@ This folder holds **immutable source material** ingested from external systems. 
 | `fireflies/` | Meeting summary records (transcripts stay in Fireflies, DEC-032) | `atlas-fireflies-ingest` |
 | `wispr/` | Wispr Flow dictation history, notes, calendar events | `atlas-wispr-ingest` |
 | `wispr/meetings/` | Wispr Flow notetaker meetings (the owner's live notes + transcript) | `atlas-wispr-meetings-ingest` |
+| `gemini/meetings/` | Google Meet "Notes by Gemini" summary records (transcript stays in the doc, DEC-032) | `atlas-gemini-meetings-ingest` |
+| `teams/meetings/` | Microsoft Teams transcripts, stored in full (no API to re-fetch them) | `atlas-teams-meetings-ingest` |
 | `claude-history/` | Claude Code session summaries | `atlas-claude-history-ingest` |
 | `github/` | GitHub PRs, issues, comments | `atlas-github-ingest` |
 | `gmail/` | Gmail messages, routed by sender domain and label | `atlas-gmail-ingest` |
