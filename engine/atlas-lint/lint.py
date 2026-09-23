@@ -45,16 +45,20 @@ MIN_EVIDENCE = 3  # a thread needs >= this many *evidence* files to be synthesis
 # distinguish them (the fictional defaults are hospitality words).
 GENERIC_TOKENS = {"the", "and", "for", "inn", "lodge", "hotel", "project", "roll", "up", "in"}
 
+# The vault constitution is skipped outright, as atlas-morning's registry guard does:
+# its #thread/<slug> mentions are illustrations and registry rows, not tags on notes,
+# and on a fresh vault they would otherwise surface as thin threads and duplicate slugs.
+CONSTITUTION = "AGENTS.md"
+
 # Administrative / index files that *list* threads but are NOT evidence about them
-# (the vault constitution, dashboards/MOCs, generated weekly reviews, daily notes).
-# Their #thread tags count toward duplicate-slug detection but NOT toward the
-# evidence count that decides whether a thread is worth synthesizing.
-ADMIN_FILES = {"AGENTS.md"}
+# (dashboards/MOCs, generated weekly reviews, daily notes). Their #thread tags count
+# toward duplicate-slug detection but NOT toward the evidence count that decides
+# whether a thread is worth synthesizing.
 ADMIN_PREFIXES = (CFG.folder_name("meta"), CFG.rel("areas", "Weekly-Reviews"), CFG.folder_name("daily"))
 
 
 def is_admin(rel: str) -> bool:
-    return rel in ADMIN_FILES or any(rel.startswith(p) for p in ADMIN_PREFIXES)
+    return any(rel.startswith(p) for p in ADMIN_PREFIXES)
 
 
 # --- stdlib frontmatter parser (from atlas-emerge, DEC-021) ---
@@ -113,7 +117,10 @@ def tokens(slug: str) -> set[str]:
 
 def iter_notes(vault: Path):
     for p in vault.rglob("*.md"):
-        if any(part in EXCLUDE_DIRS for part in p.relative_to(vault).parts):
+        rel = p.relative_to(vault)
+        if any(part in EXCLUDE_DIRS for part in rel.parts):
+            continue
+        if rel.parts == (CONSTITUTION,):
             continue
         yield p
 
@@ -298,7 +305,7 @@ def cmd_report(args) -> int:
         f"_{len(syn)} synthesis · {len(con)} concept · {len(ent)} entity pages · {len(threads)} distinct #thread tags_", "",
         f"> **Staleness of *existing* synthesis pages is not checked here** — that is `atlas-synthesize`'s fingerprint job. Run `python3 {SKILL_DIR.parent / 'atlas-synthesize' / 'synthesize.py'} --list` for the authoritative new/changed status.", "",
         "## Synthesis work-list — threads with real evidence but no synthesis page", "",
-        f"*Evidence = `#thread/<slug>` tags outside admin/index files (AGENTS.md, dashboards, weekly reviews, daily notes). Run `/atlas-synthesize <slug>` on these.*", "",
+        f"*Evidence = `#thread/<slug>` tags outside admin/index files (dashboards, weekly reviews, daily notes; the constitution `AGENTS.md` is not scanned). Run `/atlas-synthesize <slug>` on these.*", "",
     ]
     if missing:
         lines += ["| Slug | Evidence | Sources | Note |", "|---|---|---|---|"]
