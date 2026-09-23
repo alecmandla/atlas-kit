@@ -143,8 +143,8 @@ written as {{fill-me}} and listed again in §9. Sources without a config get one
 <!-- AUTHOR: schedule_mode is "scheduled" or "on-demand only". For on-demand, the table
 still lists suggested cadences and the scheduler is "manual". "Needs a Claude session"
 is yes for anything that calls an MCP or writes prose (ingests via MCP, morning, weekly,
-synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
-lint, health, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
+health, synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
+lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
 morning 08:00, weekly Fri 18:00, health Sun 21:00. Practice capabilities never appear
 here. -->
 
@@ -188,8 +188,8 @@ grep -L '^derived-from:' skills/*/SKILL.md   # must print nothing
 ```
 
 <!-- AUTHOR: verification_commands holds the engine's health or lint invocation in
-read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py report
---vault "{{vault_root}}"), else a comment saying the engine has not landed. -->
+read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py
+--vault "{{vault_root}}" report; the flag goes before the subcommand), else a comment saying the engine has not landed. -->
 
 # 9. Manual steps
 
