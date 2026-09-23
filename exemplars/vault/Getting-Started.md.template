@@ -1,0 +1,73 @@
+# Getting Started — your first week in Obsidian
+
+*A hands-on checklist. Each task is about five minutes. Check them off in order. By the end, you'll know enough to live in the vault.*
+
+---
+
+## Day 1 — the basics (15 min total)
+
+- [ ] Open [[Home]] and pin it: right-click the tab → **Pin tab**. This is your launchpad.
+- [ ] Press `Cmd+P` to open the Command Palette. Type "graph" and open the **Graph view**. Drag it around. Every dot is a note, every line is a link. Close it when done.
+- [ ] Press `Cmd+O` (Quick Switcher). Type `pine`; notice it fuzzy-finds `_Pinecrest-Lodge`. This is how you'll navigate 90% of the time. Forget the file tree.
+- [ ] Press `Cmd+Shift+F` (global search). Search for `meeting`. Skim a few results. Close.
+- [ ] Open [[_Pinecrest-Lodge]]. Read it. Notice the `[[link]]` syntax; click one. Use `Cmd+[` to go back.
+
+## Day 2 — write your first real notes (20 min)
+
+- [ ] Open today's daily note (`Cmd+P` → "Open today's daily note"). If nothing appears, run "Periodic Notes: Open daily note." Jot three sentences about what you're working on.
+- [ ] Inside the daily note, type `[[` and start typing a client name. Pick one from the dropdown. You just made a backlink. Open that client's MOC and scroll to the bottom: your daily note will appear under "Linked mentions" once Obsidian indexes it.
+- [ ] Create a meeting note the right way: `Cmd+P` → "Templater: Create new note from template" → pick `Meeting-Note`. Save it inside one of your client folders under `meetings/`.
+- [ ] Add a `- [ ] follow up with Priya` task inside that meeting note. Open [[Home]]; it should show up under "Open action items" within a few seconds.
+- [ ] Add a tag like `#follow-up` to the meeting note's frontmatter. Click the tag; Obsidian filters every note with that tag.
+
+## Day 3 — get fluent with linking (15 min)
+
+- [ ] Open any inbox note in `{{folders.inbox}}/`. Decide: does it belong to a client, a project, or an area? Move it (drag in the file tree, or `Cmd+P` → "Move file").
+- [ ] In one note, deliberately link to a page that **doesn't exist yet**, e.g. `[[Q3-Planning]]`. Click the link. Obsidian creates the empty note. This is how a lot of people grow their vault: link first, write later.
+- [ ] Open Graph view again (`Cmd+P` → "Graph view: Open"). Pick a note and look at its **Local Graph** (`Cmd+P` → "Open local graph"). This shows just that note's neighborhood.
+- [ ] Try the **Outgoing links** and **Backlinks** panels: right sidebar icons. Toggle them. Backlinks are how you discover unintended connections; it's the killer feature.
+
+## Day 4 — search and dashboards (15 min)
+
+- [ ] Open [[Active-Projects]]. Notice it's a Dataview query that auto-populates from your `{{folders.projects}}/` folder. You don't maintain it; it maintains itself.
+- [ ] Open [[Unreviewed-Inbox]]. Same idea: it lists what's in `{{folders.inbox}}/` so you can clear it.
+- [ ] Try Omnisearch: `Cmd+P` → "Omnisearch: Vault search". Search for a phrase you remember from a meeting. Notice it ranks by relevance, not just exact match.
+- [ ] Bookmark a note: right-click → **Bookmark**. Open the Bookmarks pane (left sidebar star icon). Bookmark [[Home]], [[Clients-MOC]], and one or two active project MOCs.
+
+## Day 5 — Friday weekly review (the routine that makes it stick, 15 min)
+
+- [ ] Run your first weekly review: `Cmd+P` → "Templater: Create new note from template" → `Weekly-Review`. Save in `{{folders.areas}}/Weekly-Reviews/`. (Once `atlas-weekly` is scheduled, it drafts this for you.)
+- [ ] Triage `{{folders.inbox}}/` to zero. For each note: archive, move to a project/area, or delete.
+- [ ] Scan [[Active-Projects]]. Anything stale? Add a `- [ ] next step` task to its MOC.
+- [ ] Move any finished projects to `{{folders.archive}}/Projects/`.
+- [ ] Close the laptop. You're done.
+
+---
+
+## Habits to build over week 2
+
+- **Capture first, organize later.** When in doubt, dump it in `{{folders.inbox}}/` and clean it up Friday. The worst thing you can do is hesitate over filing.
+- **Link liberally.** Every meeting note should link to the project or client. Every project MOC should link back to the client MOC. Density of links = quality of vault.
+- **Don't reorganize folders.** Your structure is good. The pull to "tidy" it is a procrastination trap. Let links and tags do the work.
+- **Rename instead of delete.** `Cmd+P` → "Rename file" updates every link automatically. Delete is fine too, but rename is safer when you're unsure.
+- **One note, one idea.** If a note has two distinct topics, split it. Smaller notes link better.
+
+## Cheat sheet — keyboard shortcuts you'll use daily
+
+| Shortcut | What it does |
+|---|---|
+| `Cmd+O` | Quick switcher (jump to any note by name) |
+| `Cmd+P` | Command palette (do anything) |
+| `Cmd+Shift+F` | Global search |
+| `Cmd+[` / `Cmd+]` | Back / forward through your note history |
+| `Cmd+E` | Toggle edit / reading view |
+| `Cmd+N` | New note |
+| `Cmd+,` | Settings |
+| `[[` | Start a link |
+| `#` | Start a tag |
+
+## When you get stuck
+
+- The full reference is [[Guide]]: folder rules, conventions, automations.
+- Obsidian's official docs are excellent: <https://help.obsidian.md>. Use the in-app help: `Cmd+P` → "Open Obsidian help".
+- If something feels clunky, it probably is. Flag it and adjust the setup.

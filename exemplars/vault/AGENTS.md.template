@@ -1,0 +1,165 @@
+---
+type: vault-constitution
+locked: true
+---
+
+# AGENTS.md — Vault constitution
+
+> Stable constitution for any human or AI working **inside** `{{vault_root}}/`. For the skill-side rules (how each `atlas-*` skill behaves), see the `SKILL.md` in each folder under `{{skills_root}}/`. For locked decisions, see `docs/DECISIONS.md` in the skills repository.
+
+This file is tool-agnostic: it applies to any AI agent (Claude Code, Codex, Cursor, a chat assistant with an Obsidian plugin) and to {{owner_name}}. It governs the vault's contents, not the repository that builds the vault.
+
+## Vault summary
+
+`{{vault_root}}/` is {{owner_name}}'s personal second brain. Layout is PARA (Inbox / Projects / Areas / Resources / Archive / Meta / Attachments) augmented with a people CRM, a web-clippings inbox, and the LLM Wiki spine (`{{folders.raw}}/` + `{{folders.wiki}}/`) (DEC-004). It is local-only, not synced to any cloud (DEC-002), and not under git (DEC-011).
+
+## Folder map
+
+Every folder at the vault root has a single purpose. Stay inside it.
+
+| Folder | Purpose | Mutability |
+|---|---|---|
+| `{{folders.inbox}}/` | Unrouted captures. New material lands here when the router can't classify it (DEC-016: unroutable meetings move to `{{folders.inbox}}/needs-decision/`). | Drains via routing rules + the owner's weekly review. |
+| `{{folders.daily}}/` | One note per calendar day. Created by the daily-note template; populated by the morning scheduled agent. | Append-only within the day's note; never edit yesterday's note in place. |
+| `{{folders.projects}}/` | PARA Projects: outcomes with a deadline. Each project is a folder under `Clients/<client>/`, `Work/<project>/`, or top-level for personal projects. | Freely editable. |
+| `{{folders.areas}}/` | PARA Areas: ongoing responsibilities without a deadline (e.g. `HQ/`, `Client-Success/`, `Marketing/`). | Freely editable. |
+| `{{folders.resources}}/` | PARA Resources: reference material organized by topic (e.g. `Templates/`, `Books/`, `Claude-Skills/`). | Freely editable. |
+| `{{folders.archive}}/` | PARA Archive: inactive material. Moved here when a project closes or an area dissolves. | Read-mostly; new edits are rare. |
+| `{{folders.meta}}/` | Vault-about-the-vault: dashboards (`Dashboards/`), maps of content (`MOCs/`), research answers (`Research/`), guides. | Freely editable. |
+| `{{folders.attachments}}/` | Binary assets: images, PDFs, audio. Referenced from notes via Obsidian's `![[file.png]]` syntax. | Append-only in practice. Don't rename existing files (breaks embeds). |
+| `{{folders.crm}}/` | People CRM: one note per person at `{{folders.crm}}/People/<First-Last>.md` (DEC-012). Person notes carry `tier`, `email`, `aliases` frontmatter and are referenced as `[[First-Last]]` wikilinks (DEC-003). | Person notes are freely editable. Wikilink names are stable identifiers; rename only via the rename-and-redirect protocol. |
+| `{{folders.clippings}}/` | Web-clipper inbox (the browser extension drops articles here as `.md`). | Drains by being moved into `{{folders.resources}}/` or `{{folders.archive}}/`. |
+| `{{folders.raw}}/` | LLM Wiki source layer: append-only material from external systems. Subfolders per source. See `{{folders.raw}}/README.md`. | **Append-only** (DEC-004, DEC-009). Never edit or delete an existing file. Corrections use the `corrected_by:` / `corrects:` chain. |
+| `{{folders.wiki}}/` | LLM Wiki projection layer: entity / concept / synthesis pages materialized from `{{folders.raw}}/` by `atlas-wiki-materialize` and `atlas-synthesize`. See `{{folders.wiki}}/index.md`. | **Freely rewriteable.** Pages are regenerated on each run. Don't hand-edit outside a page's marked editable region; your edit gets overwritten on the next run. |
+
+## Naming conventions
+
+- **Person notes**: `{{folders.crm}}/People/First-Last.md`. Append a company shortname on collision (`Sam-Pinecrestlodge.md` vs `Sam-Saltmarshinn.md`) per DEC-012.
+- **Meeting notes**: `YYYY-MM-DD — Title.md` (em dash, with surrounding spaces). Routed into a project, area, or `{{folders.inbox}}/` by the meeting router.
+- **Concept / wiki pages**: kebab-case, no date prefix: `portal-rewrite.md`, `ledgerline-integration.md`.
+- **Daily notes**: `YYYY-MM-DD.md` exactly.
+- **Raw source files**: `<source-id>.md` (the source system's stable id; ULID-style ids preferred where the source supplies one). Never use display titles in `{{folders.raw}}/`: ids are stable, titles drift.
+- **Attachments**: keep the original filename when possible (`2026-04-screenshot.png`); add a date prefix if collision-prone.
+
+## Frontmatter conventions
+
+YAML between `---` fences. Key order is stable so Dataview queries are predictable:
+
+```yaml
+---
+date: 2026-05-20
+id: 01J5WABCDEF
+type: meeting          # meeting | person | wiki-entity | wiki-concept | daily | raw-fireflies | …
+participants: [[Priya-Okafor]], [[Jordan-Vale]]   # wikilinks, not email strings (DEC-003)
+attendee_emails: [priya@pinecrestlodge.example, jordan.vale@harborlane.example]   # mechanical join key
+project: Pinecrest-Lodge-Portal-Rewrite
+prep_note: "[[2026-05-20 — Pinecrest Lodge weekly sync (prep)]]"   # OPTIONAL: set by atlas-fireflies-ingest when a same-date prep note exists in the folder; omit otherwise
+tags: [meeting, client/pinecrest-lodge, thread/portal-rewrite]
+source-url: https://app.fireflies.ai/view/...
+---
+```
+
+Append additional keys alphabetically after `source-url`. Don't reorder existing keys.
+
+**Prep notes and call notes.** A meeting-prep note (`YYYY-MM-DD — <title> (prep).md`, hand-authored before a call and used for live notes during it) stays a *separate* file from the ingested call note, linked reciprocally: the prep carries `call_note: "[[<call>]]"`, the call carries `prep_note: "[[<prep>]]"`. `atlas-fireflies-ingest` writes both on ingest, joining on **date + folder**, and only when exactly one same-date prep exists in the routed `meetings/` folder (zero or two-plus: skipped, never guessed). The prep's body is never touched; only its frontmatter `call_note:` is set.
+
+## Wikilinks and tags
+
+- **Wikilinks**: `[[Note-Title]]` with no surrounding spaces inside the brackets. Use aliases for display: `[[Pinecrest-Lodge-Portal-Rewrite|the portal rewrite]]`. Wikilink names are stable identifiers.
+- **Tags**: kebab-case after `#`. Hierarchical tags use `/`: `#thread/portal-rewrite`, `#client/pinecrest-lodge`, `#status/draft`. Don't put tags inside frontmatter as YAML keys (use the `tags:` array).
+
+## Threads — the `#thread/<slug>` convention
+
+A **thread** is a single line of thinking that crosses multiple meetings, documents, and source files over time. Threads are how the owner's long-term goal, "track how a project idea changes over time", gets answered: tag every related note with the same `#thread/<slug>`, then query for the slug to walk the timeline.
+
+A thread is not the same as a project or a client:
+- **Client** (`#client/pinecrest-lodge`): *who* the work is with. One-to-many with threads.
+- **Project** (`#project/portal`): a bounded outcome with a deadline. One-to-many with threads.
+- **Thread** (`#thread/portal-rewrite`): a line of thinking that may span multiple projects and clients, and which evolves over a series of meetings, decisions, and revisions.
+
+### Convention
+
+- **Slug shape**: lower-case ASCII, words separated by `-` (kebab-case). `#thread/portal-rewrite`, not `#thread/PortalRewrite`, not `#thread/portal_rewrite`, not `#thread/portal rewrite`. The slug is the durable identifier: pick once, keep forever.
+- **One slug per thread.** Don't fork the slug when the thread evolves (`portal-rewrite-v2` is a smell; the v1-to-v2 evolution IS the thread). Renaming is a deliberate operation: write a `thread-aliases.md` row in `{{folders.meta}}/` so old slugs still resolve.
+- **Multiple threads per note are fine.** A meeting can carry `#thread/portal-rewrite` and `#thread/ledgerline-integration` simultaneously; that is exactly what makes threads more useful than projects for tracking idea drift.
+- **Tag at write time, not retroactively.** New meetings should carry their thread tags from the Meeting-Note template. `atlas-emerge` surfaces recurring untagged patterns and proposes thread slugs; `atlas-graduate` adopts them.
+
+### Canonical threads
+
+The first rows are the canonical examples. `atlas-graduate` appends one row per graduated slug; do not remove the table or reword this sentence, because the graduate skill locates the table by the phrase "canonical examples" on the line before it.
+
+| Slug | What it tracks |
+|---|---|
+| `#thread/portal-rewrite` | The decision to rebuild the guest portal: spans `{{folders.projects}}/Work/Portal/` plus the Pinecrest Lodge client meetings discussing the rebuild scope. |
+| `#thread/ledgerline-integration` | The Ledgerline reporting integration: spans the `{{folders.projects}}/Clients/Ledgerline/` project meetings, the onboarding Monday board, and the items that depend on it. |
+| `#thread/northstar-migration` | The migration from the current analytics stack to Northstar BI: spans `{{folders.projects}}/Work/Northstar-Migration/`, vendor-evaluation meetings, and the ETL-redesign discussions across `{{folders.areas}}/HQ/`. |
+
+### Where threads surface
+
+- **Frontmatter `tags:` array** of every note involved: `tags: [meeting, client/pinecrest-lodge, thread/portal-rewrite]`.
+- **`atlas-emerge`**: surfaces patterns from `{{folders.raw}}/` that have no thread tag yet, proposing new slugs.
+- **`atlas-graduate`**: promotes a thread slug into a `{{folders.wiki}}/concepts/<slug>.md` page (or a project / area / resource MOC) once it has enough signal.
+- **`atlas-synthesize`**: writes a cited narrative page at `{{folders.wiki}}/synthesis/<slug>.md` whenever a thread's evidence changes.
+- **Timeline plugin** (optional): renders one thread chronologically, every note tagged `#thread/<slug>`, oldest to newest.
+
+## Templates
+
+Templates live in `{{folders.resources}}/Templates/`. Used by the Templater plugin and by skill scaffolding:
+
+- Person-note template: used by `atlas-people-extract` when materializing CRM rows.
+- Daily-note template: fired by the morning scheduled agent.
+- Meeting-note template: used by the meeting router after extraction.
+- Raw-source template: used by each ingest skill when writing to `{{folders.raw}}/<source>/`.
+- Weekly-review template: used by `atlas-weekly`.
+
+When authoring a new template, drop it in this folder and reference it by relative path from the consuming skill; never inline template content in a `SKILL.md`.
+
+## The append-only `{{folders.raw}}/` invariant
+
+Files in `{{folders.raw}}/` are immutable. The vault is rebuildable from `{{folders.raw}}/` alone: delete `{{folders.wiki}}/` and the PARA `meetings/` folders, and a full `atlas-wiki-materialize` run plus a meeting-router replay reconstructs them. This disaster-recovery property holds **only** if `{{folders.raw}}/` itself is stable.
+
+Corrections use a forward-pointer chain; see `{{folders.raw}}/README.md` for the protocol. PII / secret deletion is the one allowed exception, and it must be logged in `docs/DECISIONS.md`.
+
+## How agents change the vault
+
+Any agent working in the vault (interactive or scheduled) interacts with it in three ways:
+
+1. **Read-only inspection.** State detection (`find` / `grep` / `ls`) is non-mutating. Read `{{folders.raw}}/`, `{{folders.wiki}}/`, and PARA folders to figure out what exists before acting.
+2. **Skill-mediated mutation.** Vault changes happen through Atlas skills (`atlas-*`, see DEC-007), never via ad-hoc inline edits from an automation, except for explicit one-off scaffolding the owner asked for. Skills enforce idempotency, dry-run discipline, and frontmatter shape.
+3. **No vault commits.** Vault state is NOT git-tracked (DEC-011). Verify a change through file counts, frontmatter spot-checks, and dry-run replay; record what changed in the skill's `last-run.md` and, for repo work, the commit message body, never via `git add {{vault_root}}/...`.
+
+Dry-run discipline: any operation that moves or rewrites more than 5 files in the vault produces a dry-run report first (`--dry-run-report <path>`). The owner reviews the dry-run before allowing the destructive operation.
+
+## Tier system (People CRM)
+
+Person notes carry a `tier:` frontmatter field:
+
+| Tier | Meaning | Examples |
+|---|---|---|
+| `T1` | Inner circle: weekly or near-weekly contact | Direct manager, close family, daily collaborators |
+| `T2` | Frequent: recurring contact, multiple touchpoints per quarter | Client GMs on active projects, regular team members |
+| `T3` | Occasional: known person, sporadic contact | Past collaborators, semi-active clients, infrequent vendors |
+| `T4` | Acknowledged: exists in the graph but no current relationship | Old contacts, one-off meeting attendees |
+
+Tier is set automatically from meeting-attendance counts by `atlas-people-extract` and edited manually for ground-truth cases. The skill never auto-demotes. Don't promote a tier without thinking about it: T1/T2 surface on the home dashboard and in scheduled-agent attention windows.
+
+## What NOT to do
+
+- **Do not commit the vault.** `{{vault_root}}/` is not git-tracked (DEC-011). Don't `git init` inside it. Don't `git add` vault paths from any checkout. Don't push vault contents to any remote.
+- **Do not delete or edit existing files in `{{folders.raw}}/`.** Append-only invariant (DEC-004, DEC-009). Corrections go through the `corrected_by:` / `corrects:` chain. PII / secret deletion is the only exception and requires a `DECISIONS.md` entry.
+- **Do not hand-edit generated pages in `{{folders.wiki}}/`** outside their marked editable region. They are regenerated on every run; your edit will be overwritten. To change wiki content, edit the underlying `{{folders.raw}}/` sources, the PARA notes, or the materialization skill.
+- **Do not commit `.obsidian/workspace.json`** or any other `.obsidian/` file containing personal UI state. If the vault is ever brought under git, this directory needs to be ignored except for `.obsidian/plugins/` and `.obsidian/community-plugins.json`.
+- **Do not rename a person-note file** without writing a redirect alias. Wikilinks reference the filename. Renaming breaks every meeting note that referenced the person until the alias resolves. Use Obsidian's "rename and update backlinks" only after grep-checking that no skill or template hardcodes the old name.
+- **Do not put API keys, OAuth tokens, or credentials in any vault file.** Secrets live in environment variables or a git-ignored `.env` read by skills. The vault is local-only but is backed up and shared via screen-share; treat it as low-trust storage.
+- **Do not rename frontmatter `meeting_id`, `wispr_id`, `gmail_thread_id`, `message_ts`, or other source-system ids.** They are the durable dedup keys for ingest idempotency. Renaming them causes the next ingest run to re-import everything.
+- **Do not move files across `{{folders.raw}}/<source>/` boundaries.** A meeting summary belongs in `{{folders.raw}}/fireflies/`, even if it semantically overlaps with a Slack thread. Cross-source synthesis happens in `{{folders.wiki}}/synthesis/`, not by relocating raw files.
+- **Do not introduce new top-level folders.** The vault root is a locked contract (DEC-001 + DEC-004). New folders go inside an existing PARA bucket or get a `DECISIONS.md` entry first.
+- **Do not pull from sources that have no decision entry.** A new ingest source needs a `DEC-` entry before any `{{folders.raw}}/<new-source>/` folder is created.
+
+## Cross-references
+
+- `docs/DECISIONS.md` (skills repository): locked decisions referenced throughout this file.
+- `{{folders.raw}}/README.md`: append-only invariant detail.
+- `{{folders.wiki}}/index.md`: wiki index, regenerated by `atlas-wiki-materialize`.
+- `{{folders.meta}}/Guide.md`: the human-facing folder guide.
+- `{{folders.meta}}/Getting-Started.md` and `{{folders.meta}}/Onboarding-Playbook.md`: first-week onboarding.

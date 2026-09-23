@@ -21,3 +21,6 @@ __pycache__/
 atlas.config.json
 *.local.yaml
 *.local.json
+# Local scrub-gate patterns (real names; never shipped)
+docs/scrub-patterns.local.txt
+*.local.txt

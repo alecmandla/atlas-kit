@@ -1,0 +1,48 @@
+# atlas-gmail-ingest routing (example)
+#
+# Two tiers, in this order:
+#
+#   1. domain_routes — WHO the mail is from. Sender domain → folder. This is
+#      tier 1 because the sender never changes, so one folder stays one
+#      correspondent. Client routing lives here and needs no labels at all.
+#   2. label_routes  — WHAT the owner plans to do about it. Only consulted when no
+#      domain rule matched, so triaging a client email never yanks it out of
+#      its client folder.
+#
+# Anything matching neither lands in {{folders.raw}}/gmail/_unrouted/.
+#
+# Routing is OR within a tier — a message with multiple matching labels routes
+# to the first match in this file's order (top-to-bottom).
+#
+# IMPORTANT: each `label:` value below is a Gmail label *display name*
+# (e.g. "3. ADD TO TRIAGE"), NOT a label ID. Gmail's search_threads returns
+# opaque IDs like "Label_1234567890123456789"; ingest.py resolves those to
+# display names using a `list_labels` capture (--labels-json) before matching
+# here. Use the parent/child form for nested labels exactly as Gmail shows them.
+#
+# Every label below must actually exist in the mailbox. A label that was planned
+# but never created matches nothing, silently, so the label tier looks dead.
+# Check a `list_labels` capture before adding.
+
+label_routes:
+  # The owner's numbered triage workflow — labels they actually maintain. These
+  # describe handling state, not subject matter, so they only apply to mail no
+  # domain rule claimed.
+  - { label: "1. QUICK REPLY", route: "quick-reply" }
+  - { label: "2. QUICK REVIEW", route: "quick-review" }
+  - { label: "3. ADD TO TRIAGE", route: "add-to-triage" }
+  #
+  # Deliberately NOT routed — they fall through to the next tier:
+  #   Triage-Forwarded        — only ever co-occurs with "3. ADD TO TRIAGE"
+  #   Marketing Automation/*  — automation plumbing, not reading material
+
+# Tier 1. Client and partner mail routes by sender domain, no labeling required.
+#
+# Note: github.com is intentionally absent. It is often the single largest sender
+# in _unrouted, but atlas-github-ingest already covers that material from the
+# source side; a domain route here would duplicate it.
+domain_routes:
+  pinecrestlodge.example: pinecrest-lodge
+  saltmarshinn.example: saltmarsh-inn
+  ledgerline.example: ledgerline
+  {{employer_domain}}: hq

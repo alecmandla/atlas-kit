@@ -1,0 +1,270 @@
+---
+tags: [meta, onboarding]
+created: <YYYY-MM-DD>
+---
+
+# Obsidian Onboarding Playbook
+
+A hands-on starter sequence. Don't read it all. Do **Mission 1**, then come back tomorrow for Mission 2. The goal is to build muscle memory, not knowledge.
+
+---
+
+## Before you start: 5 shortcuts to memorize
+
+Memorize these. They're 80% of how power users move around. (On Mac; replace `Cmd` with `Ctrl` on Windows.)
+
+| Shortcut | What it does |
+|---|---|
+| `Cmd + P` | **Command palette**, your master menu. When in doubt, hit this. |
+| `Cmd + O` | **Quick switcher**: jump to any note by typing part of its name. |
+| `Cmd + N` | New note. |
+| `Cmd + E` | Toggle between **edit** mode and **reading** (rendered) mode. |
+| `[[` | Inside any note, type two square brackets to link to another note. The autocomplete is your best friend. |
+
+Add these as you grow:
+- `Cmd + T`: new tab.
+- `Cmd + Click` on a `[[link]]`: open that note in a new tab.
+- `Cmd + ,`: open Settings.
+
+---
+
+## Mission 1 — Tour and your first real note (10 min)
+
+**Goal:** prove the basics work.
+
+1. Open the vault. The left sidebar shows your folder tree. The right sidebar shows backlinks and an outline of the current note.
+2. Click `{{folders.meta}}` → click `Onboarding-Playbook` (this file). You're reading it in **Reading mode**. Hit `Cmd + E` to switch to **Edit mode**. Notice the markdown becomes visible.
+3. Hit `Cmd + E` again to flip back. *That toggle is something you'll do a hundred times a day.*
+4. Hit `Cmd + N`. A blank note opens. Name it `Scratch.md`; save it in `{{folders.inbox}}`.
+5. Type a few lines. Try this:
+   ```markdown
+   # My first note
+
+   This is **bold**, this is *italic*, this is `inline code`.
+
+   - bullet one
+   - bullet two
+     - nested bullet
+
+   1. numbered list
+   2. another item
+   ```
+6. Hit `Cmd + E` to render it. That's the entire pitch for markdown.
+7. ✅ **Done with Mission 1.** Leave `Scratch.md` open.
+
+---
+
+## Mission 2 — The internal link (10 min)
+
+**Goal:** experience why Obsidian beats a plain notes app.
+
+1. In `Scratch.md`, on a new line, type `[[`. An autocomplete dropdown appears.
+2. Type `Onb`; it should match `Onboarding-Playbook`. Hit Enter. You just made a link.
+3. `Cmd + Click` your new link. It opens this file in a new tab. *That round-trip is the core of Obsidian.*
+4. Open the right sidebar (the icon top-right). You'll see **Backlinks: 1**: Scratch.md links here. Now you know who points to this note.
+5. Try linking to a note that doesn't exist yet: `[[Priya Okafor]]`. The link will look slightly different (lighter color); Obsidian calls these *unresolved*. Click it. A new note is created on the fly.
+6. ✅ **Done with Mission 2.** Welcome to bidirectional thinking. The takeaway: **don't worry about creating notes "in the right place" first. Link to them, and resolve where they live later.**
+
+---
+
+## Mission 3 — Daily Notes (5 min, then 5 min/day forever)
+
+**Goal:** build the habit that makes the whole vault work.
+
+1. `Cmd + ,` → **Core plugins** → make sure **Daily Notes** is on.
+2. In Daily Notes settings, set:
+   - **Date format:** `YYYY-MM-DD`
+   - **New file location:** `{{folders.daily}}`
+   - **Template file location:** leave blank for now (we'll set this in Mission 5).
+3. Open the command palette (`Cmd + P`) → type `daily` → pick **Daily notes: Open today's daily note**. A note named `<YYYY-MM-DD>.md` is created.
+4. Write three things in it:
+   ```markdown
+   ## What's on today
+   - Meeting with [[_Pinecrest-Lodge]] at 10am
+   - Finish the [[_Portal]] spec
+
+   ## Notes from the day
+   - Talked to Priya; she wants the schema doc by Friday
+
+   ## End of day
+   - Wrapped: portal spec
+   - Open: Pinecrest follow-up
+   ```
+5. The next morning, hit `Cmd + P` → **Open today's daily note** again. New empty file for the new day.
+6. ✅ **Mission 3 ongoing.** The daily note is your "where was I yesterday" lifeline. Use it loosely; don't try to make it perfect. Once `atlas-morning` is scheduled, it fills the top of this note for you.
+
+---
+
+## Mission 4 — Your first Map of Content (MOC) (15 min)
+
+**Goal:** make one client folder feel useful.
+
+Pick a real, active client. Let's say Pinecrest Lodge.
+
+1. Open `{{folders.projects}}/Clients/Pinecrest-Lodge/` (create the subfolder if it isn't there).
+2. Create a new note: `_Pinecrest-Lodge.md`. The leading underscore makes it sort to the top of the folder. *This is your MOC convention: every project/client folder gets one.*
+3. Paste this skeleton and fill in what you know:
+   ```markdown
+   ---
+   tags: [client, moc]
+   status: active
+   started: 2024-XX-XX
+   ---
+
+   # Pinecrest Lodge
+
+   ## Snapshot
+   One paragraph: who they are, what we're doing for them, current phase.
+
+   ## Primary contacts
+   - **Priya Okafor**, General Manager. Email: priya@pinecrestlodge.example
+   - …
+
+   ## Active workstreams
+   - [[Pinecrest Lodge Reporting Setup]]
+   - [[Pinecrest Lodge Booking Sync]]
+
+   ## Recent meetings
+   *(this will be auto-populated by Dataview in Mission 6; leave a placeholder)*
+
+   ## Open questions
+   - [ ] Do they want the dashboard rebranded?
+   - [ ] Confirm contract renewal date
+   ```
+4. ✅ **Done with Mission 4.** You now have a *landing page* for Pinecrest Lodge. Whenever a meeting happens, when a question comes up, when you remember a fact about them: it goes here, or it links here. Repeat for your top five most-active clients over the next week. Don't do all of them at once.
+
+---
+
+## Mission 5 — Install Templater + use a template (15 min)
+
+**Goal:** stop retyping the same skeleton over and over.
+
+1. `Cmd + ,` → **Community plugins** → **Turn on community plugins** (if it asks) → **Browse**.
+2. Search for **Templater**. Install. Enable.
+3. In Templater settings:
+   - **Template folder location:** `{{folders.resources}}/Templates`
+   - **Trigger Templater on new file creation:** off for now (we'll trigger manually).
+4. Create a new file in `{{folders.resources}}/Templates/` called `Meeting-Note.md`. Paste:
+   ```markdown
+   ---
+   date: <% tp.date.now("YYYY-MM-DD") %>
+   attendees: []
+   project: ""
+   tags: [meeting]
+   ---
+
+   # <% tp.date.now("YYYY-MM-DD") %> — <% tp.file.title %>
+
+   ## Summary
+
+   ## Key Decisions
+   -
+
+   ## Action Items
+   - [ ]
+
+   ## Notes
+
+   ```
+5. Now create a new note anywhere; name it something like `Pinecrest Lodge Weekly Sync`.
+6. `Cmd + P` → **Templater: Open Insert Template modal** → pick `Meeting-Note`. Your blank note is now structured, with today's date filled in automatically.
+7. ✅ **Done with Mission 5.** Now do the same to create `Client-MOC.md`, `Project-MOC.md`, and `Weekly-Review.md` over the next few days. Use Mission 4's MOC as the starting point for those.
+
+---
+
+## Mission 6 — Your first Dataview query (10 min)
+
+**Goal:** make a folder of meetings auto-list itself.
+
+1. Install **Dataview** (Settings → Community plugins → Browse → Dataview → install + enable).
+2. In Settings → Dataview, turn on **Enable JavaScript Queries** and **Enable Inline JavaScript Queries** (you won't use those today, but you'll want them later).
+3. Make sure you have at least two meeting notes inside `{{folders.projects}}/Clients/Pinecrest-Lodge/meetings/`. If you don't, create two dummy ones using the Meeting-Note template.
+4. Open `_Pinecrest-Lodge.md`. Replace the "Recent meetings" placeholder with this code block:
+
+   ````markdown
+   ## Recent meetings
+
+   ```dataview
+   TABLE date AS "Date", file.link AS "Meeting"
+   FROM "{{folders.projects}}/Clients/Pinecrest-Lodge/meetings"
+   SORT date DESC
+   LIMIT 20
+   ```
+   ````
+5. Switch to Reading mode (`Cmd + E`). The block renders as a live table of every meeting you've filed for Pinecrest Lodge. Add another meeting note in that folder, refresh, and it appears in the table.
+6. ✅ **Done with Mission 6.** This is the trick that makes MOCs maintain themselves. Every client/project MOC should have a Dataview block like this. *You never manually maintain an index again.*
+
+---
+
+## Mission 7 — Graph view (5 min, mostly for fun)
+
+**Goal:** see the brain you're building.
+
+1. `Cmd + P` → **Graph view: Open graph view**.
+2. Right now it'll look sparse; that's fine.
+3. Filter, color-code by tag, drag nodes around. Notice that orphaned notes (no links in or out) float around the edge. *Those are notes you should either link or delete.*
+4. ✅ **Done with Mission 7.** The graph isn't that useful day-to-day, but it's a great gut check on whether your linking is dense enough. If it's a hairball after two months, you're doing it right.
+
+---
+
+## Mission 8 — Weekly review ritual (15 min, every Friday)
+
+**Goal:** keep the vault from rotting.
+
+Every Friday afternoon, do this:
+
+1. `Cmd + P` → **Daily notes: Open today's daily note** (or open the review `atlas-weekly` drafted in `{{folders.areas}}/Weekly-Reviews/`).
+2. Open `{{folders.inbox}}`. For every note in there:
+   - **Keep + file:** drag it into the right Project/Area/Resource folder. Add tags.
+   - **Keep + delete contents:** the note was a thought, not a record. Capture what's worth keeping in the right MOC, then delete the original.
+   - **Delete:** if you don't recognize it after one read, you don't need it.
+3. Open each active client/project MOC. Update **Open questions** based on the week's meetings.
+4. Look at the **Daily Notes** for the week. Anything you said you'd do that you didn't? Carry it forward or kill it.
+5. Write three lines in your weekly note:
+   - What's on track
+   - What's blocked
+   - The one thing that matters most next week
+
+This is the single highest-leverage habit. Skip everything else and do just this and the vault will compound.
+
+---
+
+## Things to NOT do as a beginner
+
+- **Don't install 20 plugins.** You'll spend a week tweaking and zero days writing notes. Stick with Templater + Dataview + Periodic Notes for the first month.
+- **Don't reorganize the folders.** Ride out the structure for 30 days. If it still doesn't feel right, refactor *with evidence*, not from a hunch.
+- **Don't try to migrate everything at once.** Old notes, browser bookmarks, old docs: they can wait. Get fluent on new notes first.
+- **Don't make notes too long.** A note should be one *thing*: one meeting, one decision, one concept, one client. When in doubt, split and link.
+- **Don't make notes too small.** Atomic Zettelkasten-style notes are a trap for working professionals. A meeting note with summary + decisions + action items is fine; don't break it into four notes.
+- **Don't skip the daily note.** Even a three-line daily note is enough.
+- **Don't worry about file naming convention day one.** `Cmd + O` and full-text search find anything. Migrate to a convention only if it's hurting you.
+
+---
+
+## Your 30-day rhythm
+
+| Day | Habit |
+|---|---|
+| Mon–Fri | Open today's daily note in the morning. Add bullets throughout the day. |
+| Every meeting | New note from the Meeting-Note template (or let the meeting ingest do it once it is running). Link it to the project MOC. |
+| Friday afternoon | Weekly review ritual (Mission 8). |
+| When you read something good | Drop the URL + a one-liner into `{{folders.inbox}}`. Triage Friday. |
+| When you have a thought | Open `Scratch.md`. Write it. Triage Friday. |
+
+Do this for 30 days. By day 31, opening Obsidian will feel like opening your kitchen: automatic, comfortable, full of stuff you actually use.
+
+---
+
+## When you get stuck
+
+- `Cmd + P` and start typing what you want to do. The command palette knows almost everything.
+- Right-click anything (a folder, a note, a link). The context menu reveals features you didn't know existed.
+- Ask Claude. Paste a screenshot of what you're seeing and what you're trying to do.
+
+---
+
+*Next steps, in whatever order pulls hardest:*
+1. *Build the six templates (Meeting-Note, Client-MOC, Project-MOC, Article-Note, Weekly-Review, Daily-Note).*
+2. *Schedule the meeting ingest so meeting notes write themselves.*
+3. *Migrate browser bookmarks into `{{folders.resources}}/Articles/`.*
+4. *Run the notes-app import.*

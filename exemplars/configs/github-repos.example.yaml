@@ -1,0 +1,22 @@
+# atlas-github-ingest repo list (example)
+#
+# The repos in the owner's GitHub account are auto-discoverable via:
+#   gh repo list <owner> --json name
+# but they are explicitly enumerated here so the ingest never surprises you.
+#
+# Add a new line to ingest a new repo. Remove a line (or set `enabled: false`)
+# to stop ingesting one. The skill always reads this file as the source of
+# truth — it does NOT auto-discover repos at runtime.
+#
+# A repo that `gh` can no longer resolve (renamed, transferred, deleted) raises
+# a non-fatal error on every nightly run; remove or disable it rather than
+# leaving the noise.
+
+owner: harborlane
+repos:
+  - name: guest-portal
+    enabled: true
+  - name: booking-etl
+    enabled: true
+  - name: reporting-dashboards
+    enabled: false   # archived; keep the entry so its raw/ folder stays explained

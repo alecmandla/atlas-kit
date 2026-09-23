@@ -1,0 +1,121 @@
+# Fireflies → Obsidian routing rules (example)
+#
+# Routing priority:
+#   tier-1: attendees (exact email)              [routes:]
+#   tier-2: domains (email-domain)               [routes:]
+#   tier-3: title_contains (substring on title)  [routes:]
+#   tier-4: Monday lookup ({{folders.raw}}/monday/ mirror)   [monday_routes:]
+#     tier-4a: email-exact — participant email matches a Monday item's email column
+#     tier-4b: full-name substring — the full normalized item name (≥2 tokens, ≥8 chars
+#              after stopword removal) appears as a substring of the meeting title
+#   tier-4.5: owner fallback                     [maintainer_fallback:]
+#   tier-5: fallback → {{folders.inbox}}/needs-decision/ (DEC-016)
+#
+# First match wins across the full ruleset. Edit after a misroute to prevent recurrence.
+#
+# NEVER put the owner's own email under a rule's `attendees:` (tier-1). The owner
+# attends every recorded meeting, so it matches everything and silently kills
+# tiers 2–4. Use the `maintainer_fallback:` block near the bottom of this file.
+#
+# Schema for `routes:` (tiers 1–3):
+#   folder:         destination folder (relative to {{vault_root}}/)
+#   project_moc:    name of the MOC file linked from the meeting note's frontmatter
+#   tags:           list of tags added to the meeting note (in addition to `meeting`)
+#   attendees:      optional list of exact email addresses (tier 1)
+#   domains:        optional list of email-domain strings, no @ prefix (tier 2)
+#   title_contains: optional list of case-insensitive substrings matched against the title (tier 3)
+#
+# `monday_routes:` (tier 4): one entry per ingested Monday board slug. The tier reads ONLY
+# from {{folders.raw}}/monday/ (DEC-009); it never calls the Monday API. If the mirror is
+# missing or its newest mtime is > 48h old, tier 4 is skipped.
+
+routes:
+
+  # === SALES PROSPECTS ===
+  # One entry per OPEN pursuit in `{{folders.projects}}/Sales/<Prospect>/`. Placed at the TOP
+  # on purpose: a prospect's title tokens must be specific enough to beat the broad client
+  # tokens below (first-match-wins within a tier). Cross-tier priority still applies
+  # (attendee > domain > title): a title-only prospect rule can be out-prioritized by a
+  # DOMAIN match on a client rule, so add decision-maker emails under `attendees:` to harden it.
+  #   - On close-won:  move the folder to Clients/ and change folder + tags to [client, <slug>].
+  #   - On close-lost: comment the entry out so an archived prospect stops pulling calls.
+  - folder: "{{folders.projects}}/Sales/Ledgerline-Retail/meetings"
+    project_moc: "_Ledgerline-Retail"
+    tags: [prospect, sales]
+    # The retail team SHARES ledgerline.example with the Ledgerline partner rule below, so a
+    # domain match can't separate them. Discriminate by tier-1 attendees unique to the
+    # retail team (tier-1 beats the partner's tier-2 domain rule) plus retail-specific tokens.
+    # Do NOT add a contact who attends BOTH partner and retail calls; that steals partner calls.
+    attendees:
+      - marcus.hale@ledgerline.example   # Ledgerline retail — account manager
+    title_contains: ["ledgerline retail", "retail kickoff"]
+
+  # === WORK PROJECTS ===
+  - folder: "{{folders.projects}}/Work/Portal/meetings"
+    project_moc: "_Portal"
+    tags: [project, portal]
+    title_contains: [portal]
+
+  # === CLIENTS / PARTNERS ===
+  - folder: "{{folders.projects}}/Clients/Pinecrest-Lodge/meetings"
+    project_moc: "_Pinecrest-Lodge"
+    tags: [client, pinecrest-lodge]
+    attendees: [priya@pinecrestlodge.example]
+    domains: ["pinecrestlodge.example"]
+    title_contains: ["pinecrest lodge", "pinecrest"]
+
+  - folder: "{{folders.projects}}/Clients/Saltmarsh-Inn/meetings"
+    project_moc: "_Saltmarsh-Inn"
+    tags: [client, saltmarsh-inn]
+    domains: ["saltmarshinn.example"]   # domain is the reliable signal; a bare "inn" token would collide
+    title_contains: ["saltmarsh inn", "saltmarsh"]
+
+  - folder: "{{folders.projects}}/Clients/Ledgerline/meetings"
+    project_moc: "_Ledgerline"
+    tags: [client, ledgerline]
+    domains: ["ledgerline.example"]   # tier-2 domain beats tier-3 "{{employer}}" so "HQ / Ledgerline" routes here, not HQ
+    title_contains: ["ledgerline", "ledgerline sync"]   # the Retail rule above is evaluated first within tier 3
+
+  # === AREAS ===
+  - folder: "{{folders.areas}}/Marketing/meetings"
+    project_moc: "_Marketing"
+    tags: [area, marketing]
+    title_contains: ["marketing call", "marketing sync"]
+
+  - folder: "{{folders.areas}}/HQ/meetings"
+    project_moc: "_HQ"
+    tags: [area, hq]
+    title_contains: ["{{employer}}", "team sync", "hiring", "roadmap review", "jordan and {{owner_name}}", "1:1"]
+    # The owner's email deliberately does NOT appear under `attendees:` here; see maintainer_fallback.
+
+  - folder: "{{folders.areas}}/Client-Success/meetings"
+    project_moc: "_Client-Success"
+    tags: [area, client-success]
+    title_contains: ["client success", "escalation", "support review"]
+
+# tier-4.5: owner fallback. Runs AFTER tier-4 and BEFORE tier-5. The owner attends every
+# recorded meeting, so "was the owner there?" carries no routing signal; encoded as its own
+# tier so the behavior is deterministic. Set `enabled: false` to send unmatched meetings to
+# needs-decision instead (DEC-016).
+maintainer_fallback:
+  enabled: true
+  emails: ["{{owner_email}}"]
+  folder: "{{folders.areas}}/HQ/meetings"
+  project_moc: "_HQ"
+  tags: [area, hq, maintainer-fallback]
+
+# tier-4: Monday lookup. One entry per ingested board slug under {{folders.raw}}/monday/
+# <workspace_slug>/<board_slug>/. On match → route to `folder:`, add `tags:` and a
+# `monday_context:` frontmatter block. Even when tier 4 is NOT the deciding tier, the
+# skill still ATTACHES `monday_context:` so the metadata is captured.
+monday_routes:
+  dashboard-onboarding:
+    folder: "{{folders.areas}}/Dashboard-Onboarding/meetings"
+    project_moc: "_Dashboard-Onboarding"
+    tags: [area, dashboard-onboarding, monday-routed]
+  request-triage:
+    folder: "{{folders.areas}}/Request-Triage/meetings"
+    project_moc: "_Request-Triage"
+    tags: [area, request-triage, monday-routed]
+
+# Fallback: any meeting that hits no rule above lands in {{folders.inbox}}/needs-decision/ with tags: [meeting, needs-decision]

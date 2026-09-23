@@ -1,0 +1,23 @@
+# atlas-slack-ingest channel-to-folder routing (example)
+#
+# Scope: all public + private channels the owner is in, plus DMs. This file
+# controls routing for *output organization* — every ingested channel writes to
+# {{folders.raw}}/slack/<channel_or_dm_route>/<message_ts>.md. The default
+# behavior uses the channel name as the route (slugified). Explicit entries
+# below override the default, which is how several related channels collapse
+# into one folder.
+#
+# Channel discovery happens via slack_search_channels (paginated) at ingest
+# time. This yaml is not the source of truth for which channels to ingest —
+# it's the routing layer.
+
+# Optional channel-name override → route folder
+channel_routes:
+  - { channel: "ops-feed", route: "ops" }
+  - { channel: "eng-incidents", route: "eng" }
+  - { channel: "eng-deploys", route: "eng" }
+  - { channel: "mktg-automations", route: "marketing" }
+  - { channel: "client-updates", route: "client-updates" }
+
+# DMs route to a fixed folder.
+dm_route: "_dms"
