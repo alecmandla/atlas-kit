@@ -1,0 +1,23 @@
+{
+  "showGettingStartedBanner": false,
+  "hasMigratedDailyNoteSettings": true,
+  "hasMigratedWeeklyNoteSettings": true,
+  "daily": {
+    "enabled": true,
+    "format": "YYYY-MM-DD",
+    "folder": "10 - Daily Notes/YYYY/YYYY-MM",
+    "template": "60 - Meta/Templates/Daily-Note.md"
+  },
+  "weekly": {
+    "enabled": false
+  },
+  "monthly": {
+    "enabled": false
+  },
+  "quarterly": {
+    "enabled": false
+  },
+  "yearly": {
+    "enabled": false
+  }
+}

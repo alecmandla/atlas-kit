@@ -1,0 +1,11 @@
+{
+  "globalFilter": "",
+  "removeGlobalFilter": false,
+  "taskFormat": "tasksPluginEmoji",
+  "setDoneDate": true,
+  "autoSuggestInEditor": true,
+  "autoSuggestMinMatch": 0,
+  "autoSuggestMaxItems": 6,
+  "provideAccessKeys": true,
+  "useFilenameAsScheduledDate": false
+}
