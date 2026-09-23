@@ -52,7 +52,8 @@ ignored, which is how `atlas.config.example.json` carries `_doc` strings.
     "clippings":   "Clippings",
     "raw":         "raw",
     "wiki":        "wiki"
-  }
+  },
+  "no_nudge": []
 }
 ```
 
@@ -65,6 +66,11 @@ Rules enforced at load time (a violation raises `ConfigError` naming the file):
   not `.` or `..`. Subfolders below the top level (`Clients/`, `People/`,
   `entities/`, `Dashboards/`, ...) are engine conventions and are not
   configurable here.
+- `no_nudge` is a list of non-empty strings, each a vault-relative folder path
+  (`30 - Areas/Journal`) or a tag (`#journal`). Entries are trimmed and lose any
+  leading or trailing `/`. The list is what must never appear on a nudge
+  surface (morning report, weekly review, dashboards, scheduled output); the
+  owner names it in the kickoff interview and it defaults to empty.
 - Invalid JSON raises `ConfigError` with the path and the decoder's message.
 
 `atlas.config.example.json` at the repo root shows every key at its default
@@ -80,6 +86,7 @@ atlas_config.vault_from_arg(v) -> Path # --vault value if given, else load().vau
 Config.vault_root: Path                # absolute, ~ expanded
 Config.owner_name: str
 Config.timezone: str
+Config.no_nudge: list[str]             # folders and tags never surfaced as nudges; [] by default
 Config.source: Path | None             # file the values came from; None = defaults
 Config.folder(key) -> Path             # absolute: vault_root / folders[key]
 Config.folder_name(key) -> str         # bare name, e.g. "20 - Projects"
@@ -138,7 +145,8 @@ than `CFG.folder(...)`, so a `--vault` override flows through.
 
 - `_shared/test_atlas_config.py` (unittest, temp dirs only): defaults match the
   reference layout, resolution order, `~` expansion, unknown/`_doc` keys
-  ignored, the example file loads to the defaults, malformed JSON and wrong
+  ignored, the example file loads to the defaults, `no_nudge` loads as a
+  trimmed list and rejects non-list or empty entries, malformed JSON and wrong
   types raise `ConfigError` naming the path, `$ATLAS_CONFIG` pointing at a
   missing file errors, blank `$ATLAS_CONFIG` means unset.
 - Existing suites are unchanged and pass before and after (222 checks across
@@ -183,7 +191,6 @@ Changed (one line each):
 - `atlas-graduate/graduate.py` - `VAULT_DEFAULT`, `PARA_DIRS`, `TARGET_PATHS`, area/client inference, raw walk, the Dataview `FROM` clause, report path, `--vault` fallback go through config.
 - `atlas-lint/lint.py` - absolute home-directory vault path replaced; `EXCLUDE_DIRS`, `ADMIN_PREFIXES`, wiki dirs, raw check, dashboard path, `--vault` from config.
 - `atlas-monday-ingest/ingest.py` - `RAW_MONDAY` goes through config.
-- `atlas-monk/monk_scaffold.py` - `DEFAULT_VAULT`, Templates and Monk-Manual dirs from config; `--vault` help text generic.
 - `atlas-people-extract/extract.py` - absolute home-directory vault path and `SKILL_DIR` replaced; `PEOPLE_DIR`, `SCAN_ROOTS`, and both Dataview `FROM` clauses derive from config.
 - `atlas-research/research.py` - absolute home-directory vault path replaced; `EXCLUDE_DIRS`, `RESEARCH_SUBDIR`, every `LAYER_RULES` prefix, raw/wiki lookups, `--vault` from config.
 - `atlas-slack-ingest/ingest.py` - `RAW_SLACK` goes through config.

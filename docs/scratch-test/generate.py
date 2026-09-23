@@ -43,9 +43,11 @@ PROFILE = {
         "attachments": "Attachments", "crm": "CRM", "clippings": "Clippings",
         "raw": "raw", "wiki": "wiki",
     },
-    "no_nudge": "Areas/Journal",
+    # round 2.4: the folder and tag that must never appear on a nudge surface -> config no_nudge
+    "no_nudge": ["Areas/Journal", "#journal"],
     "user_rule": "Never rewrite the headings of a daily note.",
 }
+NO_NUDGE_DISPLAY = ", ".join(f"`{x}`" for x in PROFILE["no_nudge"])
 DEFAULT_FOLDERS = {
     "inbox": "00 - Inbox", "daily": "10 - Daily Notes", "projects": "20 - Projects",
     "areas": "30 - Areas", "resources": "40 - Resources", "archive": "50 - Archive",
@@ -94,7 +96,6 @@ BLOCKED = [
     ("atlas-wispr-meetings-ingest", "no Wispr Flow store under ~/Library"),
     ("atlas-voice-memos-ingest", "experimental; Full Disk Access not confirmed (declined)"),
     ("atlas-book-summary", "declined in the interview"),
-    ("atlas-monk", "selected as the reflection practice, but the exemplar depends on five Monk-* templates and /atlas-monk-* commands the kit does not ship; needs a decision"),
     ("atlas-transcript-extract", "status: retired"),
 ]
 SCRIPT_JOBS = {
@@ -189,9 +190,9 @@ def main() -> int:
          "Archive is a move the human does. Enforced by the absence of any delete step in every generated skill.", "accepted"),
         ("Meeting transcripts stay summary-only on disk; the full transcript is fetched on demand.",
          "Keeps the vault small and cheap to search. No meeting source is selected in this vault; the rule stands for any added later.", "accepted"),
-        (f"Nothing under `{PROFILE['no_nudge']}` appears on any nudge surface.",
-         "Nudge surfaces are the morning report, weekly review, dashboards, and any scheduled output. Skills for these practices are on-demand only and never wired to a scheduler.",
-         f"accepted (list: `{PROFILE['no_nudge']}`)"),
+        (f"Nothing under {NO_NUDGE_DISPLAY} appears on any nudge surface.",
+         "Nudge surfaces are the morning report, weekly review, dashboards, and any scheduled output. The list is the config's `no_nudge` key; every briefing and dashboard skill skips those folders and tags, and no scheduled job is ever generated for them.",
+         f"accepted (list: {NO_NUDGE_DISPLAY})"),
         (PROFILE["user_rule"],
          "The owner has been burned by a tool that rewrote daily-note headers. Skills that write into a daily note replace only the body of their own `## Atlas ...` section and leave every other heading byte-identical.", "accepted"),
     ]
@@ -238,7 +239,7 @@ def main() -> int:
         f"3. Fill every `{{{{fill-me}}}}` in `{cfg_dir}/github-repos.yaml` (owner, repo names).",
         "4. Full Disk Access: not needed (voice memos not selected).",
         f"5. Run the first job by hand (`python3 engine/atlas-claude-history-ingest/ingest.py --execute`) and check `{F['raw']}/claude-history/` and `engine/atlas-claude-history-ingest/last-run.md`, not the timestamp.",
-        f"6. Reflection practice: `{PROFILE['no_nudge']}` is excluded from every nudge surface, but no practice skill was generated (see blocked list).",
+        f"6. No-nudge list: {NO_NUDGE_DISPLAY} is written to `no_nudge` in `atlas.config.json` and excluded from every nudge surface. The kit ships no skill for a personal practice; only the exclusion is generated.",
     ])
     kick = fill(body, {
         **values,
@@ -255,7 +256,8 @@ def main() -> int:
         "job_rows": "\n".join(job_rows), "generation_tree": gen_tree,
         "folder_keys_list": json.dumps(list(F.keys())),
         "verification_commands": f'python3 engine/atlas-lint/lint.py --vault "{vault}" report',
-        "manual_steps": manual_steps, "no_nudge_list": f"`{PROFILE['no_nudge']}`",
+        "manual_steps": manual_steps, "no_nudge_list": NO_NUDGE_DISPLAY,
+        "no_nudge_json": json.dumps(PROFILE["no_nudge"]),
     })
     leftover = sorted(set(re.findall(r"\{\{[^}]+\}\}", kick)) - {"{{fill-me}}"})
     (repo / "docs").mkdir(parents=True, exist_ok=True)
@@ -264,7 +266,8 @@ def main() -> int:
 
     # ---------------------------------------------------------------- Phase 4.1 config
     config = {"vault_root": str(vault), "owner_name": PROFILE["owner_name"], "owner_email": "", "employer": "",
-              "employer_domain": "", "timezone": PROFILE["timezone"], "folders": F}
+              "employer_domain": "", "timezone": PROFILE["timezone"], "folders": F,
+              "no_nudge": PROFILE["no_nudge"]}
     (repo / "atlas.config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     user_cfg = home / ".config/atlas/config.json"
     if user_cfg.exists():
@@ -287,7 +290,7 @@ def main() -> int:
         "", "## Guardrails", "",
         "Decided at kickoff (`docs/ATLAS-KICKOFF.md` §3; `docs/DECISIONS.md` DEC-035 to DEC-043). Do not relitigate without a new decision.", "",
     ] + [f"{i}. **{rule}** {why} (DEC-{dec_base + i - 1:03d})" for i, (rule, why, _) in enumerate(constraints, 1)] + [
-        f"8. Skip `{PROFILE['no_nudge']}/` when scanning for tasks, tags, threads, or activity; never list it, never wire it to a scheduler. (DEC-042)",
+        f"8. Skip every folder and tag in the config's `no_nudge` list ({NO_NUDGE_DISPLAY}) when scanning for tasks, tags, threads, or activity; never list them, never wire them to a scheduler. (DEC-042)",
         "",
     ])
     for name, *_ in SELECTED:
@@ -351,13 +354,17 @@ def main() -> int:
             text = edit(text, r"### 3a — Today's calendar\n.*?(?=### 3b)",
                         "### 3a — Today's calendar\n\nNo calendar source is configured for this vault (no meeting ingest, no dictation ingest, no calendar MCP). Write:\n\n```markdown\n### Today's calendar\n\n*(No calendar source configured.)*\n```\n\nIf a calendar source is connected later, re-run `/atlas-kickoff --resume` so this section is regenerated from the exemplar.\n\n",
                         "morning calendar section", regex=True)
-            text = edit(text, r"\*\*Exclude no-nudge practice tasks\.\*\*.*?\n\n",
-                        f"**Exclude no-nudge practice tasks.** Skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge']}/` before matching. The owner's reflection practice is intentionally quiet (DEC-027, DEC-042); its tasks never appear as overdue here.\n\n",
+            text = edit(text, r"\*\*Exclude everything on the no-nudge list\.\*\*.*?\n\n",
+                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any matching line tagged `{PROFILE['no_nudge'][1]}` before matching. These are intentionally quiet (DEC-027, DEC-042); their tasks never appear as overdue here.\n\n",
                         "morning no-nudge paragraph", regex=True)
             text = edit(text, r"- `atlas-wispr-ingest` — writes[^\n]*\n", "", "morning wispr relationship", regex=True)
             text = edit(text, r"- `atlas-fireflies-ingest` — writes[^\n]*\n", "", "morning fireflies relationship", regex=True)
             text = edit(text, "- **CalendarEvents table missing**: skip silently; write `*(CalendarEvents not available.)*` in the calendar section.\n", "", "morning calendar edge case 1")
             text = edit(text, r"- \*\*Wispr DB locked\*\*[^\n]*\n", "", "morning calendar edge case 2", regex=True)
+        if name == "atlas-weekly":
+            text = edit(text, r"\*\*Exclude everything on the no-nudge list\.\*\*.*?\n\n",
+                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any item tagged `{PROFILE['no_nudge'][1]}`. The weekly review is a nudge surface (DEC-027, DEC-042); nothing on that list is ever listed here or in the \"Needs attention\" alert.\n\n",
+                        "weekly no-nudge paragraph", regex=True)
         if name == "atlas-research":
             text = edit(text, r"### Step 2a — Transcript escalation.*?(?=## Step 3)", "", "research transcript escalation", regex=True)
             text = edit(text, r" \(The Step 2a Fireflies transcript escalation[^)]*\)", "", "research anti-goal sentence", regex=True)

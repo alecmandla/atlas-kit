@@ -98,7 +98,7 @@ or the plain-text Tasks plugin format:
 ```
 where the captured date < TODAY.
 
-**Exclude no-nudge practice tasks.** Drop any matching line that contains a `#monk/` tag. Practice priorities in the owner's reflection folder are intentionally quiet carry-over, not "overdue" — the owner opted out of nudges (DEC-027). They surface only in their own gentle practice hub note, never in this morning report.
+**Exclude everything on the no-nudge list.** Read `no_nudge` from the Atlas config (`$ATLAS_CONFIG`, else `~/.config/atlas/config.json`): a list of vault-relative folder paths and `#tags`. Skip every file under a listed folder before matching, and drop any matching line that carries a listed tag (or a sub-tag of it, `#journal/…`). Whatever the owner put on that list is intentionally quiet carry-over, not "overdue" — they opted out of nudges for it (DEC-027). It never appears in this morning report, even when the list is empty by default and nothing is skipped.
 
 Collect: file path (relative to vault root), task text, due date. Sort by due date ascending (oldest overdue first). Cap at 10 items to avoid flooding the morning report; if more exist, append a `… and N more` line.
 

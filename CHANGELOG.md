@@ -17,8 +17,8 @@ First public release.
   checklist, and a scheduler setup. Ships its own interview method, kickoff template,
   workflow reference, Obsidian plugin guide, and three scheduler guides (desktop
   scheduled tasks, launchd, manual runbook) under `references/`.
-- `exemplars/`: 25 scrubbed exemplar `SKILL.md` files (ingest, spine, query, briefing,
-  orchestrator, capture, practice), 6 vault document templates (`AGENTS.md`, `Guide.md`,
+- `exemplars/`: 24 scrubbed exemplar `SKILL.md` files (ingest, spine, query, briefing,
+  orchestrator, capture), 6 vault document templates (`AGENTS.md`, `Guide.md`,
   `Getting-Started.md`, `Onboarding-Playbook.md`, raw-layer README, wiki index), 6 example
   routing and seed configs, and the design-decision register (`DECISIONS.md`) that the
   exemplars cite. Every generated skill traces back to one exemplar by name.
@@ -26,7 +26,9 @@ First public release.
   graduate, synthesize, lint, health) and the file-based ingests, with a config layer
   (`engine/_shared/atlas_config.py`) that resolves `$ATLAS_CONFIG`, then
   `~/.config/atlas/config.json`, then built-in defaults, so the same scripts run against
-  any vault layout. Includes `atlas.config.example.json`.
+  any vault layout. Includes `atlas.config.example.json`. The config's `no_nudge` list
+  names the folders and tags that must never appear on a nudge surface; briefing and
+  dashboard skills honor it (DEC-027).
 - `vault-scaffold/`: a default PARA folder tree with numbered prefixes, `raw/` and `wiki/`
   layers with their invariant READMEs, an `.obsidian/` configuration with settings for
   each community plugin the pipeline expects, five note templates (daily, meeting,
@@ -39,3 +41,8 @@ First public release.
   and the whole-history identity check.
 - `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` so the repository
   installs as a Claude Code plugin from its own marketplace.
+
+### Not included
+
+- The maintainer's personal reflection-practice skill is not part of the kit and may
+  appear later as a separate add-on plugin.

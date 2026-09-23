@@ -32,5 +32,7 @@
     "raw": "raw",
     "_doc_wiki": "Synthesized knowledge: wiki/entities, wiki/concepts, wiki/synthesis.",
     "wiki": "wiki"
-  }
+  },
+  "_doc_no_nudge": "Folders and tags that must never appear on a nudge surface (morning report, weekly review, dashboards, any scheduled output). Entries are vault-relative folder paths (\"30 - Areas/Journal\") or tags (\"#journal\"). Briefing and dashboard skills skip them; nothing on this list is ever scheduled. Empty means nothing is excluded.",
+  "no_nudge": []
 }

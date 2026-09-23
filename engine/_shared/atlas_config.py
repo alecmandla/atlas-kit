@@ -27,8 +27,14 @@ Schema (every key optional; unknown keys and keys starting with "_" are ignored)
         "clippings":   "Clippings",
         "raw":         "raw",
         "wiki":        "wiki"
-      }
+      },
+      "no_nudge": []
     }
+
+"no_nudge" lists what must never appear on a nudge surface (morning report,
+weekly review, dashboards, any scheduled output): vault-relative folder paths
+("30 - Areas/Journal") and tags ("#journal"). Empty by default; the owner
+names entries in the kickoff interview.
 
 Usage from a skill script (two levels below the repo root):
 
@@ -40,6 +46,7 @@ Usage from a skill script (two levels below the repo root):
     CFG = atlas_config.load()
     RAW_GMAIL = CFG.folder("raw") / "gmail"        # absolute Path under vault_root
     PARA = [CFG.folder_name("projects"), ...]      # bare folder name for note text
+    QUIET = CFG.no_nudge                           # folders and tags never nudged
 
 A malformed config file raises ConfigError naming the offending path; a
 missing default file silently falls back to the built-in defaults.
@@ -56,6 +63,7 @@ __all__ = [
     "Config",
     "ConfigError",
     "DEFAULT_FOLDERS",
+    "DEFAULT_NO_NUDGE",
     "DEFAULT_OWNER_NAME",
     "DEFAULT_TIMEZONE",
     "DEFAULT_VAULT_ROOT",
@@ -88,6 +96,7 @@ DEFAULT_FOLDERS: Mapping[str, str] = {
     "wiki": "wiki",
 }
 FOLDER_KEYS = tuple(DEFAULT_FOLDERS)
+DEFAULT_NO_NUDGE: list[str] = []
 
 
 class ConfigError(ValueError):
@@ -100,6 +109,7 @@ class Config:
     owner_name: str
     timezone: str
     folders: Mapping[str, str]
+    no_nudge: list[str]  # vault-relative folder paths and #tags never surfaced as nudges
     source: Optional[Path]  # the file the values came from; None means built-in defaults
 
     def folder_name(self, key: str) -> str:
@@ -171,11 +181,22 @@ def from_mapping(data: Mapping[str, Any], source: Optional[Path] = None) -> Conf
             )
         folders[key] = name
 
+    no_nudge: list[str] = []
+    raw_no_nudge = data.get("no_nudge", DEFAULT_NO_NUDGE)
+    _expect(raw_no_nudge, list, '"no_nudge"', src)
+    for i, entry in enumerate(raw_no_nudge):
+        _expect(entry, str, f'"no_nudge[{i}]"', src)
+        entry = entry.strip().strip("/")
+        if not entry:
+            raise ConfigError(f'Atlas config {src}: "no_nudge[{i}]" must not be empty')
+        no_nudge.append(entry)
+
     return Config(
         vault_root=vault_root,
         owner_name=owner_name,
         timezone=timezone,
         folders=folders,
+        no_nudge=no_nudge,
         source=source,
     )
 

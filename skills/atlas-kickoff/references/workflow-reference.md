@@ -93,7 +93,7 @@ The vault defaults the interview proposes:
 | Every claim on a generated wiki page carries a resolvable wikilink. | Synthesize and research run a citation-resolution gate before writing. |
 | Nothing generated deletes a note. | No generated skill has a delete step; archive is a move the human does. |
 | Meeting transcripts stay summary-only on disk. | Meeting ingest writes summary records and a link; transcripts are fetched on demand. |
-| No-nudge practices never appear on nudge surfaces. | Briefing and dashboard skills carry the exclusion list in their guardrails; practice skills are never scheduled. |
+| Nothing on the no-nudge list appears on a nudge surface. | The list is the config's `no_nudge` key; briefing and dashboard skills read it and repeat it in their guardrails, and no scheduled job is generated for anything on it. |
 
 ## The DECISIONS log
 

@@ -82,6 +82,8 @@ Walk PARA. For each, extract:
 
 For ranking, prefer items with a due date (`📅 YYYY-MM-DD` or `due:YYYY-MM-DD`). Among those, prefer items overdue or due this week (already on the owner's radar).
 
+**Exclude everything on the no-nudge list.** Read `no_nudge` from the Atlas config (`$ATLAS_CONFIG`, else `~/.config/atlas/config.json`): skip every file under a listed vault-relative folder, and drop any item carrying a listed `#tag`. The weekly review is a nudge surface (DEC-027); nothing the owner put on that list is ever listed here, in 2c or in the "Needs attention" alert that reads from it.
+
 Collect: task text, file path, due date if any. Cap at 25; surface the cap.
 
 ### 2d — Threads with new activity this week
