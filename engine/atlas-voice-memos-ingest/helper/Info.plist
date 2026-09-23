@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.atlas.transcribe</string>
+    <key>CFBundleName</key>
+    <string>atlas-transcribe</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>atlas-transcribe transcribes your iOS Voice Memos on-device so the Atlas vault can mirror them. Audio never leaves this machine.</string>
+</dict>
+</plist>
