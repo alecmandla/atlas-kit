@@ -209,14 +209,18 @@ so a failure in one is reported, not fatal to the rest.
    file's comments; they document the format. `entity_seeds.json` gets the user's product
    and technology seeds, or the example's structure with an empty list.
 5. **Vault scaffold.** Copy `${CLAUDE_PLUGIN_ROOT}/vault-scaffold/` into the vault,
-   renaming folders per the config. Rules: create folders that do not exist; skip any
+   renaming folders per the config. Rules: create folders that do not exist (the
+   scaffold's `.gitkeep` markers are never copied); skip any
    folder that exists and has content; copy `.obsidian/` files only when the vault has no
    `.obsidian/` directory (otherwise write them to `<vault>/60 - Meta/atlas-obsidian-config/`
    equivalent under `{{folders.meta}}` and tell the user to merge by hand); write
    templates only if the destination file is absent. Rewrite the folder names inside
    `.obsidian/plugins/*/data.json` and `.obsidian/app.json` to the config values. Copy
-   `exemplars/vault/*.md.template` into the vault root with placeholders filled, again only
-   if absent.
+   `exemplars/vault/{AGENTS,Guide,Getting-Started,Onboarding-Playbook}.md.template` into
+   the vault root with placeholders filled, again only if absent. `raw-README.md.template`
+   and `wiki-index.md.template` are not copied: the scaffold already placed `raw/README.md`
+   and `wiki/index.md`, and the template versions show the populated shape the
+   materializer produces, not first-run content.
 6. **Plugin checklist.** Copy `vault-scaffold/PLUGIN-CHECKLIST.md` into
    `<vault>/{{folders.meta}}/PLUGIN-CHECKLIST.md`, marking each plugin already present in
    `community-plugins.json` as installed and pruning plugins no selected capability needs
