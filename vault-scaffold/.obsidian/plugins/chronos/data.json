@@ -1,0 +1,19 @@
+{
+  "selectedLocale": "en",
+  "align": "left",
+  "clickToUse": false,
+  "roundRanges": false,
+  "useUtc": true,
+  "useAI": false,
+  "showChangelogOnUpdate": true,
+  "enableCaching": false,
+  "basesPropNames": {
+    "start": "start",
+    "end": "end",
+    "group": "group",
+    "color": "color",
+    "type": "type",
+    "content": "content",
+    "description": "description"
+  }
+}

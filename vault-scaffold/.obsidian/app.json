@@ -1,0 +1,13 @@
+{
+  "attachmentFolderPath": "99 - Attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "00 - Inbox",
+  "alwaysUpdateLinks": true,
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "promptDelete": true,
+  "trashOption": "system",
+  "showLineNumber": false,
+  "livePreview": true,
+  "defaultViewMode": "source"
+}
