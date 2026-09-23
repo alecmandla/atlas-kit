@@ -3,7 +3,7 @@ name: atlas-morning
 description: Daily 8 AM agent. Creates today's daily note (if not yet created) and injects an "Atlas morning report" section with three synthesized lists: today's calendar events, overdue PARA tasks, and active idea-threads from the last 7 days. Idempotent — running again overwrites only the morning report section, preserving any other edits. Triggers on "atlas morning", "morning report", "create daily note", "/atlas-morning", or any scheduled 8 AM run.
 exemplar-of: atlas-morning
 status: active
-requires: [mcp/scheduled-tasks, cli/python3]
+requires: [cli/python3]
 ---
 
 # atlas-morning

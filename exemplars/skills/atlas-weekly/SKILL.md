@@ -3,7 +3,7 @@ name: atlas-weekly
 description: Friday 6 PM weekly review agent. Generates a narrative weekly review at {{folders.areas}}/Weekly-Reviews/<ISO-week>.md from the Weekly-Review.md template, populated with: this week's meetings the owner attended, shipped tasks (completed this week), open action items still unticked, threads with new activity this week, and threads gone quiet for ≥ 14 days. Idempotent — re-runs the same Friday overwrite the file (it's a snapshot). Triggers on "atlas weekly", "weekly review", "/atlas-weekly", or any scheduled Friday 18:00 run.
 exemplar-of: atlas-weekly
 status: active
-requires: [mcp/scheduled-tasks, cli/python3]
+requires: [cli/python3]
 ---
 
 # atlas-weekly
