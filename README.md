@@ -1,38 +1,86 @@
 # atlas-kit
 
-atlas-kit is a Claude Code plugin that sets up an Obsidian second brain with an automated
-knowledge pipeline. It interviews you about your vault, your sources, and your
-non-negotiables, then generates a suite of skills, configs, and a scheduler setup tailored
-to that vault, in your own repository. The pipeline it produces mirrors your sources into an
-append-only raw layer, materializes a regenerable wiki on top of it, and answers questions
-with citations back to the evidence.
+atlas-kit is a Claude Code plugin that turns an Obsidian vault into a second brain with an
+automated knowledge pipeline. You run one command, answer an interview about your vault
+and your sources, and it generates a set of skills, configs, and a scheduler tailored to
+you, in your own repository. From then on your meetings, email, chat, boards, repositories,
+and dictation land in the vault on a schedule, get distilled into a wiki, and can be
+queried with citations back to the evidence.
+
+```
+sources ──ingest──▶ raw/ ──emerge / graduate──▶ wiki/ (entities, concepts, syntheses)
+                                                   │
+briefings (morning, weekly, health) read the vault ┘   research answers questions with citations
+```
 
 ## Who it is for
 
 People who already live in Obsidian and Claude Code, keep their working life across
-several systems (meetings, email, chat, boards, repositories, dictation), and want one
-vault that ingests all of it on a schedule without anyone hand-copying notes. You should
-be comfortable running `python3` scripts and reading a generated `SKILL.md`; you do not
-need to write either.
+several systems, and want one vault that ingests all of it without hand-copying notes. You
+should be comfortable running a `python3` script and reading a generated `SKILL.md`. You
+do not need to write either.
 
-## What you get
+## What to expect
 
-| Part | What it is |
-|---|---|
-| `skills/atlas-kickoff/` | The one skill this plugin installs. `/atlas-kickoff` diagnoses your machine, interviews you, writes a kickoff document, and executes it. Everything else below is material the kickoff reads or copies. |
-| `exemplars/` | 24 scrubbed exemplar skills (ingest, spine, query, briefing, orchestrator, capture), 6 vault document templates, 6 example routing configs, and the design-decision register they cite. Nothing here runs; it is the design source every generated skill is derived from. |
-| `engine/` | A stdlib-only Python engine for the spine (wiki materialize, emerge, graduate, synthesize, lint, health) and the file-based ingests, with a config layer so the same scripts run against any folder layout. The kickoff copies it into your repo. |
-| `vault-scaffold/` | A default PARA folder tree, `raw/` and `wiki/` layers with their invariant READMEs, an `.obsidian/` configuration with per-plugin settings, four note templates, and a plugin checklist. The kickoff copies it into your vault, renaming folders to match your answers. |
+**Time.** Install takes two minutes. The kickoff interview and generation take twenty to
+forty minutes, most of it answering questions. Working through the Obsidian plugin
+checklist takes another ten. The first pipeline run is a few minutes on an empty vault.
+
+**What changes in your vault.** New top-level folders `raw/` and `wiki/` appear, plus
+whichever PARA folders you asked for that did not already exist. Existing folders with
+content are never written into. A meta folder gains templates, a plugin checklist, and a
+dashboards folder. Nothing generated ever deletes or edits a note you wrote.
+
+**What changes on your machine.** A config file at `~/.config/atlas/config.json` with your
+vault path, name, timezone, and folder names. A repository of your choosing gains
+`skills/`, `engine/`, `docs/`, and a runbook. If you choose a scheduler, its job
+definitions are written there too and you install them by hand.
+
+**What it feels like after.** Each morning your daily note carries a briefing: calendar,
+overdue tasks, active threads. Each night the ingests run, the wiki is regenerated, and
+new recurring patterns are listed for you to promote or ignore. On Fridays a weekly review
+is drafted. When you want an answer, `/atlas-research <question>` drills through the wiki
+down to the raw evidence and cites every claim. When you want a thought captured,
+`/atlas-distill` files the current conversation as a linked note.
+
+**Honest tiers.** The spine (wiki, emerge, graduate, synthesize, lint, health, research,
+distill) works on any vault with only `python3`. Each ingest is opt-in and needs one
+connected service, listed below; missing ones are skipped, never faked. Voice memos and
+Wispr dictation are macOS-only and experimental. Expect to babysit those two.
 
 ## Prerequisites
 
-Required:
+### Required
 
-- **Obsidian**, installed, with a vault you can point at (or a folder where one should be created).
-- **Claude Code** (CLI or the desktop app). The desktop app additionally offers its built-in scheduler as a scheduling option.
-- **python3 3.10 or newer** on your `PATH`. The engine is standard-library only; nothing is installed with `pip`.
+| What | Why |
+|---|---|
+| Obsidian with a vault, or a folder where one should be created | The pipeline writes into it |
+| Claude Code, CLI or desktop app | Runs the kickoff and the session-driven skills |
+| `python3` 3.10 or newer on your `PATH` | The engine. Standard library only, nothing installed with `pip` |
+| A git repository for the generated skills, empty is fine | The kickoff writes there |
 
-Optional, by source. Each unlocks one ingest; missing ones are skipped, not faked:
+Required Obsidian community plugins. The kickoff writes their settings; you install them
+from inside Obsidian:
+
+| Plugin | Needed by |
+|---|---|
+| Templater | Daily, meeting, person, project, and weekly templates |
+| Dataview | Dashboards, project and person pages, weekly review |
+| Periodic Notes | Daily-note folder and template, morning briefing |
+
+### Recommended
+
+| What | Why |
+|---|---|
+| Tasks plugin | Overdue tasks in the morning briefing, shipped tasks in the weekly review |
+| Tag Wrangler | Renaming thread tags across the vault when a pattern graduates |
+| Omnisearch | Better full-text search when you research by hand |
+| `rg` (ripgrep) | Faster research over large vaults; the engine falls back to Python without it |
+
+### Per source, optional
+
+Each unlocks one ingest. The kickoff detects what is connected in the session it runs in
+and offers only those.
 
 | Source | Prerequisite |
 |---|---|
@@ -40,89 +88,121 @@ Optional, by source. Each unlocks one ingest; missing ones are skipped, not fake
 | Email | Gmail MCP server |
 | Chat | Slack MCP server |
 | Boards | Monday.com MCP server |
-| Apple Notes | Apple Notes MCP server (macOS) |
-| Repositories | `gh` CLI, authenticated (`gh auth status` exits 0) |
+| Repositories | `gh` CLI, authenticated |
 | Claude Code session history | a non-empty `~/.claude/projects/` |
+| Apple Notes | Apple Notes MCP server, macOS |
+| Wispr dictation | Wispr Flow installed, macOS |
+| Voice memos | macOS with Full Disk Access granted to the runner |
 | Calendar in the morning briefing | a calendar MCP server |
 | Scheduled runs from the desktop app | the app's scheduled-tasks MCP |
 
-## Install
+## Setup
 
-Two commands, inside Claude Code:
+### Step 1. Install the plugin
+
+Inside Claude Code:
 
 ```
 /plugin marketplace add alecmandla/atlas-kit
 /plugin install atlas-kit@atlas-kit
 ```
 
-The first registers this repository as a marketplace named `atlas-kit`; the second
-installs the plugin of the same name from it. Restart the session or run
-`/reload-plugins`, and `/atlas-kickoff` is available.
+Restart the session or run `/reload-plugins`. The `/atlas-kickoff` command is now
+available.
 
-## First run
+### Step 2. Connect your sources first
 
-Open Claude Code in the repository where you want the generated skills to live (create an
-empty one if you have none), then:
+Connect whichever MCP servers you want ingested before you run the kickoff, in the same
+Claude session. Authenticate `gh` if you want repositories. The kickoff only offers sources
+it can see. You can add a source later with `/atlas-kickoff --resume` after connecting it.
+
+### Step 3. Run the kickoff
+
+Open Claude Code in the repository where the generated skills should live, then:
 
 ```
 /atlas-kickoff
+/atlas-kickoff ~/path/to/vault       # skip vault detection
+/atlas-kickoff --write-only          # stop after writing the kickoff document, execute later
+/atlas-kickoff --resume              # execute an existing kickoff document
 ```
 
-Give it a vault path as an argument if you want to skip detection:
-`/atlas-kickoff ~/path/to/vault`.
+The interview runs in at most three rounds. Every question states its default so you can
+accept it in a word.
 
-**Diagnosis, no questions.** The skill looks for your vault, checks that Obsidian and
-`python3` are present, detects which MCP servers and CLIs are connected, reads which
-exemplars those unlock, and inspects the target repo. It reads folder names and file
-counts in the vault, never note contents.
+1. **Identity and shape.** What generated notes should call you, the one-paragraph
+   mission, your folder scheme (numbered PARA by default, or PARA without numbers,
+   Zettelkasten, or custom), and your timezone.
+2. **Folders, sources, and silence.** The full folder table for edits, which detected
+   sources to ingest, which non-ingest capabilities to include, and which folders, tags, or
+   practices must never appear in any briefing, dashboard, or scheduled output.
+3. **Operation and non-negotiables.** Scheduled or on-demand, which scheduler, and five
+   invariants to accept or explicitly waive with a reason: raw is append-only, the wiki is
+   regenerable from raw, every generated claim carries a resolvable wikilink, nothing
+   generated deletes a note, transcripts stay summary-only on disk. It also asks what a
+   tool once did to your notes that you never want repeated; that becomes a guardrail in
+   every generated skill.
 
-**Interview, at most three rounds.** Round one asks who the vault is for, its one-paragraph
-mission, the folder scheme (numbered PARA by default), and confirms the timezone. Round
-two shows the full folder table for edits, offers only the sources whose prerequisites were
-detected, lets you choose the non-ingest capabilities, and asks which practices, folders,
-or tags must never appear on any nudge surface. Round three settles on-demand versus
-scheduled, the scheduler, and the non-negotiables: raw is append-only, the wiki is
-regenerable from raw, every generated claim carries a resolvable wikilink, nothing
-generated ever deletes a note, transcripts stay summary-only on disk. Each can be accepted
-or explicitly waived with a reason; nothing is dropped silently. Every question names its
-default so you can accept it in a word.
+### Step 4. Review the kickoff document, then let it execute
 
-**Generation.** The kickoff writes `docs/ATLAS-KICKOFF.md` in your repo and, once you
-confirm, produces:
+The kickoff writes `docs/ATLAS-KICKOFF.md` in your repo and shows it to you before doing
+anything else. Read it. It is the contract for everything generated next.
 
-- `atlas.config.json` in the repo and `~/.config/atlas/config.json` (asked before overwriting an existing one)
-- `engine/` copied into the repo
-- `skills/<name>/SKILL.md` for each selected capability, each carrying `derived-from: <exemplar>`
-- routing configs (`github-repos.yaml`, `mailbox-routing.yaml`, and so on) and `entity_seeds.json`, each next to the engine script that reads it, seeded with your real routing values
-- the vault scaffold in your vault, only into folders that are empty or missing
-- `docs/DECISIONS.md` with one entry per decision made in the interview
-- a scheduler setup: desktop task prompts, launchd plists, or a manual runbook
-- a `README.md` index of everything generated, with the verification command
+### Step 5. Work through the Obsidian plugin checklist
 
-**Obsidian plugins are installed by hand.** Obsidian only installs community plugins from
-inside the app. The kickoff writes each plugin's settings into `.obsidian/plugins/` and
-leaves `PLUGIN-CHECKLIST.md` in your meta folder; you work through the checklist once
-(Templater, Dataview, and Periodic Notes are the required ones), then run the first
-pipeline job from your runbook.
+Obsidian only installs community plugins from inside the app. Open the vault, open
+`PLUGIN-CHECKLIST.md` in your meta folder, and install each listed plugin from Settings,
+Community plugins, Browse. Their settings are already written, so each one works as soon
+as it is enabled.
 
-## What works where
+### Step 6. Run the first job and verify
 
-Be honest with yourself about the tiers before you commit to a scheduler.
+Your repo's `docs/RUNBOOK.md` lists one command per job and what each writes. Run the
+health check first, then one ingest, then wiki materialize. Verify by looking at the files
+that appeared under `raw/` and `wiki/`, never by a scheduler's last-run timestamp.
 
-- **Spine skills work on any vault.** Wiki materialize, emerge, graduate, synthesize, lint,
-  and health need only `python3` and the folder layout from your config. They run on
-  macOS, Linux, and Windows under WSL.
-- **Ingests are opt-in and gated on prerequisites.** Each one needs the MCP server or CLI
-  listed above, connected in the same Claude session the kickoff runs in. The kickoff
-  generates nothing for a source it cannot detect, and tells you what to connect and how to
-  re-run for just that source.
-- **Voice memos and Wispr dictation are macOS-only and experimental.** They read local
-  application data (a dictation database, the Voice Memos library), voice memos need Full
-  Disk Access granted to whatever runs the job, and both depend on application internals
-  that can change without notice. Expect to babysit them.
-- **Scheduling depends on runtime.** Desktop scheduled tasks need the desktop app; launchd
-  is macOS-only; the manual runbook works everywhere and is always generated, because every
-  job is also runnable by hand.
+## What the AI sets up, and what you do
+
+| The kickoff does this | You do this |
+|---|---|
+| Detects your vault, Obsidian, `python3`, MCP servers, and CLIs | Connect the sources you want before running it |
+| Interviews you and writes `docs/ATLAS-KICKOFF.md` | Answer the interview and read the document |
+| Writes `~/.config/atlas/config.json`, asking before overwriting | Nothing, unless you want to edit folder names later |
+| Copies the engine into your repo | Nothing |
+| Generates one `SKILL.md` per selected capability, each traceable to its exemplar | Skim them; they are yours to edit |
+| Writes routing configs seeded with your real domains, channels, boards, and repos | Fill any `{{fill-me}}` it could not infer, and edit after a misroute |
+| Copies the vault scaffold into empty or missing folders, renamed to your scheme | Nothing; existing folders with content are left alone |
+| Writes every Obsidian plugin's settings into `.obsidian/plugins/` | Install the plugins from inside Obsidian |
+| Seeds `docs/DECISIONS.md` with your interview answers as decisions | Add a decision whenever you change an invariant |
+| Writes the scheduler definitions for the option you chose | Install them: create the desktop tasks, load the launchd plists, or run the runbook by hand |
+| Runs a read-only health check against the vault | Run the first real jobs from the runbook |
+
+## Using it day to day
+
+| Want to | Do |
+|---|---|
+| Answer a question from the vault, with citations | `/atlas-research <question>` |
+| File the current conversation as a linked note | `/atlas-distill` |
+| See what recurring patterns have emerged | Open the Emerging-Patterns dashboard in your meta folder |
+| Promote a pattern into a wiki page | `/atlas-graduate <slug>` |
+| Refresh a cross-source thread synthesis | `/atlas-synthesize <thread>` |
+| Check vault hygiene | `/atlas-lint` or the health job from the runbook |
+| Add or fix a routing rule | Edit the yaml next to that ingest's engine script |
+| Add a source later | Connect it, then `/atlas-kickoff --resume` |
+
+Scheduled jobs, if you chose them, run nightly at ten for ingests and the wiki, then
+synthesis, a morning briefing at eight, a weekly review on Friday evening, and a health
+audit on Sunday. All of these are also runnable by hand from the runbook.
+
+## What is in this repository
+
+| Path | What it is |
+|---|---|
+| `skills/atlas-kickoff/` | The one skill this plugin installs, with its interview, kickoff template, scheduler guides, and plugin reference |
+| `exemplars/` | 24 scrubbed exemplar skills, 6 vault document templates, 6 example routing configs, and the design-decision register. Nothing here runs; it is what generated skills derive from |
+| `engine/` | The stdlib-only Python engine with its config layer. Copied into your repo by the kickoff |
+| `vault-scaffold/` | Default PARA tree, `raw/` and `wiki/` READMEs, `.obsidian/` settings, five note templates, the plugin checklist |
+| `docs/` | The scrub rules, release checklist, and a reproducible scratch-vault test |
 
 ## Updating
 
@@ -131,53 +211,43 @@ claude plugin marketplace update atlas-kit
 claude plugin update atlas-kit@atlas-kit
 ```
 
-Then restart the session. Updating the plugin never touches your repo or your vault: the
-generated skills, the copied `engine/`, and your configs are yours and stay where they are.
-When a new version changes an exemplar you care about, re-run `/atlas-kickoff --resume`
-against your existing kickoff document to regenerate, and review the diff before keeping
-it.
+Restart the session. Updating never touches your repo or your vault; the generated
+skills, the copied engine, and your configs stay where they are. To pick up a changed
+exemplar, run `/atlas-kickoff --resume` and review the diff before keeping it.
 
 ## Privacy
 
-- The kit ships no vault content. Every exemplar, template, and example config was scrubbed
-  to a fictional world (an analytics consultancy, two inns, a vendor) and gated against a
-  banned-pattern list before it was committed. `docs/SCRUB-RULES.md` describes the rules.
+- The kit ships no vault content. Every exemplar, template, and example config was
+  scrubbed to a fictional world and checked against a banned-pattern gate before commit.
+  `docs/SCRUB-RULES.md` describes the rules.
 - Generated configs stay in your repo. Routing rules, entity seeds, and the kickoff
-  document contain your real domains, channels, boards, and names; they are written to your
-  target repository and never sent anywhere by this plugin.
-- The config file lives in your home config directory, at `~/.config/atlas/config.json`
-  (or wherever `$ATLAS_CONFIG` points). It holds your vault path, display name, timezone,
-  and folder names, nothing else.
-- The kickoff never reads note bodies during diagnosis or generation, and no generated
-  skill deletes a note.
+  document contain your real domains, channels, and names; this plugin never sends them
+  anywhere.
+- The config file holds your vault path, display name, timezone, folder names, and the
+  no-nudge list. Nothing else.
+- The kickoff reads folder names and file counts during diagnosis, never note bodies.
 
 ## Design lineage
 
-atlas-kit is a scrubbed export of a private, single-user pipeline that ran for long enough
-to accumulate opinions. The ones that survived are encoded as invariants:
+atlas-kit is a scrubbed export of a private, single-user pipeline that ran long enough to
+accumulate opinions. The ones that survived are invariants:
 
-- **An append-only raw layer.** Every source is mirrored into `raw/<source>/`, one file per
-  item, written once and never edited. Corrections are new files with a forward pointer;
-  deletions forfeit the rebuild guarantee and are recorded as decisions.
-- **A regenerable wiki spine.** Everything under `wiki/` (entities, graduated concepts,
-  thread syntheses) is a projection of `raw/` plus your own notes. Delete it, re-run, get
-  it back. A marked editable region on each page survives regeneration.
+- **An append-only raw layer.** Every source is mirrored into `raw/<source>/`, one file
+  per item, written once. Corrections are new files with a forward pointer.
+- **A regenerable wiki.** Everything under `wiki/` is a projection of `raw/` plus your own
+  notes. Delete it, re-run, get it back. A marked region on each page survives.
 - **Citation gates.** A generated line that states a fact links to the file it came from,
-  and the synthesize and research skills refuse to write a page whose wikilinks do not
-  resolve. Auditors surface findings; they never decide.
-- **A no-nudge list.** Folders, tags, and practices the owner names are never scheduled and
-  never appear on a briefing, dashboard, or weekly review. The interview asks what must stay
-  silent, writes the answer to the config's `no_nudge` key, and every briefing skill honors
-  it.
+  and the synthesize and research skills refuse to write a page whose links do not resolve.
+- **A no-nudge list.** Folders, tags, and practices you name are never scheduled and never
+  surface in a briefing, dashboard, or review.
 
-The full register is in `exemplars/decisions/DECISIONS.md`; the kickoff copies it into
-your repo as the starting `docs/DECISIONS.md`, and every decision you reject in the
-interview is marked superseded there rather than removed.
+The full register is in `exemplars/decisions/DECISIONS.md`. The kickoff copies it into
+your repo as the starting `docs/DECISIONS.md`.
 
 ## Not included
 
-- The maintainer's personal reflection-practice skill is not part of the kit and may
-  appear later as a separate add-on plugin; the kit keeps only the `no_nudge` exclusion.
+The maintainer's personal reflection-practice skill is not part of the kit and may appear
+later as a separate add-on. The kit keeps only the no-nudge exclusion.
 
 ## Contributing
 
@@ -187,10 +257,10 @@ vault the kickoff might generate. Before a pull request:
 
 1. Read `docs/SCRUB-RULES.md`. Nothing under `exemplars/`, `engine/`, `skills/`, or
    `vault-scaffold/` may contain a real name, organization, identifier, or home-directory
-   path; use the fictional world already established there.
+   path.
 2. Run the gate from section 7 of that file. It must print `gate clean`.
 3. Run `claude plugin validate .` from the repository root.
-4. Use American English spelling and a plain, declarative tone.
+4. Use American English spelling.
 
 ## License
 
