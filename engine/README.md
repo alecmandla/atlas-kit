@@ -52,7 +52,7 @@ names directly under `vault_root`. Subfolders below those (`Clients/`,
 `People/`, `entities/`, `Dashboards/`) are engine conventions and are not
 configurable. `crm` therefore names the parent folder: person notes are
 written to `<crm>/People/`, so set it to `CRM` or `Contacts`, never to
-`People` (that yields `People/People/`). Scripts that take `--vault` still do; the flag moves the root
+`People`, which would nest the subfolder under a folder of the same name. Scripts that take `--vault` still do; the flag moves the root
 for one run and does not rename the layout. The full contract, the public API,
 and the validation rules are in `CONFIG-LAYER.md`.
 
