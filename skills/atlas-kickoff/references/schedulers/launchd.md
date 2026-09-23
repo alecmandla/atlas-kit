@@ -9,7 +9,7 @@ generates one plist per job under `<repo>/schedulers/launchd/` and the user load
 
 | Kind | Runs | Needs | Examples |
 |---|---|---|---|
-| Script job | `python3 <repo>/engine/<name>/<script>.py --execute ...` | Python 3.9+, the config file | wiki-materialize, emerge, auto-graduate, lint, health, local-file ingests (dictation, Claude history, GitHub via `gh`) |
+| Script job | `python3 <repo>/engine/<name>/<script>.py --execute ...` | Python 3.10+, the config file | wiki-materialize, emerge, auto-graduate, lint, health, local-file ingests (dictation, Claude history, GitHub via `gh`) |
 | Session job | `claude -p "<prompt>" --allowedTools ...` | the `claude` CLI, MCP servers configured for the CLI, permissions pre-approved | MCP-backed ingests (meetings, email, chat, boards), morning, weekly, synthesize, nightly orchestrator |
 
 Prefer script jobs wherever a capability has a pure-engine path. A session job that

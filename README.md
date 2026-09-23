@@ -30,7 +30,7 @@ Required:
 
 - **Obsidian**, installed, with a vault you can point at (or a folder where one should be created).
 - **Claude Code** (CLI or the desktop app). The desktop app additionally offers its built-in scheduler as a scheduling option.
-- **python3 3.11 or newer** on your `PATH`. The engine is standard-library only; nothing is installed with `pip`.
+- **python3 3.10 or newer** on your `PATH`. The engine is standard-library only; nothing is installed with `pip`.
 
 Optional, by source. Each unlocks one ingest; missing ones are skipped, not faked:
 

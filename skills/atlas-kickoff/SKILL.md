@@ -64,8 +64,8 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-wispr-meetings-ingest` | same file as above | none |
 | Ingest | `atlas-apple-notes-ingest` | Apple Notes MCP: `list_notes` and `get_note_content` | none |
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
-| Spine | `atlas-wiki-materialize` | `python3` 3.9+ | `entity_seeds.json` |
-| Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.9+ | none |
+| Spine | `atlas-wiki-materialize` | `python3` 3.10+ | `entity_seeds.json` |
+| Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.10+ | none |
 | Query | `atlas-research`, `atlas-distill` | none (Fireflies MCP optional for transcript escalation) | none |
 | Briefing | `atlas-morning` | a daily-note template in the vault; calendar MCP optional | none |
 | Briefing | `atlas-weekly` | none | none |
@@ -97,7 +97,7 @@ user anything the machine can answer.
 4. **Runtime.** Desktop app if tools named `mcp__scheduled-tasks__*` (or containing
    `create_scheduled_task`) are available; otherwise Claude Code CLI. This decides which
    scheduler options exist.
-5. **CLIs.** `python3 --version` (need 3.9 or newer; record the absolute path from
+5. **CLIs.** `python3 --version` (need 3.10 or newer; record the absolute path from
    `command -v python3`), `gh --version && gh auth status`, `claude --version`,
    `launchctl version` (macOS only), `git --version`.
 6. **MCP servers.** Scan available tool names for the substrings in the catalog. Record
