@@ -200,7 +200,11 @@ so a failure in one is reported, not fatal to the rest.
    `description` that keeps the exemplar's trigger phrases. Skip anything whose
    prerequisite was not detected.
 4. **Routing configs.** For each selected source with a config, copy
-   `exemplars/configs/<file>.example.<ext>` to `<repo>/configs/<file>.<ext>` and replace
+   `exemplars/configs/<file>.example.<ext>` to `<repo>/engine/<script-dir>/<file>.<ext>`, next
+   to the script that reads it (`atlas-github-ingest/github-repos.yaml`,
+   `atlas-wiki-materialize/entity_seeds.json`, `atlas-gmail-ingest/mailbox-routing.yaml`,
+   `atlas-slack-ingest/slack-routing.yaml`, `atlas-monday-ingest/monday-boards.yaml`,
+   `atlas-fireflies-ingest/meeting-routing.yaml`; the engine has no config-path flag), and replace
    the fictional entries with the user's real values from §Sources and routing. Keep the
    file's comments; they document the format. `entity_seeds.json` gets the user's product
    and technology seeds, or the example's structure with an empty list.

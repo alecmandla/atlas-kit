@@ -164,7 +164,7 @@ docs/DECISIONS.md
 docs/RUNBOOK.md                  (manual scheduler, or always as a fallback)
 README.md                        (new, or a section appended)
 engine/                          (copied from the plugin; stdlib-only)
-configs/<one per selected source>
+engine/<script-dir>/<routing config, one per selected source>
 skills/<one per selected capability>/SKILL.md
 schedulers/<plists or task prompts, per §6>
 vault: <folders created>, .obsidian/ (only if absent), {{folders.meta}}/Templates/*,
@@ -200,7 +200,7 @@ read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py re
    (Settings, Community plugins, Browse). This cannot be automated.
 2. Scheduler-specific steps from the chosen references/schedulers/ guide (create desktop
    tasks from this directory; launchctl load each plist; or nothing for manual).
-3. Fill every {{fill-me}} in configs/.
+3. Fill every {{fill-me}} in the routing configs under engine/<script-dir>/.
 4. Grant Full Disk Access to the runner if voice memos was selected.
 5. Run the first job by hand and check its artifacts (raw/ file count, last-run.md),
    not its timestamp.

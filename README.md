@@ -93,7 +93,7 @@ confirm, produces:
 - `atlas.config.json` in the repo and `~/.config/atlas/config.json` (asked before overwriting an existing one)
 - `engine/` copied into the repo
 - `skills/<name>/SKILL.md` for each selected capability, each carrying `derived-from: <exemplar>`
-- `configs/*.yaml` and `entity_seeds.json` seeded with your real routing values
+- routing configs (`github-repos.yaml`, `mailbox-routing.yaml`, and so on) and `entity_seeds.json`, each next to the engine script that reads it, seeded with your real routing values
 - the vault scaffold in your vault, only into folders that are empty or missing
 - `docs/DECISIONS.md` with one entry per decision made in the interview
 - a scheduler setup: desktop task prompts, launchd plists, or a manual runbook
