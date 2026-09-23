@@ -95,7 +95,7 @@ LIMIT 20
 ## Notes
 ```
 
-Schema matches `{{folders.resources}}/Templates/Person-Note.md`; a person note created by hand via Templater is mutually compatible with a note created by this skill.
+Schema matches `{{folders.meta}}/Templates/Person-Note.md`; a person note created by hand via Templater is mutually compatible with a note created by this skill.
 
 ### 6. Write the per-run summary
 

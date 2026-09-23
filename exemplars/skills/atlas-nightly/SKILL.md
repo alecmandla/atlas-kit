@@ -160,7 +160,7 @@ DAILY_NOTE_PATH = {{vault_root}}/{{folders.daily}}/<YEAR>/<MONTH>/<TODAY>.md
 
 **If the daily note does NOT exist** (e.g. weekend when atlas-morning didn't fire):
 
-Create the note by instantiating `{{vault_root}}/{{folders.resources}}/Templates/Daily-Note.md` (same instantiation logic as atlas-morning Step 2). Use the freshly-instantiated note as the base.
+Create the note by instantiating `{{vault_root}}/{{folders.meta}}/Templates/Daily-Note.md` (same instantiation logic as atlas-morning Step 2). Use the freshly-instantiated note as the base.
 
 **Inject the nightly report section:**
 

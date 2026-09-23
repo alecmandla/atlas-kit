@@ -33,7 +33,7 @@ Check whether `DAILY_NOTE_PATH` already exists.
 **If it does NOT exist:**
 
 1. Create the directory chain `DAILY_NOTE_DIR` if needed.
-2. Build the note content by instantiating the template at `{{vault_root}}/{{folders.resources}}/Templates/Daily-Note.md`, replacing all Templater variables with actual values:
+2. Build the note content by instantiating the template at `{{vault_root}}/{{folders.meta}}/Templates/Daily-Note.md`, replacing all Templater variables with actual values:
    - `<% tp.date.now("YYYY-MM-DD") %>` → `TODAY`
    - `<% tp.date.now("dddd, MMMM D, YYYY") %>` → human-readable date (e.g. "Thursday, May 21, 2026")
 
@@ -213,7 +213,7 @@ Re-running on the same day produces the same morning report (modulo fresh timest
 - **CalendarEvents table missing**: skip silently; write `*(CalendarEvents not available.)*` in the calendar section.
 - **Wispr DB locked**: open in read-only mode (`?mode=ro`); if still locked, fall back to `{{folders.raw}}/wispr/calendar/` files for today.
 - **No PARA task files**: write `*(No overdue tasks found.)*`.
-- **Daily note template missing**: hard-fail with a clear error rather than writing a blank note. Surface: `"Daily-Note.md template not found at {{vault_root}}/{{folders.resources}}/Templates/Daily-Note.md"`.
+- **Daily note template missing**: hard-fail with a clear error rather than writing a blank note. Surface: `"Daily-Note.md template not found at {{vault_root}}/{{folders.meta}}/Templates/Daily-Note.md"`.
 - **Year/month directories missing**: create them. `mkdir -p` is safe.
 
 ## Invocation
