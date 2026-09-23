@@ -83,7 +83,7 @@ user anything the machine can answer.
 
 1. **Vault path.** In order: the invocation argument; `$ATLAS_CONFIG` or
    `~/.config/atlas/config.json` if one exists (read `vault_root`); then
-   `ls -d ~/Obsidian* ~/Documents/Obsidian* ~/vault* 2>/dev/null`. Zero candidates means
+   `ls -d ~/*Obsidian* ~/Documents/*Obsidian* ~/*[Vv]ault* 2>/dev/null`. Zero candidates means
    "new vault" and the interview asks where to create it. More than one means the
    interview asks which.
 2. **Obsidian installed.** macOS: `ls /Applications/Obsidian.app` or
