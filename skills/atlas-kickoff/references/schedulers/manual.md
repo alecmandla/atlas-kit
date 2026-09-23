@@ -61,6 +61,7 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 | weekly | `/atlas-weekly` (session) | Friday evening |
 | health | `/atlas-health` (session; there is no engine script) | Sunday evening |
 | lint | `python3 engine/atlas-lint/lint.py report` | Sunday evening or before a synthesis batch |
+| people-extract | `python3 engine/atlas-people-extract/extract.py --execute` | evening, before materialize; only useful once meeting notes exist |
 | materialize | `python3 engine/atlas-wiki-materialize/materialize.py --execute` | evening, if not using nightly |
 | emerge | `python3 engine/atlas-emerge/emerge.py` | evening, after materialize |
 | auto-graduate | `python3 engine/atlas-graduate/auto_graduate.py --execute` | evening, after emerge |

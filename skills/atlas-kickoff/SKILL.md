@@ -64,6 +64,7 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-wispr-meetings-ingest` | same file as above | none |
 | Ingest | `atlas-apple-notes-ingest` | Apple Notes MCP: `list_notes` and `get_note_content` | none |
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
+| Spine | `atlas-people-extract` | `python3` 3.10+; meeting notes carrying `attendee_emails:` (a meeting ingest, or notes written by hand from the meeting template). Materialize's org branch reads its output. | none |
 | Spine | `atlas-wiki-materialize` | `python3` 3.10+ | `entity_seeds.json` |
 | Spine | `atlas-emerge`, `atlas-graduate`, `atlas-lint`, `atlas-health` | `python3` 3.10+ | none |
 | Spine | `atlas-synthesize` | `python3` 3.10+; a Claude session writes the prose | none |

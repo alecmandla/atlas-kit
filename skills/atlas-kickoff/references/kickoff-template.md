@@ -146,8 +146,8 @@ written as {{fill-me}} and listed again in §9. Sources without a config get one
 <!-- AUTHOR: schedule_mode is "scheduled" or "on-demand only". For on-demand, the table
 still lists suggested cadences and the scheduler is "manual". "Needs a Claude session"
 is yes for anything that calls an MCP or writes prose (ingests via MCP, morning, weekly,
-health, synthesize, nightly); no for pure engine scripts (materialize, emerge, auto-graduate,
-lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
+health, synthesize, nightly); no for pure engine scripts (people-extract, materialize,
+emerge, auto-graduate, lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
 morning 08:00, weekly Fri 18:00, health Sun 21:00. Practice capabilities never appear
 here. -->
 

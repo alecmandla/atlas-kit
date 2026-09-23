@@ -104,8 +104,8 @@ can pick one in a word. Free-text is always allowed.
 
 ### 2.3 Capabilities beyond ingest
 
-- **Question:** "The knowledge spine (materialize, emerge, graduate, synthesize, lint, health,
-  research, distill) is on by default. Which of these do you also want? Morning
+- **Question:** "The knowledge spine (people-extract, materialize, emerge, graduate,
+  synthesize, lint, health, research, distill) is on by default. Which of these do you also want? Morning
   briefing into the daily note; weekly review note; nightly orchestrator (runs all
   ingests in order); book summaries; a reflection practice folder that is never
   scheduled."

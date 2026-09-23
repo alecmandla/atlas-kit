@@ -47,6 +47,7 @@ step ch-exec-1 python3 engine/atlas-claude-history-ingest/ingest.py --execute
 step ch-exec-2 python3 engine/atlas-claude-history-ingest/ingest.py --execute
 grep -q 'written=0 already=2' "$L/ch-exec-2.log" || { echo "FAILED: claude-history ingest is not idempotent"; exit 1; }
 step gh-parse python3 -c "import sys; sys.path.insert(0, 'engine/atlas-github-ingest'); import ingest as g; assert g.REPOS_YAML.exists(), g.REPOS_YAML; print(g.parse_repos_yaml())"
+step people-extract-dry python3 engine/atlas-people-extract/extract.py --dry-run-report "$L/people-dry.md"
 step materialize-dry python3 engine/atlas-wiki-materialize/materialize.py --dry-run-report "$L/mat-dry.md"
 step emerge-dry python3 engine/atlas-emerge/emerge.py --dry-run
 step emerge-write python3 engine/atlas-emerge/emerge.py

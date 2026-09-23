@@ -71,6 +71,7 @@ FOLDER_PURPOSE = {
 SELECTED = [
     ("atlas-claude-history-ingest", "ingest", "~/.claude/projects/ non-empty (2 sessions in 1 project)", None, False),
     ("atlas-github-ingest", "ingest", "gh 2.96.0, `gh auth status` exit 0", "github-repos.yaml", False),
+    ("atlas-people-extract", "spine", "python3 3.11.7 (no meeting notes yet; writes nothing until they exist)", None, False),
     ("atlas-wiki-materialize", "spine", "python3 3.11.7", "entity_seeds.json", False),
     ("atlas-emerge", "spine", "python3 3.11.7", None, False),
     ("atlas-graduate", "spine", "python3 3.11.7", None, False),
@@ -100,6 +101,7 @@ SCRIPT_JOBS = {
     # name -> (command from the repo root, writes, cadence)
     "atlas-claude-history-ingest": ("python3 engine/atlas-claude-history-ingest/ingest.py --execute", "raw/claude-history/<project>/<session>.md", "every evening (inside nightly)"),
     "atlas-github-ingest": ("python3 engine/atlas-github-ingest/ingest.py --execute --days 7", "raw/github/<owner>/<repo>/<kind>-<n>.md", "every evening (inside nightly)"),
+    "atlas-people-extract": ("python3 engine/atlas-people-extract/extract.py --execute", "CRM/People/<First-Last>.md stubs", "every evening, before materialize (once meeting notes exist)"),
     "atlas-wiki-materialize": ("python3 engine/atlas-wiki-materialize/materialize.py --execute", "wiki/entities/*.md, wiki/index.md", "every evening (inside nightly)"),
     "atlas-emerge": ("python3 engine/atlas-emerge/emerge.py", "Meta/Dashboards/Emerging-Patterns.md", "every evening, after materialize"),
     "atlas-graduate": ("python3 engine/atlas-graduate/auto_graduate.py --execute", "Meta/Dashboards/Thread-Review-Queue.md; graduated pages", "every evening, after emerge"),
