@@ -225,7 +225,16 @@ read-only mode if those scripts exist (e.g. python3 engine/atlas-lint/lint.py
 # 10. Tone for generated files
 
 Plain, declarative, no filler, no emojis, American English. Headings for navigation,
-tables for comparison, lists for enumeration. Code fenced with language tags. Paths
-relative to the repo root or the vault root, never absolute.
+tables for comparison, lists for enumeration. Code fenced with language tags.
+
+Paths: `atlas.config.json` (and its copy under `~/.config/atlas/`), this kickoff, the
+runbook, and any scheduler files hold the absolute vault and repo roots; that is where
+they belong (a leading `~` is fine in the config, which the engine expands; launchd
+plists need the expanded form). Everything derived from an exemplar, a vault template,
+or the scaffold (generated `SKILL.md` prose, `DECISIONS.md`, the vault documents, the
+routing configs) never carries an expanded absolute path: vault paths are written
+relative to the vault root, repo paths relative to the repo root, and where a root
+itself must appear (the exemplars' `{{vault_root}}` and `{{skills_root}}`) it is
+written home-relative (`~/Vault`, `~/atlas`) whenever it lies under the home directory.
 
 # TEMPLATE ENDS
