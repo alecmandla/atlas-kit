@@ -20,7 +20,6 @@ settings below are already in place the moment the plugin is installed. Obsidian
 | Tasks (`obsidian-tasks-plugin`) | optional | morning briefing (overdue tasks), weekly review (shipped tasks) | The briefing reads task lines in the Tasks emoji format (due and done dates). Without it the overdue and shipped lists are empty but nothing breaks. | Community plugins, Browse, "Tasks" |
 | Tag Wrangler (`tag-wrangler`) | optional | graduate (thread tags) | Renaming `#thread/<slug>` tags across the vault when a graduated pattern gets a better name. Convenience only. | Community plugins, Browse, "Tag Wrangler" |
 | Omnisearch (`omnisearch`) | optional | research (human side) | Full-text search with better ranking than the core search; useful when checking a research answer by hand. The pipeline never calls it. | Community plugins, Browse, "Omnisearch" |
-| Chronos (`chronos`) | optional | none | Timeline rendering for project notes. Purely visual; keep or drop. | Community plugins, Browse, "Chronos Timeline" |
 
 ## Core plugins
 
@@ -87,7 +86,7 @@ settings are what let the weekly review count shipped tasks.
 `taskFormat: tasksPluginEmoji`, `setDoneDate: true`, `globalFilter` empty. The done-date
 stamp is what the weekly review reads.
 
-### Omnisearch, Tag Wrangler, Chronos
+### Omnisearch, Tag Wrangler
 
 Shipped with their defaults. Nothing in the pipeline reads their settings.
 

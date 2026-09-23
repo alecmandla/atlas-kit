@@ -44,7 +44,6 @@ Nothing breaks without these. Each helps one capability or is a convenience.
   graduated pattern gets a better name.
 - [ ] **Omnisearch** (`omnisearch`) — better full-text search when checking a research
   answer by hand.
-- [ ] **Chronos Timeline** (`chronos`) — timeline blocks in project notes. Visual only.
 - [ ] Core: **Bases** — table views over frontmatter, a lighter alternative to Dataview
   for simple lists.
 

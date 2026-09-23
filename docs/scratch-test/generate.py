@@ -421,7 +421,8 @@ def main() -> int:
 
     # ---------------------------------------------------------------- Phase 4.6 plugin checklist
     chk = (scaffold / "PLUGIN-CHECKLIST.md").read_text(encoding="utf-8")
-    chk = edit(chk, r"- \[ \] \*\*Chronos Timeline\*\*[^\n]*\n", "", "checklist: prune Chronos (needed by no capability)", regex=True)
+    # Every plugin in the scaffold's list is needed by at least one capability the profile selects
+    # or is a listed convenience, so nothing is pruned for this profile.
     (vault / F["meta"] / "PLUGIN-CHECKLIST.md").write_text(chk, encoding="utf-8")
     print("phase4.6: plugin checklist written")
 
