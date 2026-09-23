@@ -20,8 +20,8 @@ mode (once), Browse, search the name, Install, then Enable.
 These are needed by at least one generated skill. Without them, templates render as
 raw code or the briefings cannot find today's note.
 
-- [ ] **Templater** (`templater-obsidian`) — the daily, meeting, person, and project
-  templates use its syntax; folder templates apply the project and person templates
+- [ ] **Templater** (`templater-obsidian`) — the daily, meeting, person, project, and
+  weekly-review templates use its syntax; folder templates apply the project and person templates
   automatically.
 - [ ] **Dataview** (`dataview`) — the project and person templates and the dashboards
   embed Dataview queries.

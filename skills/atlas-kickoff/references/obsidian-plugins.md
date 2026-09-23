@@ -14,7 +14,7 @@ settings below are already in place the moment the plugin is installed. Obsidian
 
 | Plugin (id) | Required | Needed by | Why | Install |
 |---|---|---|---|---|
-| Templater (`templater-obsidian`) | required | morning briefing, weekly review, meeting ingest, distill, the vault templates | The scaffold templates use Templater syntax (`<% tp.date.now() %>`). Folder templates auto-apply the project and person templates on new notes. | Community plugins, Browse, "Templater" |
+| Templater (`templater-obsidian`) | required | morning briefing, weekly review, meeting ingest, distill, the vault templates | The scaffold templates (daily, meeting, person, project, weekly review) use Templater syntax (`<% tp.date.now() %>`). Folder templates auto-apply the project and person templates on new notes. | Community plugins, Browse, "Templater" |
 | Dataview (`dataview`) | required | dashboards, project and person templates, weekly review | Templates and dashboards embed Dataview queries (open tasks per project, recent meetings per person). Without it those blocks render as code. | Community plugins, Browse, "Dataview" |
 | Periodic Notes (`periodic-notes`) | required | morning briefing, daily-note template | Owns the daily-note folder layout (`{{folders.daily}}/YYYY/YYYY-MM/`) and template so the briefing finds today's note where Obsidian would create it. | Community plugins, Browse, "Periodic Notes" |
 | Tasks (`obsidian-tasks-plugin`) | optional | morning briefing (overdue tasks), weekly review (shipped tasks) | The briefing reads task lines in the Tasks emoji format (due and done dates). Without it the overdue and shipped lists are empty but nothing breaks. | Community plugins, Browse, "Tasks" |
@@ -72,7 +72,7 @@ The kickoff rewrites each path to the user's real folder name when copying the s
 | daily `format` | `YYYY-MM-DD` |
 | daily `folder` | `{{folders.daily}}/YYYY/YYYY-MM` |
 | daily `template` | `{{folders.meta}}/Templates/Daily-Note.md` |
-| weekly | disabled in the scaffold; enable it and point `template` at a weekly template if you want one. The weekly review capability writes its own note under `{{folders.areas}}/Weekly-Reviews/` and does not need this. |
+| weekly | disabled in the scaffold. The weekly review capability renders `{{folders.meta}}/Templates/Weekly-Review.md` itself and writes the note under `{{folders.areas}}/Weekly-Reviews/`, so it does not need this. Enable it and point `template` at that file only if you want Obsidian's own weekly-note command too. |
 
 ### Dataview (`dataview/data.json`)
 

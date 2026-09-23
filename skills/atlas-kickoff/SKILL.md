@@ -69,7 +69,7 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Spine | `atlas-synthesize` | `python3` 3.10+; a Claude session writes the prose | none |
 | Query | `atlas-research`, `atlas-distill` | none (Fireflies MCP optional for transcript escalation) | none |
 | Briefing | `atlas-morning` | a daily-note template in the vault; calendar MCP optional | none |
-| Briefing | `atlas-weekly` | none | none |
+| Briefing | `atlas-weekly` | a weekly-review template in the vault (the scaffold ships one) | none |
 | Orchestrator | `atlas-nightly` | at least one ingest selected and a scheduler chosen | none |
 | Capture | `atlas-book-summary` | web search available | none |
 | Practice | `atlas-monk` (reflection practice) | none; on-demand only, never scheduled | none |

@@ -29,8 +29,8 @@ First public release.
   any vault layout. Includes `atlas.config.example.json`.
 - `vault-scaffold/`: a default PARA folder tree with numbered prefixes, `raw/` and `wiki/`
   layers with their invariant READMEs, an `.obsidian/` configuration with settings for
-  each community plugin the pipeline expects, four note templates (daily, meeting,
-  person, project), and `PLUGIN-CHECKLIST.md` for the by-hand plugin installs.
+  each community plugin the pipeline expects, five note templates (daily, meeting,
+  person, project, weekly review), and `PLUGIN-CHECKLIST.md` for the by-hand plugin installs.
 - `docs/SCRUB-RULES.md`: the banned-string categories, placeholder vocabulary, fictional
   example world, and verification gate that everything in the kit and everything the
   kickoff generates must pass.

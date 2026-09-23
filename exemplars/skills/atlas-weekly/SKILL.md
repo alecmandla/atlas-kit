@@ -130,9 +130,11 @@ OUTPUT_PATH = <OUTPUT_DIR>/<ISO_WEEK_STR>.md
 
 Create `OUTPUT_DIR` if needed. The file is **overwrite-safe** (re-running the same Friday replaces the snapshot).
 
-Instantiate the `Weekly-Review.md` template by replacing Templater tokens:
+Instantiate the `Weekly-Review.md` template from `{{vault_root}}/{{folders.meta}}/Templates/` without Templater: drop its leading `<%* ... -%>` execution block and replace each `<% ... %>` interpolation with the value computed in Step 1:
 
-- `<% tp.date.now("YYYY-MM-DD") %>` → `TODAY`
+- `<% today %>` → `TODAY`
+- `<% isoWeek %>` → `ISO_WEEK_STR`
+- `<% monday %>` → `MONDAY`; `<% sunday %>` → `SUNDAY`
 
 Then populate sections by replacing the template's placeholder bullets / Dataview blocks with synthesized content. Keep the section headings from the template; add an "## Atlas weekly synthesis" section at the top with the needs-attention alert, ISO-week banner, and metadata. Final structure:
 

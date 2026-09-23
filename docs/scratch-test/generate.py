@@ -80,7 +80,7 @@ SELECTED = [
     ("atlas-research", "query", "python3 3.11.7; ripgrep present (optional)", None, True),
     ("atlas-distill", "query", "python3 3.11.7", None, True),
     ("atlas-morning", "briefing", "daily-note template from the scaffold", None, True),
-    ("atlas-weekly", "briefing", "python3 3.11.7", None, True),
+    ("atlas-weekly", "briefing", "weekly-review template from the scaffold", None, True),
     ("atlas-nightly", "orchestrator", "2 ingests selected; scheduler = manual", None, True),
 ]
 BLOCKED = [
@@ -224,8 +224,7 @@ def main() -> int:
         f"3. Fill every `{{{{fill-me}}}}` in `{cfg_dir}/github-repos.yaml` (owner, repo names).",
         "4. Full Disk Access: not needed (voice memos not selected).",
         f"5. Run the first job by hand (`python3 engine/atlas-claude-history-ingest/ingest.py --execute`) and check `{F['raw']}/claude-history/` and `engine/atlas-claude-history-ingest/last-run.md`, not the timestamp.",
-        f"6. The weekly review expects a `Weekly-Review.md` template under `{F['meta']}/Templates/`; the scaffold does not ship one. Create it before the first `/atlas-weekly` run.",
-        f"7. Reflection practice: `{PROFILE['no_nudge']}` is excluded from every nudge surface, but no practice skill was generated (see blocked list).",
+        f"6. Reflection practice: `{PROFILE['no_nudge']}` is excluded from every nudge surface, but no practice skill was generated (see blocked list).",
     ])
     kick = fill(body, {
         **values,

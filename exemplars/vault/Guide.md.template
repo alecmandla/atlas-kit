@@ -49,7 +49,7 @@
 
 ## Weekly routine (Fridays, 15 min)
 
-1. Open the review `atlas-weekly` drafted in `{{folders.areas}}/Weekly-Reviews/` (or create one from `{{folders.resources}}/Templates/Weekly-Review.md`).
+1. Open the review `atlas-weekly` drafted in `{{folders.areas}}/Weekly-Reviews/` (or create one from `{{folders.meta}}/Templates/Weekly-Review.md`).
 2. Triage `{{folders.inbox}}/` to zero.
 3. Scan `{{folders.meta}}/Dashboards/` for stale items and open action items.
 4. Move any finished projects to `{{folders.archive}}/Projects/`.
