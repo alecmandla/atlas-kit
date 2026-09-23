@@ -555,7 +555,12 @@ def main(argv: list[str]) -> int:
         print(f"error: vault not found at {VAULT}", file=sys.stderr)
         return 2
 
-    seeds = json.loads(SEED_FILE.read_text(encoding="utf-8"))
+    if SEED_FILE.exists():
+        seeds = json.loads(SEED_FILE.read_text(encoding="utf-8"))
+    else:
+        print(f"warning: {SEED_FILE} not found; running with no product or technology seeds "
+              "(copy exemplars/configs/entity_seeds.example.json next to this script)", file=sys.stderr)
+        seeds = {}
     entities = discover_entities(seeds)
     count_mentions(entities, seeds)
 
