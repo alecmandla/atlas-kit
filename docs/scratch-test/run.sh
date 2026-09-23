@@ -69,22 +69,39 @@ if grep -rnoE '\{\{[^}]+\}\}' "$R" "$V" --include='*.md' --include='*.json' --in
 echo "ok"
 
 # Scrub gate over the generated output, with the scratch path normalized so the gate
-# sees the content rather than the throwaway directory name.
+# sees the content rather than the throwaway directory name. Implemented in python3 (already
+# required) rather than grep: BSD grep has no -P for the PCRE patterns in the local file, and
+# GNU and BSD grep disagree on option placement, so a shell loop is not portable.
 printf -- '--- scrub gate (generated output)\n'
 PAT="$KIT/docs/scrub-patterns.local.txt"
 [ -f "$PAT" ] || { echo "gate: $PAT is missing (git-ignored; see SCRUB-RULES.md section 7)"; exit 1; }
-fail=0
-norm() { sed "s|$SCRATCH|<scratch>|g" "$1"; }
-for f in $(grep -rl '' "$R" "$V" --exclude-dir=.git); do
-  while IFS= read -r p; do
-    [ -z "$p" ] && continue
-    case "$p" in \#*) continue;; esac
-    hits=$(norm "$f" | grep -niP "$p" || true)
-    [ -z "$hits" ] || { printf '%s\n' "$hits" | sed "s|^|${f#$SCRATCH/}: |"; fail=1; }
-  done < "$PAT"
-  if norm "$f" | grep -noiE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}' | grep -viE '@(harborlane|pinecrestlodge|saltmarshinn|ledgerline)\.example|@example\.com'; then fail=1; fi
-  hits=$(norm "$f" | grep -nE '/Users/|~/Obsidian|~/Skills|file:///' || true)
-  [ -z "$hits" ] || { printf '%s\n' "$hits" | sed "s|^|${f#$SCRATCH/}: |"; fail=1; }
-done
-[ "$fail" -eq 0 ] && echo "gate clean" || { echo "FAILED: gate"; exit 1; }
+SCRATCH="$SCRATCH" REPO="$R" VAULT="$V" PAT="$PAT" python3 - <<'PY' || { echo "FAILED: gate"; exit 1; }
+import os, re, sys
+from pathlib import Path
+scratch, pat = os.environ["SCRATCH"], Path(os.environ["PAT"])
+roots = [Path(os.environ["REPO"]), Path(os.environ["VAULT"])]
+banned = [re.compile(l.strip(), re.I) for l in pat.read_text(encoding="utf-8").splitlines()
+          if l.strip() and not l.startswith("#")]
+email = re.compile(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", re.I)
+fictional = re.compile(r"@(harborlane|pinecrestlodge|saltmarshinn|ledgerline)\.example|@example\.com", re.I)
+paths = re.compile(r"/Users/|~/Obsidian|~/Skills|file:///")
+fail = False
+for root in roots:
+    for f in sorted(root.rglob("*")):
+        if not f.is_file() or ".git" in f.parts:
+            continue
+        try:
+            text = f.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        rel = str(f)[len(scratch) + 1:]
+        for n, line in enumerate(text.replace(scratch, "<scratch>").splitlines(), 1):
+            hit = any(b.search(line) for b in banned) or paths.search(line) \
+                or any(not fictional.search(m.group(0)) for m in email.finditer(line))
+            if hit:
+                print(f"{rel}:{n}: {line}")
+                fail = True
+print("gate: hits above" if fail else "gate clean")
+sys.exit(1 if fail else 0)
+PY
 echo "scratch test passed: $SCRATCH"
