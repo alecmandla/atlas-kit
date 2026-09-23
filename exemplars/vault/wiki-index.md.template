@@ -1,0 +1,53 @@
+---
+type: wiki-index
+generated_by: atlas-wiki-materialize
+generated_at: <YYYY-MM-DD>
+total_entities: <N>
+---
+
+# Wiki index
+
+Last regenerated: <YYYY-MM-DD>
+
+This file is regenerated on every `atlas-wiki-materialize` run. Do not hand-edit it. The shape below is what a populated vault looks like; the entries are illustrative.
+
+## Entities by type
+
+### Client (2)
+
+- [[Pinecrest-Lodge|Pinecrest Lodge]] — last mention 2026-09-03, 16 mention(s)
+- [[Saltmarsh-Inn|Saltmarsh Inn]] — last mention 2026-08-27, 4 mention(s)
+
+### Area (3)
+
+- [[Client-Success|Client Success]] — last mention 2026-04-22, 10 mention(s)
+- [[HQ|HQ]] — last mention 2026-09-21, 120 mention(s)
+- [[Marketing|Marketing]] — last mention 2026-09-09, 42 mention(s)
+
+### Org (2)
+
+- [[Ledgerline|Ledgerline]] — last mention 2026-09-17, 86 mention(s)
+- [[Harborlane|Harborlane]] — last mention 2026-09-21, 200 mention(s)
+
+### Product (3)
+
+- [[Ledgerline-Cloud|Ledgerline-Cloud]] — last mention 2026-09-17, 30 mention(s)
+- [[Northstar-BI|Northstar-BI]] — last mention 2026-09-21, 110 mention(s)
+- [[Fireflies|Fireflies]] — last mention 2026-09-21, 29 mention(s)
+
+### Technology (2)
+
+- [[Dataview|Dataview]] — last mention 2026-09-14, 12 mention(s)
+- [[Obsidian|Obsidian]] — last mention 2026-09-02, 5 mention(s)
+
+## Concepts
+
+Graduated threads live in `{{folders.wiki}}/concepts/<slug>.md` (written by `atlas-graduate`). Empty until the first graduation.
+
+## Synthesis
+
+Cited narrative pages live in `{{folders.wiki}}/synthesis/<slug>.md` (written by `atlas-synthesize`). Empty until the first thread has enough evidence.
+
+## Conventions
+
+See `{{vault_root}}/AGENTS.md` for the rewriteable rule and the per-page `## Related` editable-region protocol.

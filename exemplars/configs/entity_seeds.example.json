@@ -1,0 +1,22 @@
+{
+  "_comment": "Curated seed list for atlas-wiki-materialize. Each seed has a canonical name, a canonical_id (the wiki page filename), regex patterns matched case-insensitively against meeting titles and summaries, and a one-line description used on the entity page. client_aliases maps a CRM company shortname (the primary label of an email domain) to the client folder it belongs to, so the org branch does not create a duplicate org page for a known client.",
+  "products": [
+    {"name": "Ledgerline", "canonical_id": "Ledgerline", "patterns": ["\\bLedgerline\\b"], "description": "Property-management and point-of-sale vendor; the core integration target for the owner's client dashboards."},
+    {"name": "Ledgerline-Cloud", "canonical_id": "Ledgerline-Cloud", "patterns": ["\\bLedgerline Cloud\\b", "\\bLL Cloud\\b"], "description": "Ledgerline's hosted reporting tier; sub-product within the Ledgerline family."},
+    {"name": "Northstar-BI", "canonical_id": "Northstar-BI", "patterns": ["\\bNorthstar ?BI\\b", "\\bNorthstar\\b"], "description": "Analytics and BI platform; underlying engine for client-facing dashboards."},
+    {"name": "Fireflies", "canonical_id": "Fireflies", "patterns": ["\\bFireflies\\b", "\\bfireflies\\.ai\\b"], "description": "AI meeting notetaker; the source for raw/fireflies/."},
+    {"name": "Monday", "canonical_id": "Monday-com", "patterns": ["\\bMonday\\.com\\b", "\\bMonday\\.?com\\b"], "description": "Work-management platform; one of the ingest sources."},
+    {"name": "BigQuery", "canonical_id": "BigQuery", "patterns": ["\\bBigQuery\\b", "\\bBQ\\b"], "description": "Google's data warehouse; backend for the owner's pipeline data."}
+  ],
+  "technologies": [
+    {"name": "Obsidian", "canonical_id": "Obsidian", "patterns": ["\\bObsidian\\b"], "description": "Local-first markdown knowledge management; the vault host."},
+    {"name": "Dataview", "canonical_id": "Dataview", "patterns": ["\\bDataview\\b"], "description": "Obsidian plugin for querying frontmatter as a database."},
+    {"name": "Templater", "canonical_id": "Templater", "patterns": ["\\bTemplater\\b"], "description": "Obsidian plugin for dynamic markdown templates."},
+    {"name": "Claude-Code", "canonical_id": "Claude-Code", "patterns": ["\\bClaude Code\\b", "\\bclaude code\\b"], "description": "Anthropic's CLI coding agent; the host for atlas-* skills."}
+  ],
+  "client_aliases": {
+    "pinecrestlodge": "Pinecrest-Lodge",
+    "saltmarshinn": "Saltmarsh-Inn",
+    "ledgerline": "Ledgerline"
+  }
+}

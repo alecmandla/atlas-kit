@@ -1,0 +1,27 @@
+# atlas-monday-ingest workspace + board configuration (example)
+#
+# Scope: the listed workspaces, all non-subitem boards. Per-item granularity
+# (not per-board snapshot). All-time. Column values + updates captured.
+# Subitems skipped.
+#
+# Add a workspace by appending to `workspaces:`. Set `enabled: false` to pause
+# one without losing its entry.
+
+workspaces:
+  - id: 1000001
+    name: "Client Onboarding"
+    enabled: true
+  - id: 1000002
+    name: "Company OKRs"
+    enabled: true
+
+# Boards to exclude (per-name regex, case-insensitive). Subitem boards are
+# auto-created by Monday per board and are always skipped by the `^Subitems of `
+# prefix filter below.
+exclude_board_patterns:
+  - "^Subitems of "
+
+# Optional board → route folder mapping. Default is the slugified board name.
+board_routes:
+  - { board: "Dashboard Onboarding", route: "dashboard-onboarding" }
+  - { board: "Request Triage", route: "request-triage" }

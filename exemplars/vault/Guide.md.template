@@ -1,0 +1,62 @@
+# Vault Guide — start here
+
+*This vault is your **second brain**: durable notes, meeting records, references, knowledge you want to re-find in six months. Your task tracker stays the execution layer. Your phone's notes app stays the scratchpad.*
+
+## Folders, at a glance
+
+| Folder | What lives here |
+|---|---|
+| `{{folders.inbox}}` | Anything untriaged. Empty it during the weekly review. |
+| `{{folders.daily}}` | Auto-created daily notes (Daily Notes or Periodic Notes plugin). |
+| `{{folders.projects}}` | Outcome-driven work with an end state. Sub-split Work / Clients / Personal. |
+| `{{folders.areas}}` | Ongoing responsibilities with no end date (marketing, ops, home). |
+| `{{folders.resources}}` | Reference material: articles, books, Claude skills, templates. |
+| `{{folders.archive}}` | Done, dormant, or dead. Nothing deleted, just moved. |
+| `{{folders.meta}}` | This guide, top-level MOCs, Dataview dashboards. |
+| `{{folders.attachments}}` | Pasted images, PDFs. Auto-routed; you shouldn't need to open it. |
+| `{{folders.crm}}` | One note per person you work with. |
+| `{{folders.clippings}}` | Where the web clipper drops articles. |
+| `{{folders.raw}}` | Append-only mirrors of external systems (meetings, mail, chat). Never edit. |
+| `{{folders.wiki}}` | Generated entity, concept, and synthesis pages. Regenerated nightly. |
+
+## Filing rule of thumb
+
+> *If you'd file it under one name, it belongs there. If it's cross-cutting, it goes in the Area.*
+
+- "Pinecrest Lodge kickoff call" → `{{folders.projects}}/Clients/Pinecrest-Lodge/meetings/`
+- "Portal sync with the team" → `{{folders.projects}}/Work/Portal/meetings/`
+- "Marketing onboarding with a new client" → `{{folders.areas}}/Marketing/meetings/`
+- "Generic client escalation pattern" → `{{folders.areas}}/Client-Success/meetings/`
+- Everything else you aren't sure about → `{{folders.inbox}}/`
+
+## Key conventions
+
+- **MOCs** (Maps of Content) are named `_<Name>.md`; the leading underscore sorts them to the top of their folder. Every client and active project has one.
+- **Tags** use lowercase kebab-case: `#meeting`, `#client`, `#pinecrest-lodge`.
+- **Links** use `[[_Pinecrest-Lodge]]` style: bare basename, Obsidian resolves.
+- **Dates** in frontmatter use ISO: `date: 2026-04-24`.
+- **Tasks** use `- [ ]` checkboxes and live inside whichever note they came from. The Tasks plugin aggregates them.
+- **Threads** use `#thread/<slug>` to follow one idea across many notes. See `AGENTS.md`.
+
+## Automations
+
+- **Meetings → meeting notes**: the nightly `atlas-fireflies-ingest` run files each recorded meeting into the right folder. Misroutes land in `{{folders.inbox}}/needs-decision/` for a manual move; update `meeting-routing.yaml` to prevent recurrence.
+- **Nightly ingest**: `atlas-nightly` mirrors every connected source into `{{folders.raw}}/`, regenerates `{{folders.wiki}}/`, and surfaces emerging patterns.
+- **Morning report**: `atlas-morning` fills today's daily note with the calendar, overdue tasks, and active threads.
+- **Weekly review**: `atlas-weekly` drafts a narrative review every Friday.
+- **Claude skills mirror**: nightly pull from `{{skills_root}}/` into `{{folders.resources}}/Claude-Skills/`.
+- **Web Clipper** (browser extension): new articles save to `{{folders.clippings}}/`.
+
+## Weekly routine (Fridays, 15 min)
+
+1. Open the review `atlas-weekly` drafted in `{{folders.areas}}/Weekly-Reviews/` (or create one from `{{folders.resources}}/Templates/Weekly-Review.md`).
+2. Triage `{{folders.inbox}}/` to zero.
+3. Scan `{{folders.meta}}/Dashboards/` for stale items and open action items.
+4. Move any finished projects to `{{folders.archive}}/Projects/`.
+
+## Start pages
+
+- [[Home]]: the vault dashboard
+- [[Clients-MOC]]: all clients
+- [[Projects-MOC]]: active projects
+- [[Reading-MOC]]: reading queue

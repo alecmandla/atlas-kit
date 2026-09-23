@@ -1,0 +1,59 @@
+---
+type: raw-readme
+status: invariant
+---
+
+# `{{folders.raw}}/` — append-only source layer
+
+This folder holds **immutable source material** ingested from external systems. Every subfolder corresponds to one source.
+
+## Subfolders
+
+| Subfolder | Source | Ingested by |
+|---|---|---|
+| `fireflies/` | Meeting summary records (transcripts stay in Fireflies, DEC-032) | `atlas-fireflies-ingest` |
+| `wispr/` | Wispr Flow dictation history, notes, calendar events | `atlas-wispr-ingest` |
+| `wispr/meetings/` | Wispr Flow notetaker meetings (the owner's live notes + transcript) | `atlas-wispr-meetings-ingest` |
+| `claude-history/` | Claude Code session summaries | `atlas-claude-history-ingest` |
+| `github/` | GitHub PRs, issues, comments | `atlas-github-ingest` |
+| `gmail/` | Gmail messages, routed by sender domain and label | `atlas-gmail-ingest` |
+| `slack/` | Slack channels and DMs | `atlas-slack-ingest` |
+| `monday/` | Monday.com boards and items | `atlas-monday-ingest` |
+| `apple-notes/` | Apple Notes | `atlas-apple-notes-ingest` |
+| `voice-memos/` | Voice Memos recordings (audio referenced, never copied) | `atlas-voice-memos-ingest` |
+| `distill/` | On-demand distilled chat captures (redacted source record per capture) | `atlas-distill` |
+
+Only the subfolders for sources you connected during kickoff exist. Adding a source means adding a decision entry first (see `AGENTS.md`).
+
+## The append-only invariant
+
+**Files in `{{folders.raw}}/` are never edited or deleted once written.**
+
+This is the load-bearing property of the wiki spine: `{{folders.wiki}}/` is rebuildable from `{{folders.raw}}/` alone. If `{{folders.raw}}/` is ever mutated in place, that property silently breaks.
+
+Two sources are projections of a mutable upstream (Monday items, Wispr notetaker meetings). Their ingests rewrite a file in place when the upstream `updated_at` advances. That is the documented deviation (DEC-009): still never deleted, never renamed, path derived deterministically from the source id.
+
+### Corrections
+
+If a piece of source material is wrong (for example, a transcription got a name wrong), do NOT edit the existing file. Instead:
+
+1. Write a new file with the corrected content.
+2. Add `corrected_by: [[<new-file-name>]]` to the original file's frontmatter (this is the only allowed mutation to a raw file: adding a forward pointer).
+3. Add `corrects: [[<original-file-name>]]` to the new file's frontmatter.
+
+This produces a correction chain that the materialization layer can follow.
+
+### Deletions
+
+Don't. If a source is no longer relevant (a meeting was wrongly captured), prefer adding `superseded: true` to the file's frontmatter over deleting it. Deletion forfeits the rebuildability invariant.
+
+The one exception: if a file contains PII or secrets that should never have been ingested, deletion is acceptable, but log the deletion in `docs/DECISIONS.md` with the rationale.
+
+## Why this matters
+
+The wiki layer (`{{folders.wiki}}/`) is freely rewriteable: `atlas-wiki-materialize` and `atlas-synthesize` regenerate it on each run. The guarantee that re-running materialization from a fresh `{{folders.raw}}/` produces an equivalent `{{folders.wiki}}/` only holds if `{{folders.raw}}/` itself is stable. If you ever edit a raw file in place, future re-materializations will diverge from past ones, and the disaster-recovery property (delete `{{folders.wiki}}/`, re-run materialize, recover everything) breaks.
+
+## See also
+
+- [[AGENTS|vault AGENTS.md]] for the broader vault constitution.
+- `docs/DECISIONS.md` DEC-009: "ingest writes to raw first, promotion separate."
