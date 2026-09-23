@@ -3,6 +3,8 @@
 **/state.json.bak*
 **/seen-ledger.json
 **/last-run.md
+**/last-dry-run.md
+**/auto-graduate-last-run.md
 **/logs/
 .env
 .env.*
