@@ -20,7 +20,7 @@ need to write either.
 | Part | What it is |
 |---|---|
 | `skills/atlas-kickoff/` | The one skill this plugin installs. `/atlas-kickoff` diagnoses your machine, interviews you, writes a kickoff document, and executes it. Everything else below is material the kickoff reads or copies. |
-| `exemplars/` | 25 scrubbed exemplar skills (ingest, spine, query, briefing, orchestrator, capture, practice), 6 vault document templates, 6 example routing configs, and the design-decision register they cite. Nothing here runs; it is the design source every generated skill is derived from. |
+| `exemplars/` | 24 scrubbed exemplar skills (ingest, spine, query, briefing, orchestrator, capture), 6 vault document templates, 6 example routing configs, and the design-decision register they cite. Nothing here runs; it is the design source every generated skill is derived from. |
 | `engine/` | A stdlib-only Python engine for the spine (wiki materialize, emerge, graduate, synthesize, lint, health) and the file-based ingests, with a config layer so the same scripts run against any folder layout. The kickoff copies it into your repo. |
 | `vault-scaffold/` | A default PARA folder tree, `raw/` and `wiki/` layers with their invariant READMEs, an `.obsidian/` configuration with per-plugin settings, four note templates, and a plugin checklist. The kickoff copies it into your vault, renaming folders to match your answers. |
 
@@ -165,13 +165,19 @@ to accumulate opinions. The ones that survived are encoded as invariants:
 - **Citation gates.** A generated line that states a fact links to the file it came from,
   and the synthesize and research skills refuse to write a page whose wikilinks do not
   resolve. Auditors surface findings; they never decide.
-- **No-nudge practices.** Reflection and other on-demand practices are never scheduled and
+- **A no-nudge list.** Folders, tags, and practices the owner names are never scheduled and
   never appear on a briefing, dashboard, or weekly review. The interview asks what must stay
-  silent and encodes the answer in every briefing skill's guardrails.
+  silent, writes the answer to the config's `no_nudge` key, and every briefing skill honors
+  it.
 
 The full register is in `exemplars/decisions/DECISIONS.md`; the kickoff copies it into
 your repo as the starting `docs/DECISIONS.md`, and every decision you reject in the
 interview is marked superseded there rather than removed.
+
+## Not included
+
+- The maintainer's personal reflection-practice skill is not part of the kit and may
+  appear later as a separate add-on plugin; the kit keeps only the `no_nudge` exclusion.
 
 ## Contributing
 

@@ -102,9 +102,12 @@ Schema (all keys optional):
     "clippings":   "Clippings",
     "raw":         "raw",
     "wiki":        "wiki"
-  }
+  },
+  "no_nudge": []
 }
 ```
+
+`no_nudge` is a list of vault-relative folder paths and tags (`"30 - Areas/Journal"`, `"#journal"`) that must never appear on a nudge surface (morning report, weekly review, dashboards, scheduled output). The kickoff interview fills it; generated briefing and dashboard skills read it.
 
 Public API of `_shared/atlas_config.py`:
 
@@ -114,6 +117,7 @@ Config.vault_root: Path
 Config.folder(key: str) -> Path  # absolute path under vault_root
 Config.owner_name: str
 Config.timezone: str
+Config.no_nudge: list[str]       # [] by default
 ```
 
 Scripts import it via `sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "_shared"))`. Every `Path.home() / "Obsidian-Vault"`, every hardcoded `/Users/...`, and every literal `"20 - Projects"`-style string in Python must go through this module. `--vault` CLI flags stay and override the config.

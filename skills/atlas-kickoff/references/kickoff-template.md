@@ -78,7 +78,8 @@ The config the engine reads, written to `~/.config/atlas/config.json` and commit
     "clippings": "{{folders.clippings}}",
     "raw": "{{folders.raw}}",
     "wiki": "{{folders.wiki}}"
-  }
+  },
+  "no_nudge": {{no_nudge_json}}
 }
 ```
 
@@ -90,7 +91,10 @@ engine conventions. In particular `crm` names the parent folder and person notes
 at `<crm>/People/`, so `crm` must not itself be `People`. owner_email, employer, and
 employer_domain are written as empty strings when the user left them blank; the engine
 ignores them (they feed the routing configs and exemplar prose through substitution,
-where a blank becomes {{fill-me}}). -->
+where a blank becomes {{fill-me}}). no_nudge_json is the round 2.4 answer as a JSON
+array of vault-relative folder paths and tags, e.g. ["Areas/Journal", "#journal"], or
+[] when the answer was none; the engine's Config.no_nudge reads it and every generated
+briefing and dashboard skill repeats it in its guardrails. -->
 
 # 3. Non-negotiable constraints
 
@@ -109,8 +113,9 @@ never delete, summary-only transcripts), then the no-nudge entry, then any user-
 rules from Round 3.4. The no-nudge entry reads:
 
 N. **Nothing under {{no_nudge_list}} appears on any nudge surface.** Nudge surfaces
-   are the morning report, weekly review, dashboards, and any scheduled output. Skills
-   for these practices are on-demand only and never wired to a scheduler.
+   are the morning report, weekly review, dashboards, and any scheduled output. The list
+   is the config's `no_nudge` key; every briefing and dashboard skill skips those folders
+   and tags, and no scheduled job is ever generated for them.
    Status: accepted (list: ...) | accepted (list: none)
 
 A waived constraint stays in the list. Do not renumber around it. -->
@@ -124,7 +129,7 @@ A waived constraint stays in the list. Do not renumber around it. -->
 <!-- AUTHOR: one row per selected capability. Prerequisites column names the tool or
 file that was found (e.g. "Gmail MCP: search_threads, list_labels"). Generates column is
 the repo-relative file list: skills/<name>/SKILL.md plus any config. Group rows: ingest,
-spine, query, briefing, orchestrator, capture, practice. -->
+spine, query, briefing, orchestrator, capture. -->
 
 Blocked (nothing is generated for these until the prerequisite exists):
 
@@ -161,8 +166,8 @@ still lists suggested cadences and the scheduler is "manual". "Needs a Claude se
 is yes for anything that calls an MCP or writes prose (ingests via MCP, morning, weekly,
 health, synthesize, nightly); no for pure engine scripts (people-extract, materialize,
 emerge, auto-graduate, lint, local-file ingests). Default cadences: nightly 22:00, synthesize 22:45,
-morning 08:00, weekly Fri 18:00, health Sun 21:00. Practice capabilities never appear
-here. -->
+morning 08:00, weekly Fri 18:00, health Sun 21:00. Nothing on the no-nudge list ever
+gets a job here. -->
 
 # 7. Generation plan
 

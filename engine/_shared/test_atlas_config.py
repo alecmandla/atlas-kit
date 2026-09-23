@@ -58,6 +58,7 @@ class DefaultsTests(_Base):
         self.assertEqual(cfg.folder("wiki"), cfg.vault_root / "wiki")
         self.assertEqual(cfg.owner_name, "")
         self.assertEqual(cfg.timezone, "America/Los_Angeles")
+        self.assertEqual(cfg.no_nudge, [])
 
     def test_folder_name_and_rel(self):
         cfg = ac.load()
@@ -117,6 +118,24 @@ class FileTests(_Base):
         os.environ[ac.ENV_VAR] = str(p)
         self.assertEqual(ac.load().folder_name("raw"), "sources")
 
+    def test_no_nudge_list_loads(self):
+        p = self.write({"no_nudge": ["30 - Areas/Journal", "#journal", " Health/ "]})
+        os.environ[ac.ENV_VAR] = str(p)
+        cfg = ac.load()
+        self.assertEqual(cfg.no_nudge, ["30 - Areas/Journal", "#journal", "Health"])
+        self.assertIsInstance(cfg.no_nudge, list)
+
+    def test_no_nudge_wrong_types_name_path(self):
+        for bad in ({"no_nudge": "Areas/Journal"}, {"no_nudge": [1]}, {"no_nudge": [""]},
+                    {"no_nudge": {"a": 1}}):
+            p = self.write(bad)
+            os.environ[ac.ENV_VAR] = str(p)
+            ac.reset()
+            with self.assertRaises(ac.ConfigError) as cm:
+                ac.load()
+            self.assertIn(str(p), str(cm.exception))
+            self.assertIn("no_nudge", str(cm.exception))
+
     def test_example_file_loads_to_defaults(self):
         example = Path(__file__).resolve().parents[1] / "atlas.config.example.json"
         os.environ[ac.ENV_VAR] = str(example)
@@ -125,6 +144,7 @@ class FileTests(_Base):
         self.assertEqual(dict(cfg.folders), dict(ac.DEFAULT_FOLDERS))
         self.assertEqual(cfg.timezone, ac.DEFAULT_TIMEZONE)
         self.assertEqual(cfg.owner_name, ac.DEFAULT_OWNER_NAME)
+        self.assertEqual(cfg.no_nudge, ac.DEFAULT_NO_NUDGE)
 
     def test_malformed_json_names_path(self):
         p = self.write("{not json")

@@ -48,7 +48,9 @@ Copy `atlas.config.example.json` to `~/.config/atlas/config.json` and edit
 `vault_root` and, if your layout differs, the `folders` map. The keys (`inbox`,
 `daily`, `projects`, `areas`, `resources`, `archive`, `meta`, `attachments`,
 `crm`, `clippings`, `raw`, `wiki`) are fixed; the values are the bare folder
-names directly under `vault_root`. Subfolders below those (`Clients/`,
+names directly under `vault_root`. `no_nudge` is a list of vault-relative
+folder paths and `#tags` that briefing and dashboard skills must never surface;
+it defaults to empty. Subfolders below those (`Clients/`,
 `People/`, `entities/`, `Dashboards/`) are engine conventions and are not
 configurable. `crm` therefore names the parent folder: person notes are
 written to `<crm>/People/`, so set it to `CRM` or `Contacts`, never to
@@ -115,7 +117,6 @@ prints the full flag list.
 
 | Script | Run | Needs |
 |---|---|---|
-| `atlas-monk/monk_scaffold.py` | `python3 monk_scaffold.py {today,week,month,page,reflect} [--date YYYY-MM-DD]` | none |
 | `atlas-research/research.py` | `python3 research.py search <terms>`, `resolve`, `write` | `cli/ripgrep` speeds up search; falls back to pure Python without it |
 | `atlas-book-summary/book_summary.py` | `python3 book_summary.py --input <book.json> --execute` | none |
 

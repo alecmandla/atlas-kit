@@ -41,7 +41,7 @@ Format for new entries: `## DEC-NNN — <title>`, then **Decided**, **Status**,
 | DEC-024 | Full Disk Access is a user-granted prerequisite; blocked runs soft-skip, never fail. |
 | DEC-025 | Apple Notes ingest uses the scriptable/MCP interface, not the database. |
 | DEC-026 | Book summaries have no raw mirror; the resource note is the durable artifact. |
-| DEC-027 | Reflection practices are on-demand only, never scheduled, never nudged. |
+| DEC-027 | Whatever the owner lists in `no_nudge` is never scheduled and never surfaced as a reminder. |
 | DEC-031 | Stdlib connector fetchers are the prerequisite for headless scheduling. |
 | DEC-032 | Meeting transcripts: summary on disk, full transcript fetched from the API on demand. |
 | DEC-033 | A machine-readable preflight runs before any voice-memo transcription batch. |
@@ -380,21 +380,26 @@ of web research adds nothing rebuildable.
 **Consequences.** The note's generated region is re-renderable with `--force`;
 the owner's `## Notes` region is preserved.
 
-## DEC-027 — Reflection practices never nudge
+## DEC-027 — The no-nudge list is never scheduled and never surfaced
 
 **Status:** active
 
-**Decision.** A personal priority-and-reflection practice (the `atlas-monk`
-folder under `{{folders.areas}}/`) is pull-only: never scheduled, never wired into
-`atlas-nightly`, never surfaced as overdue. Its task tag (`#monk/`) is excluded
-from every nudge surface (the morning report's overdue list, the weekly review's
-vault-wide task query). Its notes use name-suffixed filenames so they never
-collide with the daily-note basename.
+**Decision.** The owner names, at kickoff, the folders, tags, and practices that
+must never appear on any nudge surface. That answer is the config's `no_nudge`
+list: vault-relative folder paths and `#tags`, empty by default. Every nudge
+surface (the morning report's overdue list, the weekly review's open items and
+"needs attention" alert, dashboards, any scheduled output) skips files under a
+listed folder and lines carrying a listed tag. Nothing on the list is ever wired
+into `atlas-nightly` or any scheduler; whatever lives there is pull-only, reached
+by the owner on their own initiative.
 
-**Why.** The owner explicitly opted out of accountability mechanics for this
-practice. Carry-over is quiet; patterns are neutral data.
+**Why.** The owner explicitly opted out of accountability mechanics for these.
+Carry-over there is quiet; patterns are neutral data. The kit ships no skill for
+any personal practice; it only keeps the practice silent.
 
-**Consequences.** Wiring any part of it into a scheduler requires a new decision.
+**Consequences.** Briefing and dashboard skills read `no_nudge` from the config
+and repeat the list in their guardrails. Adding an entry is a config edit;
+surfacing anything on the list, or scheduling it, requires a new decision.
 
 ## DEC-031 — Stdlib connector fetchers
 

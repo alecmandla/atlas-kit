@@ -140,16 +140,14 @@ The interview never asks for a path the diagnostic already has.
 - **Question:** "The knowledge spine (people-extract, materialize, emerge, graduate,
   synthesize, lint, health, research, distill) is on by default. Which of these do you also want? Morning
   briefing into the daily note; weekly review note; nightly orchestrator (runs all
-  ingests in order); book summaries; a reflection practice folder that is never
-  scheduled."
-- **Feeds:** kickoff §Selected capabilities (spine, briefing, orchestrator, capture,
-  practice groups).
+  ingests in order); book summaries."
+- **Feeds:** kickoff §Selected capabilities (spine, briefing, orchestrator, capture
+  groups).
 - **Follow-up if vague:** "on-demand only" answers turn briefings off and keep the
   spine; say that. If the user picks the nightly orchestrator with zero ingests, point
   out it has nothing to run and drop it.
 - **Default:** spine on; morning and weekly on if any ingest was picked; nightly on if
-  any ingest was picked and Round 3 chooses a scheduler; book summaries off; practice
-  off.
+  any ingest was picked and Round 3 chooses a scheduler; book summaries off.
 
 ### 2.4 The no-nudge question
 
@@ -157,11 +155,14 @@ The interview never asks for a path the diagnostic already has.
   report, weekly review, dashboard, or any scheduled output, even as a reminder? A
   journaling or reflection practice, a health log, a folder, a tag. Answer 'none' if
   nothing."
-- **Feeds:** kickoff §Non-negotiable constraints (the no-nudge entry); the exclusion
-  list in every generated briefing and dashboard skill's guardrails; `DEC-` entry.
+- **Feeds:** `no_nudge` in the config, a JSON list of vault-relative folder paths
+  (`Areas/Journal`) and tags (`#journal`), empty when the answer is none; kickoff
+  §Non-negotiable constraints (the no-nudge entry); the exclusion list in every
+  generated briefing and dashboard skill's guardrails; `DEC-` entry.
 - **Follow-up if vague:** "whatever you recommend" is not an answer here; offer "none"
   explicitly and ask once more. If they name a practice, ask for the folder or tag
-  that identifies it so the exclusion can be written as a path or a tag prefix.
+  that identifies it so the exclusion can be written as a path or a tag prefix. The kit
+  generates no skill for the practice itself; it only keeps it off every nudge surface.
 - **Default:** none. Never propose a practice to exclude; the user names it or the
   list is empty.
 

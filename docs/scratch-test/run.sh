@@ -42,7 +42,9 @@ python3 "$KIT/docs/scratch-test/generate.py" --kit "$KIT" --repo "$R" --vault "$
 export HOME="$H" XDG_CONFIG_HOME="$H/.config" ATLAS_CONFIG="$R/atlas.config.json"
 cd "$R"
 step() { name=$1; shift; printf -- '--- %s\n' "$name"; if "$@" > "$L/$name.log" 2>&1; then tail -n 3 "$L/$name.log"; else rc=$?; cat "$L/$name.log"; echo "FAILED: $name (exit $rc)"; exit 1; fi; }
-step config-import python3 -c "import sys; sys.path.insert(0, 'engine/_shared'); import atlas_config as c; cfg = c.load(); print(cfg.vault_root); [print(k, cfg.folder(k)) for k in ['inbox','daily','projects','areas','resources','archive','meta','attachments','crm','clippings','raw','wiki']]"
+step config-import python3 -c "import sys; sys.path.insert(0, 'engine/_shared'); import atlas_config as c; cfg = c.load(); print(cfg.vault_root); [print(k, cfg.folder(k)) for k in ['inbox','daily','projects','areas','resources','archive','meta','attachments','crm','clippings','raw','wiki']]; print('no_nudge', cfg.no_nudge)"
+# The no-nudge answer must land in the config as a list and be named by the generated briefing skills.
+step no-nudge-check python3 -c "import json; cfg = json.load(open('atlas.config.json')); assert cfg.get('no_nudge') == ['Areas/Journal', '#journal'], cfg.get('no_nudge'); m = open('skills/atlas-morning/SKILL.md').read(); assert 'no_nudge' in m and 'Areas/Journal' in m and '#journal' in m, 'morning skill does not name the no-nudge list'; w = open('skills/atlas-weekly/SKILL.md').read(); assert 'no_nudge' in w and 'Areas/Journal' in w, 'weekly skill does not name the no-nudge list'; print('no_nudge', cfg['no_nudge'], 'named by morning and weekly')"
 step lint-report python3 engine/atlas-lint/lint.py --vault "$V" report
 step ch-dry python3 engine/atlas-claude-history-ingest/ingest.py --dry-run-report "$L/ch-dry.md"
 step ch-exec-1 python3 engine/atlas-claude-history-ingest/ingest.py --execute

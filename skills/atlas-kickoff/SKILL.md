@@ -73,7 +73,6 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Briefing | `atlas-weekly` | a weekly-review template in the vault (the scaffold ships one) | none |
 | Orchestrator | `atlas-nightly` | at least one ingest selected and a scheduler chosen | none |
 | Capture | `atlas-book-summary` | web search available | none |
-| Practice | `atlas-monk` (reflection practice) | none; on-demand only, never scheduled | none |
 
 If a prerequisite is missing: generate nothing for that capability, and tell the user
 exactly what to install or connect. Do not generate a skill that will fail on first run.
@@ -137,7 +136,9 @@ meeting or email source is picked, the optional owner email and employer name an
 (blank is a valid answer; it becomes `{{fill-me}}` where used); which non-ingest
 capabilities to enable (spine is on by default; briefings, research, capture are choices);
 the **no-nudge question**: which practices, folders, or tags must never appear on any
-nudge surface (morning report, weekly review, dashboards, scheduled output).
+nudge surface (morning report, weekly review, dashboards, scheduled output). The answer
+becomes the config's `no_nudge` list; the kit ships no skill for any practice, only the
+exclusion.
 
 **Round 3 — Operation and non-negotiables.** On-demand only versus scheduled; scheduler
 choice among the options the runtime allows (desktop scheduled tasks, launchd, manual);
@@ -184,9 +185,11 @@ Treat `docs/ATLAS-KICKOFF.md` as the brief. Do these in order; each step is inde
 so a failure in one is reported, not fatal to the rest.
 
 1. **Config.** Build the JSON from §Vault layout and config using the schema in
-   `references/kickoff-template.md`. Write it to `<repo>/atlas.config.json` (committed
-   copy) and to `~/.config/atlas/config.json`. If the latter exists, show a diff and ask
-   before overwriting; never overwrite silently.
+   `references/kickoff-template.md`. `no_nudge` holds the round 2 answer as a JSON list
+   of vault-relative folder paths and `#tags` (`[]` when the answer was none). Write it
+   to `<repo>/atlas.config.json` (committed copy) and to `~/.config/atlas/config.json`.
+   If the latter exists, show a diff and ask before overwriting; never overwrite
+   silently.
 2. **Engine.** Copy `${CLAUDE_PLUGIN_ROOT}/engine/` to `<repo>/engine/` if the target
    repo does not already have one (ask if it does). Generated skills and schedulers call
    `python3 <repo>/engine/<name>/<script>.py`, never a path inside the plugin cache, which
@@ -295,9 +298,10 @@ after reviewing the output.
   request, not a generation target.
 - A capability whose prerequisite is missing generates nothing. Say what to install and
   how to re-run for just that capability (`/atlas-kickoff --resume` after connecting it).
-- The no-nudge list is encoded in every briefing and dashboard skill's guardrails. A
-  practice the user asked to keep silent never appears in generated output, scheduled or
-  not, and its skill (if any) is never wired to a scheduler.
+- The no-nudge list lives in the config as `no_nudge` and is repeated in every briefing
+  and dashboard skill's guardrails. A folder, tag, or practice the user asked to keep
+  silent never appears in generated output, scheduled or not, and no scheduled job is
+  ever generated on its behalf.
 - Waived constraints are recorded as waived, with the reason, in the kickoff and in
   `DECISIONS.md`. Nothing decided in the interview is dropped silently.
 - Plain, declarative tone in every generated file. No emojis, no filler, American English.
