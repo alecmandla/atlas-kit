@@ -192,7 +192,9 @@ so a failure in one is reported, not fatal to the rest.
 3. **Skills.** For each selected capability, read its exemplar in full and write
    `<repo>/skills/<name>/SKILL.md` adapted to this vault: replace every folder placeholder
    with the config key reference or the real folder name, replace the owner placeholder,
-   point script invocations at `<repo>/engine/`, remove steps for sources the user did not
+   point script invocations at `<repo>/engine/` (and the state, routing, and suppression
+   files an exemplar places under `{{skills_root}}/<name>/` at `<repo>/engine/<name>/`, where
+   the scripts read and write them), remove steps for sources the user did not
    select, and encode the accepted non-negotiables and the no-nudge list in a
    `## Guardrails` section. Frontmatter must carry `derived-from: <exemplar name>` and a
    `description` that keeps the exemplar's trigger phrases. Skip anything whose

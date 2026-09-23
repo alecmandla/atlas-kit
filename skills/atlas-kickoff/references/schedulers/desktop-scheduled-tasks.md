@@ -28,7 +28,7 @@ Consequences:
    and recreate them from a session started in the new location.
 3. **Verify runs by artifacts, never by last-run timestamps.** After the first scheduled
    run, and any time you doubt the pipeline, check: new files under
-   `{{vault_root}}/{{folders.raw}}/<source>/`, the mtime of `skills/<name>/last-run.md`
+   `{{vault_root}}/{{folders.raw}}/<source>/`, the mtime of `skills/<name>/last-run.md` (session jobs) or `engine/<name>/last-run.md` (script jobs)
    in the repo, and today's daily note for the morning or nightly report section. A
    timestamp with no artifact means the run failed silently.
 
