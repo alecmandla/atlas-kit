@@ -1,0 +1,23 @@
+# Never ship personal runtime state
+**/state.json
+**/state.json.bak*
+**/seen-ledger.json
+**/last-run.md
+**/logs/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+token.json
+__pycache__/
+*.py[cod]
+.pytest_cache/
+**/venv/
+**/.venv/
+.DS_Store
+# Real (non-example) configs a tester might drop in while iterating
+atlas.config.json
+*.local.yaml
+*.local.json
