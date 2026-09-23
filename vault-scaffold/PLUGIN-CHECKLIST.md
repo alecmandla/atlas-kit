@@ -55,7 +55,7 @@ Nothing breaks without these. Each helps one capability or is a convenience.
 - [ ] Open Settings, Periodic Notes, and confirm the daily-note folder and template
   paths point into your daily-notes and templates folders.
 - [ ] Create a new daily note (Command palette, "Open today's daily note"). It should
-  contain the Focus, Notes, Tasks, and two Atlas report headings.
+  contain the Focus, Notes, Tasks, two Atlas report, and Scratch headings.
 - [ ] Create a note inside the projects folder. Templater should apply the project
   template on its own; if not, Settings, Templater, Folder templates, check the mapping.
 
