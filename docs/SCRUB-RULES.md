@@ -40,10 +40,10 @@ recipient's interview answers and `atlas.config.json`.
 | Placeholder | Meaning |
 |---|---|
 | `{{owner_name}}` | The vault owner's display name, e.g. `Jordan Vale`. |
-| `{{owner_slug}}` | Derived: `{{owner_name}}` in `First-Last` form, used for the owner's own person note and wikilink (`[[{{owner_slug}}]]`). |
-| `{{owner_email}}` | The owner's primary address. Used only where a real address must be matched (the meeting-routing owner fallback). |
-| `{{employer}}` | The owner's organization name. |
-| `{{employer_domain}}` | The organization's email domain, no `@`. |
+| `{{owner_slug}}` | Derived, never asked: `{{owner_name}}` in kebab-case with its capitalization kept (`Jordan Vale` → `Jordan-Vale`), the rule `atlas-people-extract` uses for person-note filenames. Used for the owner's own person note and wikilink (`[[{{owner_slug}}]]`). |
+| `{{owner_email}}` | The owner's primary address, from the optional interview follow-up (2.2a). Used only where a real address must be matched (the meeting-routing owner fallback). Blank in the interview means `{{fill-me}}` at each use. |
+| `{{employer}}` | The owner's organization name, from the optional follow-up (2.2b). Blank means `{{fill-me}}` at each use. |
+| `{{employer_domain}}` | The organization's email domain, no `@`, from the same follow-up. Blank means `{{fill-me}}` at each use. |
 | `{{vault_root}}` | Absolute path of the Obsidian vault. |
 | `{{skills_root}}` | The target repo root, taken from the kickoff invocation (`--repo <path>`, else the directory `/atlas-kickoff` runs in); never asked in the interview. Under it, `skills/<name>/SKILL.md` holds each generated skill and `engine/<name>/` holds that skill's scripts together with their state files (`state.json`, `last-run.md`, `logs/`) and routing configs. Exemplars always spell out which half they mean: `{{skills_root}}/engine/<name>/...` or `{{skills_root}}/skills/<name>/SKILL.md`. |
 | `{{timezone}}` | IANA timezone, e.g. `America/Chicago`. |

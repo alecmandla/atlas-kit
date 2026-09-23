@@ -132,10 +132,12 @@ without numbers, Zettelkasten, custom; timezone (default detected).
 **Round 2 — Folders, sources, and silence.** Confirm every folder key's name from the
 scheme chosen (present the full table, ask for edits, not a re-derivation); which sources
 to ingest, offering only capabilities whose prerequisites were detected and listing the
-blocked ones with what is missing; which non-ingest capabilities to enable (spine is on by
-default; briefings, research, capture are choices); the **no-nudge question**: which
-practices, folders, or tags must never appear on any nudge surface (morning report, weekly
-review, dashboards, scheduled output).
+blocked ones with what is missing, with a follow-up call for routing values and, when a
+meeting or email source is picked, the optional owner email and employer name and domain
+(blank is a valid answer; it becomes `{{fill-me}}` where used); which non-ingest
+capabilities to enable (spine is on by default; briefings, research, capture are choices);
+the **no-nudge question**: which practices, folders, or tags must never appear on any
+nudge surface (morning report, weekly review, dashboards, scheduled output).
 
 **Round 3 — Operation and non-negotiables.** On-demand only versus scheduled; scheduler
 choice among the options the runtime allows (desktop scheduled tasks, launchd, manual);

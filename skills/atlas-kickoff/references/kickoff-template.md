@@ -32,6 +32,7 @@ question is the acceptance test for the whole pipeline. -->
 
 # 2. Vault layout and config
 
+- **Owner:** {{owner_name}} (`[[{{owner_slug}}]]` in the vault); email, organization, domain: {{identity_extras}}
 - **Vault:** `{{vault_root}}` ({{vault_state}})
 - **Scheme:** {{layout_scheme}}
 - **Target repo:** `{{repo_root}}` (`{{skills_root}}` in the exemplars: `skills/<name>/SKILL.md` and `engine/<name>/` live under it)
@@ -40,7 +41,11 @@ question is the acceptance test for the whole pipeline. -->
 <!-- AUTHOR: vault_state is one of "existing, N top-level folders" or "new, will be
 created". runtime is "Claude desktop app" or "Claude Code CLI". repo_root comes from the
 invocation (--repo, else the current directory) and is the value substituted for every
-{{skills_root}} in the exemplars; it is never asked in the interview. -->
+{{skills_root}} in the exemplars; it is never asked in the interview. owner_slug is
+derived from owner_name (kebab-case, capitalization kept: "Jordan Vale" -> "Jordan-Vale").
+identity_extras holds owner_email, employer, and employer_domain from the optional round 2
+follow-ups as "<email>, <organization>, <domain>", with "not given" in place of any the
+user left blank. -->
 
 | Key | Folder | Exists | Notes |
 |---|---|---|---|
@@ -56,6 +61,9 @@ The config the engine reads, written to `~/.config/atlas/config.json` and commit
 {
   "vault_root": "{{vault_root}}",
   "owner_name": "{{owner_name}}",
+  "owner_email": "{{owner_email}}",
+  "employer": "{{employer}}",
+  "employer_domain": "{{employer_domain}}",
   "timezone": "{{timezone}}",
   "folders": {
     "inbox": "{{folders.inbox}}",
@@ -79,7 +87,10 @@ defaults exist for the maintainer's private checkout, not for users. vault_root 
 a leading ~ ; the engine expands it. Folder values are the top-level folder names only;
 the subfolders below them (Clients/, People/, Dashboards/, Templates/, entities/) are
 engine conventions. In particular `crm` names the parent folder and person notes live
-at `<crm>/People/`, so `crm` must not itself be `People`. -->
+at `<crm>/People/`, so `crm` must not itself be `People`. owner_email, employer, and
+employer_domain are written as empty strings when the user left them blank; the engine
+ignores them (they feed the routing configs and exemplar prose through substitution,
+where a blank becomes {{fill-me}}). -->
 
 # 3. Non-negotiable constraints
 

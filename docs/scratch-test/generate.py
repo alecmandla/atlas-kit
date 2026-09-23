@@ -156,6 +156,8 @@ def main() -> int:
     values = {f"folders.{k}": v for k, v in F.items()}
     values.update({
         "owner_name": PROFILE["owner_name"], "owner_slug": PROFILE["owner_slug"],
+        # left blank in the interview (no meeting or email source): every use becomes {{fill-me}}
+        "owner_email": "{{fill-me}}", "employer": "{{fill-me}}", "employer_domain": "{{fill-me}}",
         "timezone": PROFILE["timezone"], "vault_root": str(vault),
         "skills_root": str(repo), "repo_root": str(repo),
     })
@@ -230,6 +232,8 @@ def main() -> int:
     ])
     kick = fill(body, {
         **values,
+        # the config block holds the raw values (blank when not given); the identity line says so in words
+        "owner_email": "", "employer": "", "employer_domain": "", "identity_extras": "not given",
         "date": TODAY, "n_rounds": "3", "mission_paragraph": PROFILE["mission"],
         "vault_state": "existing, empty (0 top-level folders)", "layout_scheme": PROFILE["layout_scheme"],
         "runtime": "Claude Code CLI", "claude_cli_state": "claude 2.1.280 on PATH",
@@ -248,7 +252,8 @@ def main() -> int:
     print("phase3: docs/ATLAS-KICKOFF.md written; unresolved placeholders:", leftover or "none")
 
     # ---------------------------------------------------------------- Phase 4.1 config
-    config = {"vault_root": str(vault), "owner_name": PROFILE["owner_name"], "timezone": PROFILE["timezone"], "folders": F}
+    config = {"vault_root": str(vault), "owner_name": PROFILE["owner_name"], "owner_email": "", "employer": "",
+              "employer_domain": "", "timezone": PROFILE["timezone"], "folders": F}
     (repo / "atlas.config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     user_cfg = home / ".config/atlas/config.json"
     if user_cfg.exists():
