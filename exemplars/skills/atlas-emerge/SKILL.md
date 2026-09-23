@@ -124,7 +124,7 @@ This is a regenerated projection of recurring topics in `raw/` that don't yet ha
 ## Notes
 
 - Hand-edit nothing in this file — it's regenerated on every run.
-- To suppress a false-positive cluster permanently, add its slug to `{{skills_root}}/atlas-emerge/suppress.txt` (one slug per line).
+- To suppress a false-positive cluster permanently, add its slug to `{{skills_root}}/engine/atlas-emerge/suppress.txt` (one slug per line).
 - To force-promote a pattern to a tracked surface, run `/atlas-graduate <slug>`.
 ```
 
@@ -132,7 +132,7 @@ The "Graduate" column is a clickable Markdown link of the form `[Graduate](/atla
 
 ### 7. Write per-run summary
 
-`{{skills_root}}/atlas-emerge/last-run.md` captures one run's metadata:
+`{{skills_root}}/engine/atlas-emerge/last-run.md` captures one run's metadata:
 
 ```markdown
 # atlas-emerge — last run
@@ -176,7 +176,7 @@ python3 emerge.py --vault /tmp/test-vault --report-path /tmp/test-report.md
 Re-running on the same corpus must:
 
 - **Always overwrite** `Emerging-Patterns.md` — no appended content; same generation produces the same report.
-- **Never create** files outside `{{vault_root}}/{{folders.meta}}/Dashboards/Emerging-Patterns.md` and `{{skills_root}}/atlas-emerge/last-run.md`.
+- **Never create** files outside `{{vault_root}}/{{folders.meta}}/Dashboards/Emerging-Patterns.md` and `{{skills_root}}/engine/atlas-emerge/last-run.md`.
 - **Not write** to `{{folders.raw}}/` (read-only invariant per DEC-009).
 - **Not touch** `{{folders.wiki}}/concepts/` or `{{folders.wiki}}/entities/` — promotion is `atlas-graduate`'s job.
 
@@ -192,7 +192,7 @@ Verified mechanically: two consecutive `--execute` runs against an unchanged cor
 
 ## Suppression list
 
-Maintain `{{skills_root}}/atlas-emerge/suppress.txt`:
+Maintain `{{skills_root}}/engine/atlas-emerge/suppress.txt`:
 
 - One kebab-slug per line.
 - Comments start with `#`.

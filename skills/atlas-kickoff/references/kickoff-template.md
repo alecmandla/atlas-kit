@@ -34,11 +34,13 @@ question is the acceptance test for the whole pipeline. -->
 
 - **Vault:** `{{vault_root}}` ({{vault_state}})
 - **Scheme:** {{layout_scheme}}
-- **Target repo:** `{{repo_root}}`
+- **Target repo:** `{{repo_root}}` (`{{skills_root}}` in the exemplars: `skills/<name>/SKILL.md` and `engine/<name>/` live under it)
 - **Runtime:** {{runtime}} ({{claude_cli_state}})
 
 <!-- AUTHOR: vault_state is one of "existing, N top-level folders" or "new, will be
-created". runtime is "Claude desktop app" or "Claude Code CLI". -->
+created". runtime is "Claude desktop app" or "Claude Code CLI". repo_root comes from the
+invocation (--repo, else the current directory) and is the value substituted for every
+{{skills_root}} in the exemplars; it is never asked in the interview. -->
 
 | Key | Folder | Exists | Notes |
 |---|---|---|---|

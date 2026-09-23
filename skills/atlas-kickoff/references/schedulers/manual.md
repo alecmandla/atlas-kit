@@ -37,13 +37,13 @@ Verify by artifacts (the files each job writes), never by the fact that it exite
 ### nightly
 - **Run:** in a Claude Code session here, `/atlas-nightly`
 - **Writes:** `{{folders.raw}}/<source>/` files, wiki pages, the emerging-patterns dashboard, a report section in today's daily note
-- **Verify:** `find "{{vault_root}}/{{folders.raw}}" -newer skills/atlas-nightly/last-run.md -type f | wc -l` is greater than zero on a day with new source activity
+- **Verify:** `find "{{vault_root}}/{{folders.raw}}" -newer engine/atlas-nightly/last-run.md -type f | wc -l` is greater than zero on a day with new source activity
 - **Cadence:** every evening
 
 ### <each script job>
 - **Run:** `python3 engine/<name>/<script>.py --execute`
 - **Writes:** ...
-- **Verify:** `cat engine/<name>/last-run.md` (scripts write state next to themselves)
+- **Verify:** `cat engine/<name>/last-run.md` (every job, script or session, records its run there)
 - **Cadence:** ...
 
 ### <each session job>

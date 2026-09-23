@@ -8,7 +8,7 @@ requires: [cli/python3]
 
 # atlas-lint
 
-You audit the **wiki spine** for quality issues and surface **what should be synthesized next**. You are read-only on the spine — you write only `{{folders.meta}}/Dashboards/Wiki-Lint.md` and `{{skills_root}}/atlas-lint/last-run.md`. You never edit `{{folders.wiki}}/`, `{{folders.raw}}/`, or PARA notes.
+You audit the **wiki spine** for quality issues and surface **what should be synthesized next**. You are read-only on the spine — you write only `{{folders.meta}}/Dashboards/Wiki-Lint.md` and `{{skills_root}}/engine/atlas-lint/last-run.md`. You never edit `{{folders.wiki}}/`, `{{folders.raw}}/`, or PARA notes.
 
 This is the complement to **`atlas-health`**, not a replacement: `atlas-health` covers vault-wide hygiene (orphaned notes, broken wikilinks, frontmatter violations, inbox overflow, stale `{{folders.raw}}/`). `atlas-lint` covers what that pass doesn't — the *quality and coverage of the synthesized layer*.
 
@@ -20,12 +20,12 @@ This is the complement to **`atlas-health`**, not a replacement: `atlas-health` 
 | **missing-synthesis** | `#thread/<slug>` with **≥ `MIN_EVIDENCE` (3) evidence files** and **no** `{{folders.wiki}}/synthesis/<slug>.md`. This is the **synthesis work-list**. *Evidence* counts tags outside admin/index files (AGENTS.md, dashboards, weekly reviews, daily notes — those only *list* threads). Threads below the threshold are shown as **tagged-but-thin**, not work. Variant slugs are merged; a possible existing duplicate is annotated `dup_of=`. |
 | **hollow-pages** | synthesis/concept pages with `evidence_count <= 1` (placeholders / N=1 threads). |
 
-> **Staleness of *existing* synthesis pages is deliberately NOT checked here** — that is `atlas-synthesize`'s content-fingerprint job, and an mtime/date heuristic false-positives against it. For authoritative new/changed status, run `python3 {{skills_root}}/atlas-synthesize/synthesize.py --list`.
+> **Staleness of *existing* synthesis pages is deliberately NOT checked here** — that is `atlas-synthesize`'s content-fingerprint job, and an mtime/date heuristic false-positives against it. For authoritative new/changed status, run `python3 {{skills_root}}/engine/atlas-synthesize/synthesize.py --list`.
 
 ## Step 1 — Run the lint
 
 ```bash
-python3 {{skills_root}}/atlas-lint/lint.py report
+python3 {{skills_root}}/engine/atlas-lint/lint.py report
 ```
 This prints a stdout summary, (over)writes the `{{folders.meta}}/Dashboards/Wiki-Lint.md` snapshot, and updates `last-run.md`. Aggregate the counts; don't load the full dashboard into context unless asked.
 
@@ -37,7 +37,7 @@ Summarize per check with counts, then the **synthesis work-list** (the actionabl
 
 The synthesis work-list is machine-readable for the backfill:
 ```bash
-python3 {{skills_root}}/atlas-lint/lint.py worklist
+python3 {{skills_root}}/engine/atlas-lint/lint.py worklist
 # <slug> | evidence=<n> | sources=<csv> | status=missing [| dup_of=<slug>]   (actionable only)
 ```
 Hand `status=missing` slugs (skipping any `dup_of` unless the user wants a separate page) to `atlas-synthesize` — by hand (`/atlas-synthesize <slug>`) or via the batched synthesis run. For re-synthesis of *existing* pages, run `synthesize.py --list` (its fingerprint decides what's stale). **Resolve duplicate slugs first** (pick the canonical, retag) so synthesis doesn't produce a duplicate page. An empty work-list is the healthy steady state.

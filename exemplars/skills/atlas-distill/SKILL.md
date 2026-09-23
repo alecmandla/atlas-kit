@@ -56,7 +56,7 @@ A JSON object:
 ### 4. Dry-run, then execute
 
 ```bash
-cd {{skills_root}}/atlas-distill
+cd {{skills_root}}/engine/atlas-distill
 python3 distill.py --input /tmp/capture.json --dry-run    # proposal + preview, writes nothing
 python3 distill.py --input /tmp/capture.json --execute     # writes both files
 python3 distill.py --input /tmp/capture.json --execute --force   # update an existing note

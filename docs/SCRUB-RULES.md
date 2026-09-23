@@ -45,7 +45,7 @@ recipient's interview answers and `atlas.config.json`.
 | `{{employer}}` | The owner's organization name. |
 | `{{employer_domain}}` | The organization's email domain, no `@`. |
 | `{{vault_root}}` | Absolute path of the Obsidian vault. |
-| `{{skills_root}}` | Absolute path of the directory holding the generated `atlas-*` skill folders. |
+| `{{skills_root}}` | The target repo root, taken from the kickoff invocation (`--repo <path>`, else the directory `/atlas-kickoff` runs in); never asked in the interview. Under it, `skills/<name>/SKILL.md` holds each generated skill and `engine/<name>/` holds that skill's scripts together with their state files (`state.json`, `last-run.md`, `logs/`) and routing configs. Exemplars always spell out which half they mean: `{{skills_root}}/engine/<name>/...` or `{{skills_root}}/skills/<name>/SKILL.md`. |
 | `{{timezone}}` | IANA timezone, e.g. `America/Chicago`. |
 | `{{folders.inbox}}` | Folder name for unrouted captures (default `00 - Inbox`). |
 | `{{folders.daily}}` | Daily notes (default `10 - Daily Notes`). |
@@ -68,8 +68,13 @@ Rules of use:
   defaults belong to the config layer, not the prose.
 - Subfolders below the placeholder (`Clients/`, `Dashboards/`, `MOCs/`, `Templates/`,
   `People/`, `needs-decision/`) are part of the design and stay literal.
-- Skill-local files (`state.json`, `last-run.md`, `suppress.txt`) are written as
-  `{{skills_root}}/<skill-name>/<file>`.
+- Script invocations are written as `python3 {{skills_root}}/engine/<skill-name>/<script>.py`,
+  and skill-local files (`state.json`, `last-run.md`, `suppress.txt`, routing configs)
+  as `{{skills_root}}/engine/<skill-name>/<file>`, because that is where the scripts
+  read and write them. Session-only skills (morning, weekly, health, nightly) write
+  their `last-run.md` under `{{skills_root}}/engine/<skill-name>/` too, so every skill's
+  state lives in one place. A reference to another skill's instructions is
+  `{{skills_root}}/skills/<skill-name>/SKILL.md`.
 - A placeholder inside a fenced code block is still a placeholder; the kickoff
   substitutes inside code blocks too.
 - The kickoff substitutes **only** the tokens in the table above. Any other

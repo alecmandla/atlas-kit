@@ -13,7 +13,7 @@ You are the vault hygiene auditor. You run once per week on Sunday at 21:00 in `
 1. Walk the vault and detect five categories of hygiene issues.
 2. Build a snapshot report at `{{folders.meta}}/Dashboards/Vault-Health.md`.
 3. Surface a "Needs attention" alert at the top for any category with ≥ 1 finding.
-4. Write a per-run summary at `{{skills_root}}/atlas-health/last-run.md`.
+4. Write a per-run summary at `{{skills_root}}/engine/atlas-health/last-run.md`.
 
 This skill is **diagnostic, not corrective**. It never deletes, moves, or edits files in the vault. It only **reads** and produces a regenerated dashboard.
 
@@ -254,7 +254,7 @@ Recommended action: re-run `atlas-wiki-materialize` and `atlas-emerge` to surfac
 
 ## Step 4 — Write last-run.md
 
-`{{skills_root}}/atlas-health/last-run.md`:
+`{{skills_root}}/engine/atlas-health/last-run.md`:
 
 ```markdown
 # atlas-health — last run
@@ -288,7 +288,7 @@ Verified mechanically: two consecutive runs on an unchanged corpus produce byte-
 
 ## Failure isolation
 
-If one detection category errors (e.g. permission failure scanning a subdir), the skill captures the error and continues to the next category. The report shows the failed category's row as `⚠️ scan failed — see logs` rather than omitting it. Errors are logged to `{{skills_root}}/atlas-health/logs/<TODAY>/<category>.stderr.log`.
+If one detection category errors (e.g. permission failure scanning a subdir), the skill captures the error and continues to the next category. The report shows the failed category's row as `⚠️ scan failed — see logs` rather than omitting it. Errors are logged to `{{skills_root}}/engine/atlas-health/logs/<TODAY>/<category>.stderr.log`.
 
 ## Edge cases
 

@@ -100,7 +100,7 @@ Idempotency: if the raw file exists AND its `ended` frontmatter matches the JSON
 
 ### 5. State + per-run summary
 
-`{{skills_root}}/atlas-claude-history-ingest/state.json` tracks `last_run_iso`, `last_run_count`. Per-run summary at `last-run.md`.
+`{{skills_root}}/engine/atlas-claude-history-ingest/state.json` tracks `last_run_iso`, `last_run_count`. Per-run summary at `last-run.md`.
 
 ## Invocation
 

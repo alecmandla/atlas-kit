@@ -99,7 +99,7 @@ Schema matches `{{folders.meta}}/Templates/Person-Note.md`; a person note create
 
 ### 6. Write the per-run summary
 
-After the walk completes, write `{{skills_root}}/atlas-people-extract/last-run.md` with:
+After the walk completes, write `{{skills_root}}/engine/atlas-people-extract/last-run.md` with:
 
 - Timestamp.
 - Mode (`execute` vs `dry-run`).

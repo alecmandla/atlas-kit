@@ -149,7 +149,7 @@ See `{{vault_root}}/AGENTS.md` for the rewriteable rule and the per-page `## Rel
 
 ### 6. Write per-run summary
 
-`{{skills_root}}/atlas-wiki-materialize/last-run.md` captures:
+`{{skills_root}}/engine/atlas-wiki-materialize/last-run.md` captures:
 
 - Timestamp + mode.
 - Counts per entity_type.

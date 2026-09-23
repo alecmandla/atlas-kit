@@ -19,13 +19,13 @@ The owner has one vault at `{{vault_root}}/` with a PARA structure. Their client
 ## Workflow — daily Fireflies sync
 
 State, dedup, and the duplicate-fire guard are mechanical — always use the
-helper `{{skills_root}}/atlas-fireflies-ingest/fireflies_state.py` for them
+helper `{{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py` for them
 rather than reading/writing `state.json` or grepping by hand.
 
 ### 0. Duplicate-fire guard
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py guard
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py guard
 ```
 
 Exit 1 → STOP immediately and report the `skipped:` line it printed (a desktop
@@ -34,7 +34,7 @@ scheduler can fire this task many times in a burst on wake-from-sleep). Exit 0 �
 ### 1. Determine the time window
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py since
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py since
 ```
 
 Fetch all Fireflies transcripts with `date >=` the printed timestamp (it is
@@ -44,7 +44,7 @@ Use the Fireflies MCP's `fireflies_get_transcripts` — request at minimum: `id`
 
 ### 2. Route each meeting
 
-Load `{{skills_root}}/atlas-fireflies-ingest/meeting-routing.yaml`. For each transcript, apply rules in this priority order — **first match wins**:
+Load `{{skills_root}}/engine/atlas-fireflies-ingest/meeting-routing.yaml`. For each transcript, apply rules in this priority order — **first match wins**:
 
 1. **Attendee email match** (tier 1) — if any participant email is listed under a rule's `attendees:`, route there.
 2. **Attendee email domain match** (tier 2) — if the domain portion (text after `@`) of any participant email is listed under a rule's `domains:`, route there. Compare lowercased.
@@ -145,7 +145,7 @@ Sanitization: filename title → strip `/\:?*"<>|`, collapse whitespace, truncat
 The owner hand-authors a **prep note** before some calls — named `YYYY-MM-DD — <title> (prep).md` in the same `meetings/` folder — and takes live notes in it during the call. Prep and call stay two separate files, linked. After you've decided the routed folder and the call-note basename (but **before** writing the note), run:
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/link_prep.py \
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/link_prep.py \
   --folder "<routed_folder>" --call-basename "YYYY-MM-DD — <sanitized-title>"
 ```
 
@@ -163,7 +163,7 @@ Full transcripts never live on disk (DEC-032): they stay in Fireflies, and the q
 **Never hand-format this file.** The format lives in exactly one place — the writer module (DEC-034). Dump the step-1 meeting JSON (the whole object: `id`, `title`, `dateString`, `participants`, `meetingAttendees`, `summary`), add a `"meeting_note"` key, and pipe it through:
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/summary_record.py apply --payload - <<'EOF'
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/summary_record.py apply --payload - <<'EOF'
 { ...meeting JSON..., "meeting_note": "YYYY-MM-DD — <sanitized-title>" }
 EOF
 ```
@@ -185,7 +185,7 @@ The record body ends with the transcript pointer: the URL is for humans; AI tool
 Before writing each meeting, run:
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py check-dup {{fireflies_id}}
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py check-dup {{fireflies_id}}
 ```
 
 It searches **all eight** vault roots the filing/archival pipeline can land a
@@ -211,11 +211,11 @@ After a successful run:
 
 ```bash
 # fetched >= 1 meeting: cursor = newest meeting's timestamp + 1s
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py advance \
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py advance \
   --newest "<ISO timestamp of the newest meeting fetched>" --count <meetings filed>
 
 # fetched 0 meetings: run it with NO --newest — it leaves the cursor untouched
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py advance
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py advance
 ```
 
 Never write `state.json` by hand, never write "now" or a date-only value as the
@@ -255,7 +255,7 @@ The dashboard at `{{folders.meta}}/Dashboards/Unreviewed-Inbox.md` lists Inbox f
 
 Triggered on phrase "mirror skills" or as a second step in the scheduled daily run.
 
-For each folder in `{{skills_root}}/` (and any other skill directories the owner maintains):
+For each folder in `{{skills_root}}/skills/` (and any other skill directories the owner maintains):
 
 1. Skip folders starting with `archive-` or without a `SKILL.md` / `README.md`.
 2. Read the frontmatter and first 500 chars of `SKILL.md` (or `README.md` fallback).
@@ -264,7 +264,7 @@ For each folder in `{{skills_root}}/` (and any other skill directories the owner
 ```markdown
 ---
 type: skill-reference
-source: {{skills_root}}/<folder-name>
+source: {{skills_root}}/skills/<folder-name>
 status: active
 last_modified: {{file_mtime_iso}}
 tags: [claude-skill]
@@ -279,7 +279,7 @@ tags: [claude-skill]
 {{extracted-from-description}}
 
 ## Source
-`{{skills_root}}/<folder-name>/`
+`{{skills_root}}/skills/<folder-name>/`
 
 ## Excerpt
 {{first-500-chars-of-skill-md}}
@@ -312,7 +312,7 @@ routes:
 If the owner asks to "backfill last N days", treat that as: ignore the cursor, fetch transcripts with `date >= today - N days`, run the rest of the workflow normally (including per-meeting `check-dup`). After completion:
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/fireflies_state.py backfill-done \
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/fireflies_state.py backfill-done \
   --through "<full ISO timestamp of the END of the window you fetched>"
 ```
 
@@ -322,18 +322,18 @@ Pass the actual fetch-window end, not "today" — the helper rejects date-only v
 
 One-time (re-runnable) pass that converges every unenriched file in `{{folders.raw}}/fireflies/` — link-only stubs **and** legacy summary conversions — onto the enriched summary record. **Attended run only** — the Fireflies connector doesn't auth headless (DEC-031). It never reads or writes `state.json` (the sync cursor is not involved), never deletes or renames files, and is safe to stop and resume mid-way (the writer is idempotent).
 
-1. List what's left: `python3 {{skills_root}}/atlas-fireflies-ingest/summary_record.py pending` → `<meeting_id>\t<date>\t<stub|legacy-summary>` per row, oldest first, count (with a per-kind breakdown) on stderr. `legacy-summary` rows already carry content and re-render on `apply`; a fetch just refreshes them to the current Fireflies summary.
+1. List what's left: `python3 {{skills_root}}/engine/atlas-fireflies-ingest/summary_record.py pending` → `<meeting_id>\t<date>\t<stub|legacy-summary>` per row, oldest first, count (with a per-kind breakdown) on stderr. `legacy-summary` rows already carry content and re-render on `apply`; a fetch just refreshes them to the current Fireflies summary.
 2. Work in date windows: pick a chunk of pending rows, call `fireflies_get_transcripts` with `fromDate`/`toDate` spanning them. **Page to exhaustion** — the tool returns at most 50 per call, so keep advancing `skip` (by `limit`) until a call returns a short (< `limit`) page. Dump the full returned list to a JSON file. Do **not** inject `meeting_note` — the writer preserves it from the existing record.
 3. **Filter the fetched JSON to the current `pending` ids before applying.** `fireflies_get_transcripts` returns every meeting in the window, including ones that already have a full note; applying those would fresh-write orphan records (no `meeting_note`) that `check-dup` then blocks the real note against forever. Keep only entries whose `id` is in step-1's pending list:
 
    ```bash
-   python3 {{skills_root}}/atlas-fireflies-ingest/summary_record.py pending | cut -f1 > pending.ids
+   python3 {{skills_root}}/engine/atlas-fireflies-ingest/summary_record.py pending | cut -f1 > pending.ids
    python3 -c 'import json; ids=set(open("pending.ids").read().split()); json.dump([m for m in json.load(open("fetched.json")) if m.get("id") in ids], open("filtered.json","w"))'
    ```
 
-   Then `python3 {{skills_root}}/atlas-fireflies-ingest/summary_record.py apply --payload filtered.json`. It prints one line per meeting and a count summary (`enriched / already-current / no-content / conflict / error`).
-4. A pending id is "aged out" only when a **fully-paged** window (step 2 exhausted) did not return it: `python3 {{skills_root}}/atlas-fireflies-ingest/summary_record.py mark-unavailable <id> ...` annotates the stub (`unavailable_at_source:`) so `pending` stops offering it. **Never** `mark-unavailable` off a truncated (50-cap) response — you'd annotate live meetings. Ids whose date sits exactly on a window boundary: don't mark them here — re-check them in the next window.
-5. Append each batch's count line to the run ledger at `{{skills_root}}/atlas-fireflies-ingest/backfill-ledger.md`, then repeat from step 1. **Termination:** `pending: 0` is not always reachable — a meeting that is available but has no summary content (AI notes off, processing skipped) reports `no-content` and correctly stays a stub. Each pending id ends in exactly one terminal state: `enriched`/`already-current` (converged), `unavailable-marked` (aged out), or *present-in-an-exhausted-fetch-but-contentless* (leave as stub — record the id in the ledger). The loop ends when every pending id has reached one of the three, **not** when `pending` hits 0.
+   Then `python3 {{skills_root}}/engine/atlas-fireflies-ingest/summary_record.py apply --payload filtered.json`. It prints one line per meeting and a count summary (`enriched / already-current / no-content / conflict / error`).
+4. A pending id is "aged out" only when a **fully-paged** window (step 2 exhausted) did not return it: `python3 {{skills_root}}/engine/atlas-fireflies-ingest/summary_record.py mark-unavailable <id> ...` annotates the stub (`unavailable_at_source:`) so `pending` stops offering it. **Never** `mark-unavailable` off a truncated (50-cap) response — you'd annotate live meetings. Ids whose date sits exactly on a window boundary: don't mark them here — re-check them in the next window.
+5. Append each batch's count line to the run ledger at `{{skills_root}}/engine/atlas-fireflies-ingest/backfill-ledger.md`, then repeat from step 1. **Termination:** `pending: 0` is not always reachable — a meeting that is available but has no summary content (AI notes off, processing skipped) reports `no-content` and correctly stays a stub. Each pending id ends in exactly one terminal state: `enriched`/`already-current` (converged), `unavailable-marked` (aged out), or *present-in-an-exhausted-fetch-but-contentless* (leave as stub — record the id in the ledger). The loop ends when every pending id has reached one of the three, **not** when `pending` hits 0.
 6. Final report to the owner: enriched / already-current / unavailable totals, the leave-as-stub (contentless) list, plus every `conflict` line for manual review.
 
 **Steady state:** the nightly sync keeps minting stubs for new meetings, so `pending` is also the periodic re-check entry point — re-run this loop occasionally (or after any big backfill), not once-ever.
@@ -343,7 +343,7 @@ One-time (re-runnable) pass that converges every unenriched file in `{{folders.r
 `dry_run_monday_tier.py` replays the Monday tier-4 logic against the current `{{folders.inbox}}/needs-decision/` corpus and emits a markdown report. Use when modifying tier-4 logic or after a Monday backfill to verify rescue counts.
 
 ```bash
-python3 {{skills_root}}/atlas-fireflies-ingest/dry_run_monday_tier.py \
+python3 {{skills_root}}/engine/atlas-fireflies-ingest/dry_run_monday_tier.py \
   --out /tmp/atlas-fireflies-ingest-monday-tier-dryrun.md
 ```
 

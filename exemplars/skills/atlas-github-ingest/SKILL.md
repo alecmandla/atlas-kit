@@ -18,7 +18,7 @@ Python scripts (the `ingest.py` for this skill) can't invoke MCP tools — MCP i
 
 ### 1. Read `github-repos.yaml`
 
-Parse the file at `{{skills_root}}/atlas-github-ingest/github-repos.yaml`. `owner` field + `repos[]` list. Skip entries with `enabled: false`.
+Parse the file at `{{skills_root}}/engine/atlas-github-ingest/github-repos.yaml`. `owner` field + `repos[]` list. Skip entries with `enabled: false`.
 
 ### 2. For each repo, list PRs + Issues
 

@@ -36,7 +36,7 @@ Wikilinks resolve **by filename**: `[[01ABCDEF…]]` → `{{folders.raw}}/firefl
 ## Step 1 — Build the read-first evidence map
 
 ```bash
-python3 {{skills_root}}/atlas-research/research.py search --question "<the user's question, verbatim>"
+python3 {{skills_root}}/engine/atlas-research/research.py search --question "<the user's question, verbatim>"
 ```
 Pass `--terms a,b,c` if you know the canonical names better than the question wording (e.g. the entity is "Ledgerline-Cloud" but the user typed "LL cloud"). The output gives you: **Direct hubs** (read first), **ranked candidates by layer**, and a **drill map** (`[[id]] -> path`).
 
@@ -78,7 +78,7 @@ Match the synthesis bar: a real thesis, explicit counter-evidence, calibrated co
 
 Every `[[link]]` in your answer must resolve to a real file. Write your draft answer to a temp file and check it:
 ```bash
-python3 {{skills_root}}/atlas-research/research.py resolve --file /tmp/atlas-answer.md
+python3 {{skills_root}}/engine/atlas-research/research.py resolve --file /tmp/atlas-answer.md
 ```
 Fix or drop any **UNRESOLVED** citation before presenting — never ship a broken `[[link]]`. (You may also pipe the draft on stdin.)
 
@@ -86,11 +86,11 @@ Fix or drop any **UNRESOLVED** citation before presenting — never ship a broke
 
 Default is **answer-in-chat, no file**. Persist a research note only when the user asks to save it, OR the answer cited ≥2 sources AND the user bookmarks it:
 ```bash
-python3 {{skills_root}}/atlas-research/research.py write \
+python3 {{skills_root}}/engine/atlas-research/research.py write \
   --slug ledgerline-integration --question "<q>" --answer-file /tmp/atlas-answer.md \
   --confidence high --sources 6 --layers synthesis,para,raw
 ```
-This writes `{{folders.meta}}/Research/<date>-<slug>.md` (with a preserved `## Notes` editable region), appends a greppable line to `{{folders.meta}}/Research/_research-log.md`, runs the citation gate again (flagging any unresolved link in the note + `last-run.md`), and updates `{{skills_root}}/atlas-research/last-run.md`.
+This writes `{{folders.meta}}/Research/<date>-<slug>.md` (with a preserved `## Notes` editable region), appends a greppable line to `{{folders.meta}}/Research/_research-log.md`, runs the citation gate again (flagging any unresolved link in the note + `last-run.md`), and updates `{{skills_root}}/engine/atlas-research/last-run.md`.
 
 ## Output template (persisted note)
 

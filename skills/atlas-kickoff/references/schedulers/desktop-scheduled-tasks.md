@@ -28,8 +28,8 @@ Consequences:
    and recreate them from a session started in the new location.
 3. **Verify runs by artifacts, never by last-run timestamps.** After the first scheduled
    run, and any time you doubt the pipeline, check: new files under
-   `{{vault_root}}/{{folders.raw}}/<source>/`, the mtime of `skills/<name>/last-run.md` (session jobs) or `engine/<name>/last-run.md` (script jobs)
-   in the repo, and today's daily note for the morning or nightly report section. A
+   `{{vault_root}}/{{folders.raw}}/<source>/`, the mtime of `engine/<name>/last-run.md`
+   in the repo (every job, script or session, records its run there), and today's daily note for the morning or nightly report section. A
    timestamp with no artifact means the run failed silently.
 
 ## Wake-from-sleep storms
@@ -57,7 +57,7 @@ write a new job here without one.
   `{{repo_root}}/atlas.config.json` for the vault path and folder names. Do not ask
   questions; on any ambiguity, skip the item, note it in `last-run.md`, and continue.
   Write nothing outside the paths that SKILL.md names. Finish by writing
-  `{{repo_root}}/skills/<capability>/last-run.md` with counts and any errors.
+  `{{repo_root}}/engine/<capability>/last-run.md` with counts and any errors.
 ```
 
 Default job set and cadence (adjust per the interview):

@@ -44,7 +44,7 @@
 - **Nightly ingest**: `atlas-nightly` mirrors every connected source into `{{folders.raw}}/`, regenerates `{{folders.wiki}}/`, and surfaces emerging patterns.
 - **Morning report**: `atlas-morning` fills today's daily note with the calendar, overdue tasks, and active threads.
 - **Weekly review**: `atlas-weekly` drafts a narrative review every Friday.
-- **Claude skills mirror**: nightly pull from `{{skills_root}}/` into `{{folders.resources}}/Claude-Skills/`.
+- **Claude skills mirror**: nightly pull from `{{skills_root}}/skills/` into `{{folders.resources}}/Claude-Skills/`.
 - **Web Clipper** (browser extension): new articles save to `{{folders.clippings}}/`.
 
 ## Weekly routine (Fridays, 15 min)

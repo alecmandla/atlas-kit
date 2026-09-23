@@ -14,7 +14,7 @@ You are the weekly review agent. You run once per week on Friday at 18:00 in `{{
 2. Build five evidence lists from the vault's current state.
 3. Render the weekly review using the `Weekly-Review.md` template, populated with synthesized prose + lists.
 4. Write the review to `{{folders.areas}}/Weekly-Reviews/<ISO-week>.md`.
-5. Write a per-run summary at `{{skills_root}}/atlas-weekly/last-run.md`.
+5. Write a per-run summary at `{{skills_root}}/engine/atlas-weekly/last-run.md`.
 
 This skill is **narrative-first**. The review should read like a coherent weekly recap, not a dump of lists. Use prose for the "What got done this week" and "What's blocked or stuck" sections, with bullets only where the data is genuinely list-shaped (meetings, action items, threads).
 
@@ -247,7 +247,7 @@ Every other section is fully regenerated.
 
 ## Step 5 — Write last-run.md
 
-`{{skills_root}}/atlas-weekly/last-run.md`:
+`{{skills_root}}/engine/atlas-weekly/last-run.md`:
 
 ```markdown
 # atlas-weekly — last run

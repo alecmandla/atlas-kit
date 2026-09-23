@@ -111,7 +111,7 @@ answers differ between, say, your interactive terminal and the scheduled
 runner):
 
 ```bash
-cd <skills_root>/atlas-voice-memos-ingest && python3 ingest.py --doctor
+cd <repo>/engine/atlas-voice-memos-ingest && python3 ingest.py --doctor
 ```
 
 ## Runbook — doctor finding → fix
