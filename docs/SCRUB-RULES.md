@@ -55,7 +55,7 @@ recipient's interview answers and `atlas.config.json`.
 | `{{folders.archive}}` | PARA archive (default `50 - Archive`). |
 | `{{folders.meta}}` | Vault-about-the-vault (default `60 - Meta`). |
 | `{{folders.attachments}}` | Binary assets (default `99 - Attachments`). |
-| `{{folders.crm}}` | People CRM (default `CRM`). |
+| `{{folders.crm}}` | Parent of the People CRM (default `CRM`). Person notes live in the fixed `People/` subfolder beneath it (`{{folders.crm}}/People/<First-Last>.md`), so the value names the parent, never `People` itself. |
 | `{{folders.clippings}}` | Web-clipper inbox (default `Clippings`). |
 | `{{folders.raw}}` | Append-only source layer (default `raw`). |
 | `{{folders.wiki}}` | Materialized wiki layer (default `wiki`). |

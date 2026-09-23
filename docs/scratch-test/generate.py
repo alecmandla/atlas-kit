@@ -40,7 +40,7 @@ PROFILE = {
     "folders": {
         "inbox": "Inbox", "daily": "Daily", "projects": "Projects", "areas": "Areas",
         "resources": "Resources", "archive": "Archive", "meta": "Meta",
-        "attachments": "Attachments", "crm": "People", "clippings": "Clippings",
+        "attachments": "Attachments", "crm": "CRM", "clippings": "Clippings",
         "raw": "raw", "wiki": "wiki",
     },
     "no_nudge": "Areas/Journal",
@@ -61,7 +61,7 @@ FOLDER_PURPOSE = {
     "archive": "finished projects and retired areas",
     "meta": "templates, dashboards, the vault's own docs",
     "attachments": "binary files",
-    "crm": "person notes",
+    "crm": "parent of the People/ subfolder that holds person notes",
     "clippings": "web clips",
     "raw": "append-only ingested source records",
     "wiki": "regenerated entity, concept, and synthesis pages",

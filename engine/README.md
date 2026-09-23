@@ -50,7 +50,9 @@ Copy `atlas.config.example.json` to `~/.config/atlas/config.json` and edit
 `crm`, `clippings`, `raw`, `wiki`) are fixed; the values are the bare folder
 names directly under `vault_root`. Subfolders below those (`Clients/`,
 `People/`, `entities/`, `Dashboards/`) are engine conventions and are not
-configurable. Scripts that take `--vault` still do; the flag moves the root
+configurable. `crm` therefore names the parent folder: person notes are
+written to `<crm>/People/`, so set it to `CRM` or `Contacts`, never to
+`People` (that yields `People/People/`). Scripts that take `--vault` still do; the flag moves the root
 for one run and does not rename the layout. The full contract, the public API,
 and the validation rules are in `CONFIG-LAYER.md`.
 

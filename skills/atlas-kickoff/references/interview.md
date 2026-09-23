@@ -66,7 +66,7 @@ can pick one in a word. Free-text is always allowed.
   | archive | `50 - Archive` | finished projects and retired areas |
   | meta | `60 - Meta` | templates, dashboards, the vault's own docs |
   | attachments | `99 - Attachments` | binary files |
-  | crm | `CRM` | person notes |
+  | crm | `CRM` | parent of the fixed `People/` subfolder that holds person notes |
   | clippings | `Clippings` | web clips |
   | raw | `raw` | append-only ingested source records |
   | wiki | `wiki` | regenerated entity, concept, and synthesis pages |
@@ -74,7 +74,10 @@ can pick one in a word. Free-text is always allowed.
 - **Feeds:** every `folders.<key>` in the config.
 - **Follow-up if vague:** for any key the user drops ("I don't use CRM"), keep the key
   with the default name and tell them the folder is created empty only if a selected
-  capability writes to it. Keys are not optional; names are.
+  capability writes to it. Keys are not optional; names are. If the user names `crm`
+  `People`, say that person notes land at `<crm>/People/` (the subfolder is an engine
+  convention, not configurable), so that name would produce `People/People/`; propose
+  `CRM` or `Contacts` for the parent instead.
 - **Default:** the table as shown for the numbered scheme; the same names without
   prefixes for the plain scheme; for Zettelkasten, `notes/` for projects, areas, and
   resources with a `type:` frontmatter field, and the rest unchanged.

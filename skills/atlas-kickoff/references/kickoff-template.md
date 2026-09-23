@@ -74,7 +74,10 @@ The config the engine reads, written to `~/.config/atlas/config.json` and commit
 
 <!-- AUTHOR: every key is present even when the name equals the default; the engine's
 defaults exist for the maintainer's private checkout, not for users. vault_root may use
-a leading ~ ; the engine expands it. -->
+a leading ~ ; the engine expands it. Folder values are the top-level folder names only;
+the subfolders below them (Clients/, People/, Dashboards/, Templates/, entities/) are
+engine conventions. In particular `crm` names the parent folder and person notes live
+at `<crm>/People/`, so `crm` must not itself be `People`. -->
 
 # 3. Non-negotiable constraints
 
