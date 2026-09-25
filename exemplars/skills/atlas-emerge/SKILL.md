@@ -36,7 +36,9 @@ For each `{{vault_root}}/{{folders.raw}}/<source>/**/*.md`:
 - If the parsed date is older than `--window-days` (default 30), skip.
 - Record: source type (parent dir of `{{folders.raw}}/`), item path, item date, title (first `# <title>` line), and body (everything after the first blank line following the title).
 
-Source-type detection: `raw/fireflies/` → `fireflies`, `raw/wispr/` → `wispr`, `raw/gemini/meetings/` → `gemini`, `raw/teams/meetings/` → `teams`, `raw/zoom/meetings/` → `zoom`, `raw/gong/meetings/` → `gong`, `raw/claude-history/<...>/` → `claude-history`, `raw/github/<owner>/<repo>/` → `github`, `raw/gmail/<route>/` → `gmail`, `raw/slack/<channel>/` → `slack`, `raw/monday/<workspace>/<board>/` → `monday`, `raw/distill/` → `distill`.
+Source-type detection: `raw/fireflies/` → `fireflies`, `raw/wispr/meetings/` → `wispr-meetings` (Wispr Notetaker records of calls), any other `raw/wispr/` file → `wispr` (the owner's dictations), `raw/gemini/meetings/` → `gemini`, `raw/teams/meetings/` → `teams`, `raw/zoom/meetings/` → `zoom`, `raw/gong/meetings/` → `gong`, `raw/claude-history/<...>/` → `claude-history`, `raw/github/<owner>/<repo>/` → `github`, `raw/gmail/<route>/` → `gmail`, `raw/slack/<channel>/` → `slack`, `raw/monday/<workspace>/<board>/` → `monday`, `raw/distill/` → `distill`.
+
+Meeting grouping: the six meeting ingests record the same call as separate raw files that point at each other through frontmatter ids, a later ingest linking to earlier ones. Each record's own id is `meeting_id` (`raw/fireflies/`), `wispr_meeting_id`, `gemini_doc_id`, `teams_meeting_id`, `zoom_id`, or `gong_call_id`; a link to another record uses `fireflies_id` for Fireflies and the same key name for the rest. Treat each (source, id) pair a record carries, its own and every link, as a node, and union every record that shares a node (union-find), so a link counts in both directions and chains through records outside the window. Never compare titles: two calls with the same title on different days stay apart. Each group counts as **one item from one source type**, and it reports the first member's source type in the order `wispr-meetings`, `fireflies`, `gemini`, `teams`, `zoom`, `gong`. `wispr-meetings` leads because a Wispr Notetaker record carries the owner's own notes; the rest follow the nightly ingest order, so otherwise the group reports its earliest-ingested record. All six are work sources for `atlas-auto-graduate` (DEC-019); only the dictations (`wispr`) are a self source. One call captured by Zoom, Gong, and Fireflies is therefore one `fireflies` item and cannot meet `--min-sources 2` alone. Records outside the meeting folders, and meeting records with no id in common, are each their own item.
 
 ### 2. Build the known-tracked deny-list
 
@@ -65,7 +67,7 @@ Per phrase, store: `phrase`, `kebab_slug`, `source_type`, `item_path`, `item_dat
 
 Cluster phrases by `kebab_slug`:
 
-- For each cluster: distinct items (count), distinct source types (count), date range (min/max), display variants seen.
+- For each cluster: distinct items (count, a meeting group counting once), distinct source types (count, a meeting group counting as its one reported source), date range (min/max), display variants seen.
 - Apply filters:
   - Drop clusters whose `kebab_slug` is in the deny-list (step 2).
   - Drop clusters with fewer than 3 distinct items OR appearing in only 1 source type.
@@ -120,6 +122,7 @@ This is a regenerated projection of recurring topics in `raw/` that don't yet ha
 - Sources walked: <list of source dirs>.
 - Deny-list size: <N> known entities + <N> known concepts + <N> known threads.
 - Minimum thresholds: ≥ 3 distinct items, ≥ 2 source types, ≥ 5 chars per slug.
+- Meeting records that cross-link through their frontmatter ids (one call captured by several meeting ingests) count as one item from one source type, reported as the first of wispr-meetings, fireflies, gemini, teams, zoom, gong among them. This run folded <N> such record(s) into another.
 
 ## Notes
 

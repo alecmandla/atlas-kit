@@ -200,6 +200,7 @@ with temp directories only, and never touches a real vault:
 ```bash
 (cd _shared && python3 test_atlas_config.py)
 (cd atlas-fireflies-ingest && python3 test_link_prep.py && python3 test_summary_record.py)
+(cd atlas-emerge && python3 test_emerge.py)
 (cd atlas-frontmatter-migrate && python3 test_migrate.py)
 (cd atlas-graduate && python3 test_graduate.py)
 (cd atlas-people-extract && python3 test_extract.py)

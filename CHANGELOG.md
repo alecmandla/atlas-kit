@@ -49,6 +49,9 @@ All notable changes to atlas-kit are recorded here. The format follows
 - `exemplars/configs/zoom-sources.example.json` and `gong-sources.example.json`.
 - `atlas-research` transcript escalation covers Gemini, Zoom, and Gong records under the
   same three-fetch cap.
+- `engine/atlas-emerge/test_emerge.py`: emerge's first test suite, stdlib only, run
+  against a temp vault through `ATLAS_CONFIG`. Covers meeting grouping, source counting,
+  and the report row.
 
 ### Fixed
 
@@ -56,6 +59,24 @@ All notable changes to atlas-kit are recorded here. The format follows
   and `raw/gong/`. Emerge's source list had omitted the Gemini and Teams folders, so their
   records never contributed to pattern emergence, and synthesize dropped them from a
   thread's source list.
+- `atlas-emerge` counts one call once. The meeting ingests record the same call as
+  separate raw files, so a call captured by Zoom, Gong, and Fireflies counted as three
+  items from three source types and could surface a pattern alone. Emerge now groups
+  records that share a frontmatter id (`meeting_id`, `fireflies_id`, `wispr_meeting_id`,
+  `gemini_doc_id`, `teams_meeting_id`, `zoom_id`, `gong_call_id`) with union-find, never
+  by title, and counts each group as one item from one source type: the first member
+  in the order wispr-meetings, fireflies, gemini, teams, zoom, gong. Wispr leads because
+  its Notetaker record carries the owner's own notes. The report's methodology says how
+  many records were folded.
+- `atlas-emerge` reports `raw/wispr/meetings/` as its own source type, `wispr-meetings`.
+  Wispr Notetaker records of calls had shared the `wispr` label with the owner's
+  dictations, so they counted as a self source in auto-graduation.
+- `atlas-auto-graduate` counts Wispr Notetaker meetings (`wispr-meetings`), Gemini, Teams,
+  Zoom, and Gong as work sources (DEC-019); Wispr dictations stay a self source.
+  They could put a pattern on the Emerging-Patterns dashboard but never counted toward
+  the two-work-source rule. Because emerge now reports one source per call, the records
+  of one call still add at most one work source. The review-queue dashboard lists the
+  sources from the code instead of a hand-kept string.
 
 ## 0.1.0 - 2026-09-22
 

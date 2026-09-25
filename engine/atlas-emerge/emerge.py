@@ -27,6 +27,27 @@ SKILL_DIR = Path(__file__).resolve().parent
 
 SOURCE_DIRS = ["fireflies", "wispr", "gemini", "teams", "zoom", "gong", "claude-history", "github",
                "gmail", "slack", "monday", "distill"]
+# Subfolders reported as their own source type. raw/wispr/ holds the owner's dictations
+# (a SELF source for atlas-graduate) and, under meetings/, Wispr Notetaker records of
+# real calls, which count as a WORK source like any other meeting ingest.
+SUB_SOURCES = {("wispr", "meetings"): "wispr-meetings"}
+# The meeting ingests record one call as separate raw files that point at each other
+# through frontmatter ids, a later ingest linking to earlier ones. Per source folder:
+# (the record's own id key, the key other records use to link to it). Only Fireflies
+# names the two differently.
+MEETING_ID_KEYS = {
+    "fireflies": ("meeting_id", "fireflies_id"),
+    "wispr-meetings": ("wispr_meeting_id", "wispr_meeting_id"),
+    "gemini": ("gemini_doc_id", "gemini_doc_id"),
+    "teams": ("teams_meeting_id", "teams_meeting_id"),
+    "zoom": ("zoom_id", "zoom_id"),
+    "gong": ("gong_call_id", "gong_call_id"),
+}
+# A group of cross-linked records counts as one item from one source type: the first
+# member in this order. Wispr Notetaker leads because its record carries the owner's
+# own notes; the rest follow the nightly ingest order, so otherwise the group reports
+# its earliest-ingested record, the one the others link to.
+MEETING_SOURCE_ORDER = ["wispr-meetings", "fireflies", "gemini", "teams", "zoom", "gong"]
 # Patterns a run is expected to surface before last-run.md carries a diagnostic. Small
 # on purpose: a new vault has little corpus, and zero patterns is a fact, not a failure.
 # Raise it with --min-patterns once the corpus is large enough that a low count means
@@ -209,7 +230,13 @@ def source_type_for(path: Path, vault: Path) -> str:
         rel = path.relative_to(vault / CFG.folder_name("raw"))
     except ValueError:
         return "unknown"
-    return rel.parts[0] if rel.parts else "unknown"
+    if not rel.parts:
+        return "unknown"
+    if len(rel.parts) > 2:
+        sub = SUB_SOURCES.get((rel.parts[0], rel.parts[1]))
+        if sub:
+            return sub
+    return rel.parts[0]
 
 
 def build_deny_list(vault: Path, skill_dir: Path) -> set[str]:
@@ -283,8 +310,80 @@ def build_deny_list(vault: Path, skill_dir: Path) -> set[str]:
     return deny
 
 
+def _id_value(v) -> str | None:
+    if v is None or isinstance(v, list):
+        return None
+    v = str(v).strip()
+    return v or None
+
+
+def meeting_tokens(item: dict) -> set[tuple[str, str]]:
+    """(source, id) pairs naming the call(s) a meeting record belongs to: its own id
+    plus every id it links to. Two records sharing any pair are the same call."""
+    keys = MEETING_ID_KEYS.get(item["source"])
+    if keys is None:
+        return set()
+    fm = item.get("fm") or {}
+    tokens: set[tuple[str, str]] = set()
+    own = _id_value(fm.get(keys[0]))
+    if own:
+        tokens.add((item["source"], own))
+    for src, (_own_key, link_key) in MEETING_ID_KEYS.items():
+        v = _id_value(fm.get(link_key))
+        if v:
+            tokens.add((src, v))
+    return tokens
+
+
+def group_meeting_records(items: list[dict]) -> int:
+    """Give every item a `unit` (what counts as one item) and a `unit_source` (the
+    source type it counts as). Cross-linked meeting records of one call share a unit,
+    found by union-find over their frontmatter ids so links resolve in both directions
+    and transitively; titles are never compared. The unit's source follows
+    MEETING_SOURCE_ORDER. Everything else is its own unit under its own folder.
+    Returns the number of records folded into another record's unit."""
+    parent = list(range(len(items)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    owner: dict[tuple[str, str], int] = {}
+    for i, item in enumerate(items):
+        for tok in meeting_tokens(item):
+            j = owner.setdefault(tok, i)
+            if j != i:
+                ri, rj = find(i), find(j)
+                if ri != rj:
+                    parent[max(ri, rj)] = min(ri, rj)
+
+    groups: dict[int, list[int]] = defaultdict(list)
+    for i in range(len(items)):
+        groups[find(i)].append(i)
+
+    rank = {s: n for n, s in enumerate(MEETING_SOURCE_ORDER)}
+    merged = 0
+    for members in groups.values():
+        if len(members) == 1:
+            item = items[members[0]]
+            item["unit"] = str(item["path"])
+            item["unit_source"] = item["source"]
+            continue
+        merged += len(members) - 1
+        lead = min(members, key=lambda i: (rank.get(items[i]["source"], len(rank)),
+                                           str(items[i]["path"])))
+        unit = "meeting:" + str(items[lead]["path"])
+        for i in members:
+            items[i]["unit"] = unit
+            items[i]["unit_source"] = items[lead]["source"]
+    return merged
+
+
 def walk_raw(vault: Path, window_days: int, today: dt.date) -> list[dict]:
-    """Return list of {path, source, date, title, body} for items in window."""
+    """Return list of {path, source, date, title, body, fm, unit, unit_source} for
+    items in window, with cross-linked meeting records grouped (group_meeting_records)."""
     raw_root = vault / CFG.folder_name("raw")
     cutoff = today - dt.timedelta(days=window_days)
     items: list[dict] = []
@@ -308,13 +407,16 @@ def walk_raw(vault: Path, window_days: int, today: dt.date) -> list[dict]:
                 continue
             body = body_of(text)
             title = title_of(body)
+            sub = p.relative_to(src_dir).parts
             items.append({
                 "path": p,
-                "source": src,
+                "source": SUB_SOURCES.get((src, sub[0]), src) if len(sub) > 1 else src,
                 "date": d,
                 "title": title,
                 "body": body,
+                "fm": fm,
             })
+    group_meeting_records(items)
     return items
 
 
@@ -381,8 +483,9 @@ def cluster_candidates(items: list[dict], deny: set[str]) -> dict[str, dict]:
         for slug in seen_in_item:
             c = clusters[slug]
             c["variants"].add(slug)
-            c["items"].add(str(item["path"]))
-            c["sources"].add(item["source"])
+            # A call captured by several meeting ingests is one item from one source.
+            c["items"].add(item.get("unit", str(item["path"])))
+            c["sources"].add(item.get("unit_source", item["source"]))
             c["dates"].append(item["date"])
     return clusters
 
@@ -421,6 +524,7 @@ def render_report(
     source_dirs: list[str],
     deny_size: int,
     today: dt.date,
+    meeting_records_grouped: int = 0,
 ) -> str:
     sources_str = ", ".join(source_dirs)
     rows: list[str] = []
@@ -469,6 +573,10 @@ def render_report(
         f"- Sources walked: {sources_str}.\n"
         f"- Deny-list size: {deny_size} known identifiers (entities, concepts, threads, stopwords).\n"
         "- Minimum thresholds: ≥ 3 distinct items, ≥ 2 source types, ≥ 5 chars per slug.\n"
+        "- Meeting records that cross-link through their frontmatter ids (one call captured by "
+        "several meeting ingests) count as one item from one source type, reported as the first "
+        f"of {', '.join(MEETING_SOURCE_ORDER)} among them. "
+        f"This run folded {meeting_records_grouped} such record(s) into another.\n"
         "\n"
         "## Notes\n"
         "\n"
@@ -544,6 +652,7 @@ def main() -> int:
 
     deny = build_deny_list(vault, SKILL_DIR)
     items = walk_raw(vault, args.window_days, today)
+    meeting_records_grouped = len(items) - len({i["unit"] for i in items})
     clusters = cluster_candidates(items, deny)
     candidates_extracted = sum(len(c["items"]) for c in clusters.values())
     candidates_after_dedup = len(clusters)
@@ -564,6 +673,7 @@ def main() -> int:
         SOURCE_DIRS,
         len(deny),
         today,
+        meeting_records_grouped,
     )
     last_run_text = render_last_run(
         mode="dry-run" if args.dry_run else "execute",

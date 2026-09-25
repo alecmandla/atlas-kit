@@ -17,8 +17,20 @@ Policy (Moderate — DEC-019):
   Everything else above the emerge floor -> REVIEW queue.
   Guard hits -> FILTERED (shown in the queue, never auto-tagged).
 
-  WORK sources = fireflies, gmail, slack, monday, github  (idea crossing systems)
+  WORK sources = fireflies, wispr-meetings, gemini,      (idea crossing systems)
+                 teams, zoom, gong, gmail, slack,
+                 monday, github
   SELF sources = claude-history, wispr                    (the owner narrating)
+
+  `wispr` is the owner's dictations; emerge reports Wispr Notetaker records
+  (raw/wispr/meetings/) as `wispr-meetings`, a real call and so a work source.
+
+  One call captured by several meeting ingests is one work source, not several:
+  emerge groups the cross-linked records (their frontmatter ids) into one item and
+  writes a single source name for the group into Emerging-Patterns.md, which is
+  all this script reads. A Zoom + Gong + Fireflies copy of one call therefore
+  arrives as `fireflies` alone and cannot meet the work-source rule by itself.
+  A call the Wispr Notetaker also captured arrives as `wispr-meetings`.
 
 Modes:
   (default)   plan  : classify, print, (re)write the review-queue dashboard
@@ -49,7 +61,10 @@ SKILL_DIR = Path(__file__).resolve().parent
 LEDGER_PATH = SKILL_DIR / "seen-ledger.json"
 QUEUE_REL = CFG.rel("meta", "Dashboards", "Thread-Review-Queue.md")
 
-WORK_SOURCES = {"fireflies", "gmail", "slack", "monday", "github"}
+# The meeting folders here must match emerge's MEETING_ID_KEYS: emerge collapses
+# cross-linked records of one call into one of them before this set is consulted.
+WORK_SOURCES = {"fireflies", "wispr-meetings", "gemini", "teams", "zoom", "gong",
+                "gmail", "slack", "monday", "github"}
 SELF_SOURCES = {"claude-history", "wispr"}
 
 # Cap on auto-graduations per run (DEC-019 addendum). A data backfill
@@ -333,7 +348,8 @@ def render_queue(vault: Path, today: str, observation_date: str, mode: str,
         "`[[Emerging-Patterns]]`. {note}\n\n".replace("{note}", mode_note)
         + "Auto-graduation policy: **Moderate** (DEC-019) — a pattern auto-tags "
         "when it spans **≥2 of your work systems** (meeting / email / Slack / "
-        "Monday / GitHub) *or* has **≥5 items**, and has **persisted ≥2 nightly "
+        "Monday / GitHub; one call recorded by several meeting tools counts once) "
+        "*or* has **≥5 items**, and has **persisted ≥2 nightly "
         "runs**. Person / known-entity / noise patterns are filtered out.\n\n"
         f"Per-run cap: at most **{MAX_AUTO_PER_RUN}** auto-graduations per run — a "
         "backfill/burst rolls out over several nights.\n\n"
@@ -357,8 +373,9 @@ def render_queue(vault: Path, today: str, observation_date: str, mode: str,
         "## Methodology\n\n"
         f"- Observation date: {observation_date}. Ledger: "
         f"`{SKILL_DIR / 'seen-ledger.json'}`.\n"
-        "- Work sources: fireflies, gmail, slack, monday, github. "
-        "Self sources: claude-history, wispr.\n"
+        f"- Work sources: {', '.join(sorted(WORK_SOURCES))}. "
+        f"Self sources: {', '.join(sorted(SELF_SOURCES))}. One call captured by several "
+        "meeting ingests counts as one work source (emerge groups the cross-linked records).\n"
         "- Regenerated every run — hand-edits are overwritten. Suppress a "
         f"false-positive via `{SKILL_DIR.parent / 'atlas-emerge' / 'suppress.txt'}`.\n"
     )
