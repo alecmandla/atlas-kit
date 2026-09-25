@@ -40,8 +40,8 @@ TITLE_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 THREAD_TAG_RE = re.compile(r"#thread/([a-z0-9][a-z0-9-]*)")
 
 PARA_DIRS = [CFG.folder_name(k) for k in ("inbox", "projects", "areas", "resources")]
-RAW_SOURCE_ORDER = ["fireflies", "gmail", "slack", "monday", "github",
-                    "claude-history", "wispr"]
+RAW_SOURCE_ORDER = ["fireflies", "gemini", "teams", "zoom", "gong", "gmail", "slack",
+                    "monday", "github", "claude-history", "wispr"]
 
 # Token-bounding caps (DEC-020). Keep the bundle inside a few-thousand-token budget.
 PER_SOURCE_CAP = 5       # at most N raw items per source (diversity)

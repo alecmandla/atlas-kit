@@ -18,6 +18,8 @@ Each ingest creates its own subfolder on first run. Typical names:
 | `fireflies/` | meeting summary records | the meetings ingest |
 | `gemini/meetings/` | Google Meet notes (summary, decisions, next steps) | the Gemini meetings ingest |
 | `teams/meetings/` | Microsoft Teams transcripts | the Teams meetings ingest |
+| `zoom/meetings/` | Zoom meeting summaries and transcripts | the Zoom meetings ingest |
+| `gong/meetings/` | Gong call notes (brief, key points, next steps) | the Gong meetings ingest |
 | `gmail/<route>/` | email messages, routed by sender or label | the email ingest |
 | `slack/<route>/` | chat messages, routed by channel | the chat ingest |
 | `monday/<workspace>/<board>/` | board items with column values | the boards ingest |

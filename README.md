@@ -87,6 +87,8 @@ and offers only those.
 | Meeting transcripts | Fireflies MCP server |
 | Meeting notes from Google Meet (Gemini) | Google Drive MCP server, or markdown exports of the notes docs |
 | Microsoft Teams meeting transcripts | a folder of exported `.vtt` or `.docx` transcripts, or a synced OneDrive Recordings folder |
+| Zoom meeting summaries and transcripts | any of: the Zoom for Claude connector (attended runs); a Zoom Marketplace app for unattended runs, which may need an admin to grant you developer access; or a folder of `.vtt` transcripts downloaded from the Zoom portal. Summaries need AI Companion meeting summaries turned on |
+| Gong call notes and transcripts | a Gong API key, which only a Gong technical admin can issue, plus your own email address so the ingest keeps only your calls; or a folder of transcripts you download from each call page |
 | Email | Gmail MCP server |
 | Chat | Slack MCP server |
 | Boards | Monday.com MCP server |
@@ -201,7 +203,7 @@ audit on Sunday. All of these are also runnable by hand from the runbook.
 | Path | What it is |
 |---|---|
 | `skills/atlas-kickoff/` | The one skill this plugin installs, with its interview, kickoff template, scheduler guides, and plugin reference |
-| `exemplars/` | 24 scrubbed exemplar skills, 6 vault document templates, 6 example routing configs, and the design-decision register. Nothing here runs; it is what generated skills derive from |
+| `exemplars/` | 28 scrubbed exemplar skills, 6 vault document templates, 9 example routing and source configs, and the design-decision register. Nothing here runs; it is what generated skills derive from |
 | `engine/` | The stdlib-only Python engine with its config layer. Copied into your repo by the kickoff |
 | `vault-scaffold/` | Default PARA tree, `raw/` and `wiki/` READMEs, `.obsidian/` settings, five note templates, the plugin checklist |
 | `docs/` | The scrub rules, release checklist, and a reproducible scratch-vault test |

@@ -25,7 +25,8 @@ CFG = atlas_config.load()
 VAULT_DEFAULT = CFG.vault_root
 SKILL_DIR = Path(__file__).resolve().parent
 
-SOURCE_DIRS = ["fireflies", "wispr", "claude-history", "github", "gmail", "slack", "monday", "distill"]
+SOURCE_DIRS = ["fireflies", "wispr", "gemini", "teams", "zoom", "gong", "claude-history", "github",
+               "gmail", "slack", "monday", "distill"]
 # Patterns a run is expected to surface before last-run.md carries a diagnostic. Small
 # on purpose: a new vault has little corpus, and zero patterns is a fact, not a failure.
 # Raise it with --min-patterns once the corpus is large enough that a low count means

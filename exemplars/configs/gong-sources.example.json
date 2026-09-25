@@ -1,0 +1,19 @@
+{
+  "_doc": "atlas-gong-meetings-ingest sources. Copy to engine/atlas-gong-meetings-ingest/gong-sources.json. Keys starting with an underscore are ignored.",
+  "_doc_owner_emails": "Required for the API and JSON paths. A Gong API key sees every call in the company, so a call is kept only when one of these addresses is a party to it, and the filter runs before anything is written. List every address the owner joins calls from.",
+  "owner_emails": [
+    "{{owner_email}}"
+  ],
+  "_doc_api_base": "Your tenant's API host, shown on Gong's API settings page next to the key. https://api.gong.io works for most tenants. Credentials never go in this file: set GONG_ACCESS_KEY and GONG_ACCESS_KEY_SECRET in the environment, or in ~/.config/atlas/gong-credentials.json with mode 600.",
+  "api_base": "https://api.gong.io",
+  "workspace_id": "",
+  "_doc_crm_context": "true asks Gong for the CRM account linked to each call and writes its name to crm_accounts. Leave false if Gong has no CRM connected.",
+  "crm_context": false,
+  "_doc_lookback_days": "An incremental run re-reads this many days before the newest call it has seen, because Gong fills in the brief and outline after the call ends.",
+  "lookback_days": 3,
+  "skip_private": false,
+  "_doc_export_dirs": "Folders of transcripts downloaded by hand from a call page (More actions, Download transcript). The only path for someone without an API key. A .md file with the same name as a transcript is attached as that call's notes; paste a Gong follow-up email or call spotlight there.",
+  "export_dirs": [
+    "~/Documents/Gong-Transcripts"
+  ]
+}

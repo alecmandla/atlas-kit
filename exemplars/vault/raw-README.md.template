@@ -16,6 +16,8 @@ This folder holds **immutable source material** ingested from external systems. 
 | `wispr/meetings/` | Wispr Flow notetaker meetings (the owner's live notes + transcript) | `atlas-wispr-meetings-ingest` |
 | `gemini/meetings/` | Google Meet "Notes by Gemini" summary records (transcript stays in the doc, DEC-032) | `atlas-gemini-meetings-ingest` |
 | `teams/meetings/` | Microsoft Teams transcripts, stored in full (no API to re-fetch them) | `atlas-teams-meetings-ingest` |
+| `zoom/meetings/` | Zoom AI Companion summary records; transcript stays at Zoom when it can be re-fetched, stored in full when it came from a downloaded file (DEC-035) | `atlas-zoom-meetings-ingest` |
+| `gong/meetings/` | Gong call records for calls the owner took part in: brief, key points, next steps, outline; same transcript rule (DEC-035) | `atlas-gong-meetings-ingest` |
 | `claude-history/` | Claude Code session summaries | `atlas-claude-history-ingest` |
 | `github/` | GitHub PRs, issues, comments | `atlas-github-ingest` |
 | `gmail/` | Gmail messages, routed by sender domain and label | `atlas-gmail-ingest` |

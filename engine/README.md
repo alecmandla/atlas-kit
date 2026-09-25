@@ -25,6 +25,12 @@ Swift binary (DEC-023): speech-to-text is not in the standard library and
 cloud transcription is barred by the local-first rule (DEC-002). It is invoked
 by absolute path through `subprocess`, never imported.
 
+Two scripts talk to the network themselves: the `fetch.py` REST clients beside the
+Zoom and Gong meeting ingests (DEC-035). They use `urllib` only, read credentials from
+environment variables or a mode-600 file under `~/.config/atlas/`, and are optional:
+each ingest also reads exported files and session-fetched JSON. Every other script
+reads only the local disk, or what a session or CLI fetched for it.
+
 ## Config layer
 
 Every script resolves vault paths through `_shared/atlas_config.py`, imported
@@ -67,7 +73,9 @@ Two kinds of file live beside a script and neither is shipped here:
   `atlas-slack-ingest/slack-routing.yaml`, `atlas-monday-ingest/monday-boards.yaml`,
   `atlas-github-ingest/github-repos.yaml`,
   `atlas-fireflies-ingest/meeting-routing.yaml`,
-  `atlas-teams-meetings-ingest/teams-sources.json`, and
+  `atlas-teams-meetings-ingest/teams-sources.json`,
+  `atlas-zoom-meetings-ingest/zoom-sources.json`,
+  `atlas-gong-meetings-ingest/gong-sources.json`, and
   `atlas-wiki-materialize/entity_seeds.json`. `atlas-emerge/suppress.txt`
   (one slug per line) is optional.
 - **Runtime state**, which the scripts create: `state.json`, `last-run.md`,
@@ -100,6 +108,10 @@ prints the full flag list.
 | `atlas-wispr-meetings-ingest/ingest.py` | `python3 ingest.py --execute --incremental` | **macOS only**: same store, meetings table |
 | `atlas-gemini-meetings-ingest/ingest.py` | `python3 ingest.py --print-query --incremental`, then `python3 ingest.py --input-json <doc.json>... --execute --incremental` (or `--input-dir <markdown exports>`) | `mcp/google-drive` lists and fetches the "Notes by Gemini" docs; no config file |
 | `atlas-teams-meetings-ingest/ingest.py` | `python3 ingest.py --execute --incremental`; one-off `--input-dir <folder>` or `--input <file>` | exported `.vtt`/`.docx` transcripts in the folders listed in `teams-sources.json`; no MCP |
+| `atlas-zoom-meetings-ingest/ingest.py` | `python3 ingest.py --fetch --execute --incremental` (REST client); `--print-window --incremental`, then `--input-json <meeting.json>... --execute` (Zoom connector); `--execute --incremental` alone reads the download folders | any one of: Zoom API credentials, `mcp/zoom` in the session, or downloaded `.vtt` files in the folders in `zoom-sources.json` |
+| `atlas-zoom-meetings-ingest/fetch.py` | `python3 fetch.py auth`, `auth --code <code>`, `check`, `pull --from <date> --to <date> [--out <dir>]`, `transcript <uuid>` | `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` (and `ZOOM_ACCOUNT_ID` for server-to-server), or `~/.config/atlas/zoom-credentials.json` |
+| `atlas-gong-meetings-ingest/ingest.py` | `python3 ingest.py --fetch --execute --incremental` (API key); `--input-json <response.json>... --execute`; `--execute --incremental` alone reads the download folders | `owner_emails` in `gong-sources.json` for the API and JSON paths; a Gong API key or downloaded transcripts |
+| `atlas-gong-meetings-ingest/fetch.py` | `python3 fetch.py check`, `pull --from <date> --to <date> [--with-transcripts] [--out <dir>]`, `transcript <callId>` | `GONG_ACCESS_KEY`, `GONG_ACCESS_KEY_SECRET`, or `~/.config/atlas/gong-credentials.json` |
 | `atlas-voice-memos-ingest/ingest.py` | `python3 ingest.py --doctor` first, then `python3 ingest.py --execute --incremental` | **macOS only**: Voice Memos container, Full Disk Access, and the built `helper/atlas-transcribe` |
 | `atlas-distill/distill.py` | `python3 distill.py --input <exchange.md> --execute` | none |
 
@@ -150,6 +162,9 @@ MCP server connected; the script itself only reads what the session fetched.
 | `mcp/monday` | monday-ingest |
 | `mcp/apple-notes` | apple-notes-ingest |
 | `mcp/google-drive` | gemini-meetings-ingest (`search_drive_files`, `get_doc_as_markdown`); not needed when feeding it markdown exports with `--input-dir` |
+| `mcp/zoom` | zoom-meetings-ingest, attended runs only (`get_meeting_assets`, `recordings_list`); not needed with the REST client or downloaded files |
+| Zoom API credentials | zoom-meetings-ingest `--fetch` and `fetch.py`: a Zoom Marketplace General app (user OAuth) or server-to-server app |
+| Gong API key | gong-meetings-ingest `--fetch` and `fetch.py`: issued by a Gong technical admin; sees the whole company, so `owner_emails` is enforced |
 | `mcp/scheduled-tasks` | none as a hard requirement; the desktop scheduler is one of three ways to run the session skills (morning, weekly, health, nightly, synthesize) |
 | `cli/gh` | github-ingest |
 | `cli/ripgrep` | research (optional; pure-Python fallback) |
@@ -191,6 +206,8 @@ with temp directories only, and never touches a real vault:
 (cd atlas-gmail-ingest && python3 test_ingest.py)
 (cd atlas-gemini-meetings-ingest && python3 test_ingest.py)
 (cd atlas-teams-meetings-ingest && python3 test_ingest.py)
+(cd atlas-zoom-meetings-ingest && python3 test_ingest.py && python3 test_fetch.py)
+(cd atlas-gong-meetings-ingest && python3 test_ingest.py && python3 test_fetch.py)
 (cd atlas-slack-ingest && python3 -m pytest -q test_ingest.py)
 (cd atlas-voice-memos-ingest && python3 -m pytest -q test_ingest.py)
 ```

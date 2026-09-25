@@ -1,6 +1,6 @@
 ---
 name: atlas-emerge
-description: Surface unnamed patterns from the last N days of the owner's raw/ corpus. Walk raw/fireflies/, raw/wispr/, raw/claude-history/, raw/github/, raw/gmail/, raw/slack/, raw/monday/, raw/distill/ for items dated within the window; extract candidate concept slugs from titles and bodies; dedupe against existing wiki/entities/, wiki/concepts/, and #thread/<slug> tags; rank by mention count and source diversity; emit a regenerated report at {{folders.meta}}/Dashboards/Emerging-Patterns.md. Idempotent (always overwrite). Triggers on "emerge", "surface patterns", "what's been recurring", "find new threads", "/atlas-emerge", or any scheduled emerge run.
+description: Surface unnamed patterns from the last N days of the owner's raw/ corpus. Walk raw/fireflies/, raw/wispr/, raw/gemini/, raw/teams/, raw/zoom/, raw/gong/, raw/claude-history/, raw/github/, raw/gmail/, raw/slack/, raw/monday/, raw/distill/ for items dated within the window; extract candidate concept slugs from titles and bodies; dedupe against existing wiki/entities/, wiki/concepts/, and #thread/<slug> tags; rank by mention count and source diversity; emit a regenerated report at {{folders.meta}}/Dashboards/Emerging-Patterns.md. Idempotent (always overwrite). Triggers on "emerge", "surface patterns", "what's been recurring", "find new threads", "/atlas-emerge", or any scheduled emerge run.
 exemplar-of: atlas-emerge
 status: active
 requires: [cli/python3]
@@ -36,7 +36,7 @@ For each `{{vault_root}}/{{folders.raw}}/<source>/**/*.md`:
 - If the parsed date is older than `--window-days` (default 30), skip.
 - Record: source type (parent dir of `{{folders.raw}}/`), item path, item date, title (first `# <title>` line), and body (everything after the first blank line following the title).
 
-Source-type detection: `raw/fireflies/` → `fireflies`, `raw/wispr/` → `wispr`, `raw/claude-history/<...>/` → `claude-history`, `raw/github/<owner>/<repo>/` → `github`, `raw/gmail/<route>/` → `gmail`, `raw/slack/<channel>/` → `slack`, `raw/monday/<workspace>/<board>/` → `monday`, `raw/distill/` → `distill`.
+Source-type detection: `raw/fireflies/` → `fireflies`, `raw/wispr/` → `wispr`, `raw/gemini/meetings/` → `gemini`, `raw/teams/meetings/` → `teams`, `raw/zoom/meetings/` → `zoom`, `raw/gong/meetings/` → `gong`, `raw/claude-history/<...>/` → `claude-history`, `raw/github/<owner>/<repo>/` → `github`, `raw/gmail/<route>/` → `gmail`, `raw/slack/<channel>/` → `slack`, `raw/monday/<workspace>/<board>/` → `monday`, `raw/distill/` → `distill`.
 
 ### 2. Build the known-tracked deny-list
 

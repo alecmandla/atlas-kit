@@ -11,9 +11,9 @@ removed and its design intent kept whole:
 
 | Directory | Contents | Count |
 |---|---|---|
-| `skills/<name>/SKILL.md` | One scrubbed SKILL.md per private skill. Frontmatter carries `exemplar-of`, `status` (`active`, `retired`, `experimental`), and `requires` (the MCP servers and CLI tools the skill needs). Structure, mental model, guardrails, invariants, output formats, and citation rules are preserved; prose is second person; every path is a placeholder. | 24 |
+| `skills/<name>/SKILL.md` | One scrubbed SKILL.md per private skill. Frontmatter carries `exemplar-of`, `status` (`active`, `retired`, `experimental`), and `requires` (the MCP servers and CLI tools the skill needs). Structure, mental model, guardrails, invariants, output formats, and citation rules are preserved; prose is second person; every path is a placeholder. | 28 |
 | `vault/*.template` | The vault constitution (`AGENTS.md`), the human guides, the raw-layer README, and the wiki index, with every folder name and identity parameterized. | 6 |
-| `configs/*.example.*` | One example per routing or seed config, preserving the exact file format and every comment that explains how routing works, with two or three fictional entries per section. | 6 |
+| `configs/*.example.*` | One example per routing or seed config, preserving the exact file format and every comment that explains how routing works, with two or three fictional entries per section. | 9 |
 | `decisions/DECISIONS.md` | The design invariants a new vault inherits, with the original `DEC-NNN` numbers so the SKILL.md citations resolve. | 1 |
 
 The scrub rules that produced this tree, and that the kickoff's generated output
