@@ -52,9 +52,21 @@ All notable changes to atlas-kit are recorded here. The format follows
 - `engine/atlas-emerge/test_emerge.py`: emerge's first test suite, stdlib only, run
   against a temp vault through `ATLAS_CONFIG`. Covers meeting grouping, source counting,
   and the report row.
+- Optional one-per-line lists next to three scripts, merged into their built-in sets so
+  lists that name real people, employers, or vendors stay out of the engine:
+  `atlas-graduate/first-names.txt` (the person guard), `atlas-lint/generic-tokens.txt`
+  (`GENERIC_TOKENS`), and `atlas-fireflies-ingest/junk-email-domains.txt` (CRM BCC-logger
+  addresses dropped from attendee lists).
+- `engine/atlas-synthesize/test_synthesize.py` and
+  `exemplars/configs/thread-vocab.example.yml`.
 
 ### Fixed
 
+- `atlas-synthesize` reads `thread-vocab.yml`, as its exemplar skill already described.
+  The engine had shipped without it, so a hand-tagged thread with no concept page matched
+  raw items on its literal slug only, which descriptive slugs rarely appear as. `include`
+  terms now join the matcher and `exclude` terms drop matching raw items; a malformed
+  line is an error rather than a silent skip.
 - `atlas-emerge` and `atlas-synthesize` now read `raw/gemini/`, `raw/teams/`, `raw/zoom/`,
   and `raw/gong/`. Emerge's source list had omitted the Gemini and Teams folders, so their
   records never contributed to pattern emergence, and synthesize dropped them from a

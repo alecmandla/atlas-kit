@@ -1,0 +1,24 @@
+# atlas-synthesize thread vocabulary (example)
+#
+# Copy to engine/atlas-synthesize/thread-vocab.yml and edit.
+#
+# A thread tagged by hand has no concept page, so the raw matcher knows only its
+# slug phrase, and descriptive slugs rarely appear verbatim in source text. List
+# the words the thread is actually written in.
+#
+#   include: extra match terms, whole-word and case-insensitive
+#   exclude: drop any raw item that matches one of these, so sibling threads
+#            that share a broad word stay apart
+#
+# Inline lists only. Terms under 4 characters are ignored. Evidence is ranked by
+# recency, so a broad term narrows the bundle to the last few days rather than
+# widening it: prefer the most specific phrase that still matches, and check a
+# new entry with `synthesize.py --thread <slug>` before trusting it.
+
+ledgerline-integration:
+  include: ["Ledgerline sync", "booking-export"]
+  exclude: ["rate parity"]
+
+guest-portal-latency:
+  include: ["guest portal", "portal timeout"]
+  exclude: []

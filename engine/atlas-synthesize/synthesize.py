@@ -34,6 +34,8 @@ import atlas_config  # noqa: E402
 CFG = atlas_config.load()
 VAULT_DEFAULT = CFG.vault_root
 SKILL_DIR = Path(__file__).resolve().parent
+# Optional per-thread search vocabulary, next to this script. See load_thread_vocab().
+THREAD_VOCAB_PATH = SKILL_DIR / "thread-vocab.yml"
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 TITLE_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
@@ -168,8 +170,52 @@ def discover_threads(vault: Path) -> dict[str, None]:
     return slugs
 
 
+def load_thread_vocab(path: Path | None = None) -> dict[str, dict[str, list[str]]]:
+    """Read thread-vocab.yml: extra search terms for threads that never got a
+    concept page (hand-tagged threads), whose descriptive slug rarely appears
+    verbatim in source text. Schema, inline lists only:
+
+        <slug>:
+          include: ["term", ...]   # added to the raw/ matcher
+          exclude: ["term", ...]   # raw items matching any of these are dropped
+
+    Parsed without PyYAML, like parse_frontmatter(). A missing file means no
+    vocabulary. A malformed line raises ValueError instead of being skipped,
+    because a silently dropped entry sends that thread back to zero raw matches.
+    """
+    path = path or THREAD_VOCAB_PATH
+    vocab: dict[str, dict[str, list[str]]] = {}
+    if not path.exists():
+        return vocab
+    current: str | None = None
+    for lineno, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if raw_line.lstrip().startswith("#"):
+            continue
+        line = raw_line.split("#", 1)[0].rstrip()
+        if not line.strip():
+            continue
+        if not line.startswith((" ", "\t")):
+            if not line.endswith(":"):
+                raise ValueError(f"{path}:{lineno}: expected '<slug>:', got {raw_line!r}")
+            current = line[:-1].strip()
+            vocab[current] = {"include": [], "exclude": []}
+            continue
+        if current is None:
+            raise ValueError(f"{path}:{lineno}: indented entry before any slug")
+        key, sep, value = line.strip().partition(":")
+        key = key.strip()
+        if not sep or key not in ("include", "exclude"):
+            raise ValueError(f"{path}:{lineno}: expected 'include:' or 'exclude:', got {raw_line!r}")
+        value = value.strip()
+        if not (value.startswith("[") and value.endswith("]")):
+            raise ValueError(f"{path}:{lineno}: {key} must be an inline list, got {value!r}")
+        vocab[current][key] = [str(v) for v in _parse_inline_list(value)]
+    return vocab
+
+
 def thread_keywords(vault: Path, slug: str) -> list[str]:
-    """Slug-derived keywords, enriched from a graduated concept page if present."""
+    """Slug-derived keywords, enriched from a graduated concept page if present
+    and from thread-vocab.yml (hand-tagged threads have no concept page)."""
     extra: list[str] = []
     concept = vault / CFG.folder_name("wiki") / "concepts" / f"{slug}.md"
     if concept.exists():
@@ -177,7 +223,16 @@ def thread_keywords(vault: Path, slug: str) -> list[str]:
         kw = fm.get("keywords")
         if isinstance(kw, list):
             extra.extend(str(k) for k in kw)
+    extra.extend(load_thread_vocab().get(slug, {}).get("include", []))
     return extra
+
+
+def thread_excludes(slug: str) -> list[re.Pattern]:
+    """Whole-word, case-insensitive patterns for the thread's exclude terms.
+    Terms shorter than 4 characters are ignored, as keyword_patterns() does."""
+    terms = load_thread_vocab().get(slug, {}).get("exclude", [])
+    return [re.compile(rf"\b{re.escape(t.strip().lower())}\b", re.IGNORECASE)
+            for t in terms if len(t.strip()) >= 4]
 
 
 def gather_para(vault: Path, slug: str) -> list[dict]:
@@ -213,8 +268,12 @@ def gather_para(vault: Path, slug: str) -> list[dict]:
     return out
 
 
-def gather_raw(vault: Path, pats: list[re.Pattern]) -> list[dict]:
-    """Best raw/ matches: per-source cap + total cap, recency-ranked, diverse."""
+def gather_raw(vault: Path, pats: list[re.Pattern],
+               neg: list[re.Pattern] | None = None) -> list[dict]:
+    """Best raw/ matches: per-source cap + total cap, recency-ranked, diverse.
+    Items matching any pattern in `neg` (thread-vocab.yml excludes) are dropped,
+    so sibling threads that share a broad word stay in their own lanes."""
+    neg = neg or []
     by_source: dict[str, list[dict]] = {}
     raw_root = vault / CFG.folder_name("raw")
     if not raw_root.exists():
@@ -232,7 +291,10 @@ def gather_raw(vault: Path, pats: list[re.Pattern]) -> list[dict]:
                 continue
             fm, body = parse_frontmatter(text)
             title = note_title(body, p.stem)
-            if not matches(title + "\n" + body[:2500], pats):
+            window = title + "\n" + body[:2500]
+            if not matches(window, pats):
+                continue
+            if neg and matches(window, neg):
                 continue
             by_source.setdefault(src, []).append({
                 "source": src,
@@ -269,7 +331,7 @@ def stored_fingerprint(vault: Path, slug: str) -> str | None:
 
 def evidence_for(vault: Path, slug: str) -> tuple[list[dict], list[dict]]:
     pats = keyword_patterns(slug, thread_keywords(vault, slug))
-    return gather_para(vault, slug), gather_raw(vault, pats)
+    return gather_para(vault, slug), gather_raw(vault, pats, thread_excludes(slug))
 
 
 def all_sources(para: list[dict], raw: list[dict]) -> list[str]:
