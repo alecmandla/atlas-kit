@@ -83,8 +83,9 @@ NOISE_SLUGS = {
 
 # Compact common-first-name set for the person guard. A slug like `marcus-hale`
 # (a person who isn't even in the CRM) gets routed away from auto-tagging.
-# This is a starter list: extend it with first names common in your own
-# network (coworkers and clients first) so their slugs never auto-graduate.
+# This is a starter list: add first names common in your own network
+# (coworkers and clients first) to first-names.txt, read below, so their slugs
+# never auto-graduate.
 COMMON_FIRST_NAMES = {
     "aaron", "adam", "alan", "alex", "alice", "amanda", "amy", "andrew",
     "angela", "anna", "anthony", "benjamin", "bill", "bob",
@@ -128,6 +129,23 @@ COMMON_FIRST_NAMES |= {
     "rowan", "harrison", "bryson", "sawyer", "blake", "cole", "drew", "grant",
     "reid", "graham", "spencer", "trevor", "wade", "colin", "felix",
 }
+
+
+def word_list(path: Path) -> set[str]:
+    """Lowercased entries of an optional one-per-line file; `#` starts a comment."""
+    if not path.exists():
+        return set()
+    words = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        w = line.split("#", 1)[0].strip().lower()
+        if w:
+            words.add(w)
+    return words
+
+
+# Your own additions live in first-names.txt next to this script, one name per
+# line. They are real people's names, so they stay out of the engine.
+COMMON_FIRST_NAMES |= word_list(SKILL_DIR / "first-names.txt")
 
 
 def norm(s: str) -> str:

@@ -41,9 +41,14 @@ EXCLUDE_DIRS = {".obsidian", ".git", ".trash", ".smart-env", "node_modules", CFG
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 THREAD_TAG_RE = re.compile(r"#thread/([A-Za-z0-9_-]+)")
 MIN_EVIDENCE = 3  # a thread needs >= this many *evidence* files to be synthesis-worthy
-# Tune to your own industry vocabulary: tokens that appear in many slugs but never
-# distinguish them (the fictional defaults are hospitality words).
+# Tokens that appear in many slugs but never distinguish them (the fictional
+# defaults are hospitality words). Add your own industry and employer words to
+# generic-tokens.txt next to this script, one per line, `#` for comments.
 GENERIC_TOKENS = {"the", "and", "for", "inn", "lodge", "hotel", "project", "roll", "up", "in"}
+_extra_tokens = SKILL_DIR / "generic-tokens.txt"
+if _extra_tokens.exists():
+    GENERIC_TOKENS |= {t for line in _extra_tokens.read_text(encoding="utf-8").splitlines()
+                       if (t := line.split("#", 1)[0].strip().lower())}
 
 # The vault constitution is skipped outright, as atlas-morning's registry guard does:
 # its #thread/<slug> mentions are illustrations and registry rows, not tags on notes,

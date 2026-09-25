@@ -160,7 +160,13 @@ def iso_date(value):
 # part is only a bot signal when no display name accompanies it, and known logger
 # domains are dropped outright. Refined per adversarial review so a real person and
 # their people-resolution join key are never silently erased.
-JUNK_EMAIL_DOMAINS: tuple = ()  # domain suffixes of BCC-to-CRM loggers; add your CRM's here
+JUNK_EMAIL_DOMAINS: tuple = ()  # domain suffixes of BCC-to-CRM loggers
+# Add your CRM's logger domains to junk-email-domains.txt next to this script,
+# one per line, `#` for comments.
+_junk_file = Path(__file__).resolve().parent / "junk-email-domains.txt"
+if _junk_file.exists():
+    JUNK_EMAIL_DOMAINS += tuple(d for line in _junk_file.read_text(encoding="utf-8").splitlines()
+                                if (d := line.split("#", 1)[0].strip().lower()))
 
 
 def is_junk_email(email):
