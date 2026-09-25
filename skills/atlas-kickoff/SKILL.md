@@ -64,6 +64,8 @@ is the expected shape so the diagnostic knows what to detect. Skip any exemplar 
 | Ingest | `atlas-wispr-meetings-ingest` | same file as above | none |
 | Ingest | `atlas-gemini-meetings-ingest` | Google Drive MCP: tool names containing `search_drive_files` and `get_doc_as_markdown` (a folder of markdown exports also works; ask) | none |
 | Ingest | `atlas-teams-meetings-ingest` | cannot be detected; ask whether the user's organization uses Teams and which folder holds (or will hold) exported transcripts | `teams-sources.json` |
+| Ingest | `atlas-zoom-meetings-ingest` | any of: the Zoom for Claude connector (tool names containing `get_meeting_assets` and `recordings_list`); `ZOOM_CLIENT_ID` set in the environment or `~/.config/atlas/zoom-credentials.json` present (check presence only, never print values); otherwise ask whether the user downloads Zoom transcripts and into which folder | `zoom-sources.json` |
+| Ingest | `atlas-gong-meetings-ingest` | `GONG_ACCESS_KEY` set in the environment or `~/.config/atlas/gong-credentials.json` present (presence only); otherwise ask whether the user's organization uses Gong, whether their Gong admin will issue an API key, and which folder will hold downloaded transcripts. Gong's official MCP server returns no calls or transcripts and does not count | `gong-sources.json`, with `owner_emails` set from `{{owner_email}}` |
 | Ingest | `atlas-apple-notes-ingest` | Apple Notes MCP: `list_notes` and `get_note_content` | none |
 | Ingest | `atlas-voice-memos-ingest` | macOS with Full Disk Access granted to the runner; cannot be detected, ask | none |
 | Spine | `atlas-people-extract` | `python3` 3.10+; meeting notes carrying `attendee_emails:` (a meeting ingest, or notes written by hand from the meeting template). Materialize's org branch reads its output. | none |
@@ -106,8 +108,10 @@ user anything the machine can answer.
    `command -v python3`), `gh --version && gh auth status`, `claude --version`,
    `launchctl version` (macOS only), `git --version`.
 6. **MCP servers.** Scan available tool names for the substrings in the catalog. Record
-   which of Gmail, Slack, Monday, Fireflies, Google Drive, Apple Notes, calendar, and
-   scheduled-tasks are connected.
+   which of Gmail, Slack, Monday, Fireflies, Google Drive, Zoom, Apple Notes, calendar, and
+   scheduled-tasks are connected. For Zoom and Gong, also record whether their API
+   credentials are present (the environment variable is set, or the credentials file
+   exists); never read or print a credential value.
 7. **Exemplars.** Read the frontmatter of every `exemplars/skills/*/SKILL.md`. Build the
    offer list: exemplar name, status, requires, and whether each requirement was detected.
 8. **Target repo.** `git rev-parse --show-toplevel` from the target directory. Note an
@@ -218,7 +222,8 @@ so a failure in one is reported, not fatal to the rest.
    to the script that reads it (`atlas-github-ingest/github-repos.yaml`,
    `atlas-wiki-materialize/entity_seeds.json`, `atlas-gmail-ingest/mailbox-routing.yaml`,
    `atlas-slack-ingest/slack-routing.yaml`, `atlas-monday-ingest/monday-boards.yaml`,
-   `atlas-fireflies-ingest/meeting-routing.yaml`, `atlas-teams-meetings-ingest/teams-sources.json`;
+   `atlas-fireflies-ingest/meeting-routing.yaml`, `atlas-teams-meetings-ingest/teams-sources.json`,
+   `atlas-zoom-meetings-ingest/zoom-sources.json`, `atlas-gong-meetings-ingest/gong-sources.json`;
    the engine has no config-path flag), and replace
    the fictional entries with the user's real values from §Sources and routing. Keep the
    file's comments; they document the format. `entity_seeds.json` gets the user's product

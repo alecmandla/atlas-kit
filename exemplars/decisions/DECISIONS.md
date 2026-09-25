@@ -8,7 +8,7 @@ or were never recovered, and nothing here cites them.
 
 When the kickoff generates a recipient's suite, this file is copied into their
 `docs/DECISIONS.md` as the starting register. New decisions continue from
-DEC-035. A decision that the recipient rejects during the interview is marked
+DEC-036. A decision that the recipient rejects during the interview is marked
 `superseded` here, never deleted, so the SKILL.md citations still resolve.
 
 Format for new entries: `## DEC-NNN — <title>`, then **Decided**, **Status**,
@@ -46,6 +46,7 @@ Format for new entries: `## DEC-NNN — <title>`, then **Decided**, **Status**,
 | DEC-032 | Meeting transcripts: summary on disk, full transcript fetched from the API on demand. |
 | DEC-033 | A machine-readable preflight runs before any voice-memo transcription batch. |
 | DEC-034 | The raw meeting summary record has exactly one writer. |
+| DEC-035 | API-backed meeting ingests: stdlib fetchers, credentials outside the repo, owner-scoped before disk. |
 
 ---
 
@@ -549,3 +550,46 @@ the system produces byte-identical output.
 of the body, because `atlas-synthesize` keyword-matches only that window and
 `atlas-emerge` scans raw bodies; this file is the meeting source's entire
 contribution to pattern emergence.
+
+## DEC-035 — API-backed meeting ingests
+
+**Status:** active
+
+**Decision.** The Zoom and Gong meeting ingests ship a stdlib-only REST client
+(`fetch.py`) beside `ingest.py`, the first sources to meet DEC-031's bar for
+headless scheduling. Three rules govern every such fetcher:
+
+1. **Credentials live outside the repo.** Read from environment variables first,
+   then from `~/.config/atlas/<source>-credentials.json`, which the fetcher refuses
+   to read unless its mode is 600. A rotating OAuth refresh token is written back
+   to `~/.config/atlas/` atomically, mode 600, before the new access token is used.
+   Nothing credential-shaped is ever written into a config next to the script,
+   into the vault, or into a log.
+2. **Owner-scoped before disk.** When a credential can see more than the owner's
+   own meetings (a Gong API key sees the whole company), the fetcher keeps only
+   meetings the owner was a party to, matched on `owner_emails`, and applies the
+   filter before anything is written anywhere, including debug output. Dropped
+   meetings are counted, never named.
+3. **Every API path has a no-API sibling.** The same ingest also reads files the
+   owner exported by hand, and JSON a session fetched through an MCP server, so
+   an owner without developer or admin rights still gets the source.
+
+The DEC-032 transcript rule generalizes as: the transcript stays at the source
+when a re-fetch path exists (an MCP tool or `fetch.py transcript <id>`) and the
+record has summary content; it is written in full when the input is a
+hand-exported file, or when the transcript is the record's only content.
+`transcript_policy:` in each record says which applied.
+
+**Why.** A personal pipeline that needs an attended session for every meeting
+source stops ingesting whenever the owner is away. Zoom and Gong both offer
+plain HTTPS APIs that the standard library can call, so the attended-only
+limitation is avoidable for them. The owner-scope rule exists because an
+organization-wide key would otherwise mirror colleagues' private calls into a
+personal vault.
+
+**Consequences.** `atlas-research`'s transcript escalation gains `fetch.py
+transcript <id>` as a sanctioned read, under the same cap and never persisted.
+Schedulers do not source the interactive shell, so a headless run needs the
+credentials file or the scheduler's own environment block; the fetcher's
+`check` command says which is missing. A fetcher is an optional input to its
+ingest: nightly runs without credentials still ingest exported files.

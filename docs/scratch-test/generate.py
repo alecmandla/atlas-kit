@@ -96,6 +96,8 @@ BLOCKED = [
     ("atlas-wispr-meetings-ingest", "no Wispr Flow store under ~/Library"),
     ("atlas-gemini-meetings-ingest", "Google Drive MCP not connected (declined)"),
     ("atlas-teams-meetings-ingest", "no Teams transcript folder (declined)"),
+    ("atlas-zoom-meetings-ingest", "no Zoom connector, credentials, or transcript folder (declined)"),
+    ("atlas-gong-meetings-ingest", "no Gong API key or transcript folder (declined)"),
     ("atlas-voice-memos-ingest", "experimental; Full Disk Access not confirmed (declined)"),
     ("atlas-book-summary", "declined in the interview"),
     ("atlas-transcript-extract", "status: retired"),
@@ -287,12 +289,12 @@ def main() -> int:
         print("phase4.2: engine copied")
 
     # ---------------------------------------------------------------- Phase 4.3 skills
-    dec_base = 35
+    dec_base = 36
     guardrails = "\n".join([
         "", "## Guardrails", "",
-        "Decided at kickoff (`docs/ATLAS-KICKOFF.md` §3; `docs/DECISIONS.md` DEC-035 to DEC-043). Do not relitigate without a new decision.", "",
+        "Decided at kickoff (`docs/ATLAS-KICKOFF.md` §3; `docs/DECISIONS.md` DEC-036 to DEC-044). Do not relitigate without a new decision.", "",
     ] + [f"{i}. **{rule}** {why} (DEC-{dec_base + i - 1:03d})" for i, (rule, why, _) in enumerate(constraints, 1)] + [
-        f"8. Skip every folder and tag in the config's `no_nudge` list ({NO_NUDGE_DISPLAY}) when scanning for tasks, tags, threads, or activity; never list them, never wire them to a scheduler. (DEC-042)",
+        f"8. Skip every folder and tag in the config's `no_nudge` list ({NO_NUDGE_DISPLAY}) when scanning for tasks, tags, threads, or activity; never list them, never wire them to a scheduler. (DEC-043)",
         "",
     ])
     for name, *_ in SELECTED:
@@ -329,7 +331,7 @@ def main() -> int:
                         "| 5 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |\n",
                         "nightly run-order table", regex=True)
             text = edit(text, r"\nIf the owner also runs `atlas-apple-notes-ingest`.*?contract\.\n", "\n", "nightly optional-ingests paragraph", regex=True)
-            text = edit(text, "Run the ten ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")
+            text = edit(text, "Run the twelve ingest skills in deterministic order.", "Run the two selected ingest skills in deterministic order.", "nightly step 1 wording")
             text = edit(text, r"\| Skill \| Nightly invocation \| Notes \|\n\|---\|---\|---\|\n(?:\|[^\n]*\n)+",
                         "| Skill | Nightly invocation | Notes |\n|---|---|---|\n"
                         "| `atlas-claude-history-ingest` | `ingest.py --execute` | also takes `--limit`; **no** `--incremental` |\n"
@@ -345,19 +347,19 @@ def main() -> int:
                         "| 4 | `atlas-emerge` | ok | 7s | 1 report | 12 patterns surfaced |\n"
                         "| 5 | `atlas-auto-graduate` | ok | 3s | 1 queue | 1 auto, 2 pending, 6 review |\n",
                         "nightly example report table", regex=True)
-            text = edit(text, "Sub-skills succeeded: <N> / 13", "Sub-skills succeeded: <N> / 5", "nightly succeeded count")
-            text = edit(text, "Sub-skills succeeded: 13 / 13", "Sub-skills succeeded: 5 / 5", "nightly idempotent count")
-            text = edit(text, "sub_skills_run: 13", "sub_skills_run: 5", "nightly last-run count")
-            text = edit(text, "each of the ten ingest skills", "both ingest skills", "nightly upstream wording")
-            text = edit(text, "sole nightly trigger for all ten ingests", "sole nightly trigger for both ingests", "nightly DEC-013 wording")
-            text = edit(text, "All ten run at 22:00, full stop (DEC-013).", "Both run at 22:00, full stop (DEC-013).", "nightly anti-goal wording")
-            new_fm = [l.replace("Runs all ten ingest skills (fireflies, wispr, wispr-meetings, gemini-meetings, teams-meetings, claude-history, github, gmail, slack, monday)", "Runs the two selected ingests (claude-history, github)") for l in new_fm]
+            text = edit(text, "Sub-skills succeeded: <N> / 15", "Sub-skills succeeded: <N> / 5", "nightly succeeded count")
+            text = edit(text, "Sub-skills succeeded: 15 / 15", "Sub-skills succeeded: 5 / 5", "nightly idempotent count")
+            text = edit(text, "sub_skills_run: 15", "sub_skills_run: 5", "nightly last-run count")
+            text = edit(text, "each of the twelve ingest skills", "both ingest skills", "nightly upstream wording")
+            text = edit(text, "sole nightly trigger for all twelve ingests", "sole nightly trigger for both ingests", "nightly DEC-013 wording")
+            text = edit(text, "All twelve run at 22:00, full stop (DEC-013).", "Both run at 22:00, full stop (DEC-013).", "nightly anti-goal wording")
+            new_fm = [l.replace("Runs all twelve ingest skills (fireflies, wispr, wispr-meetings, gemini-meetings, teams-meetings, zoom-meetings, gong-meetings, claude-history, github, gmail, slack, monday)", "Runs the two selected ingests (claude-history, github)") for l in new_fm]
         if name == "atlas-morning":
             text = edit(text, r"### 3a — Today's calendar\n.*?(?=### 3b)",
                         "### 3a — Today's calendar\n\nNo calendar source is configured for this vault (no meeting ingest, no dictation ingest, no calendar MCP). Write:\n\n```markdown\n### Today's calendar\n\n*(No calendar source configured.)*\n```\n\nIf a calendar source is connected later, re-run `/atlas-kickoff --resume` so this section is regenerated from the exemplar.\n\n",
                         "morning calendar section", regex=True)
             text = edit(text, r"\*\*Exclude everything on the no-nudge list\.\*\*.*?\n\n",
-                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any matching line tagged `{PROFILE['no_nudge'][1]}` before matching. These are intentionally quiet (DEC-027, DEC-042); their tasks never appear as overdue here.\n\n",
+                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any matching line tagged `{PROFILE['no_nudge'][1]}` before matching. These are intentionally quiet (DEC-027, DEC-043); their tasks never appear as overdue here.\n\n",
                         "morning no-nudge paragraph", regex=True)
             text = edit(text, r"- `atlas-wispr-ingest` — writes[^\n]*\n", "", "morning wispr relationship", regex=True)
             text = edit(text, r"- `atlas-fireflies-ingest` — writes[^\n]*\n", "", "morning fireflies relationship", regex=True)
@@ -365,7 +367,7 @@ def main() -> int:
             text = edit(text, r"- \*\*Wispr DB locked\*\*[^\n]*\n", "", "morning calendar edge case 2", regex=True)
         if name == "atlas-weekly":
             text = edit(text, r"\*\*Exclude everything on the no-nudge list\.\*\*.*?\n\n",
-                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any item tagged `{PROFILE['no_nudge'][1]}`. The weekly review is a nudge surface (DEC-027, DEC-042); nothing on that list is ever listed here or in the \"Needs attention\" alert.\n\n",
+                        f"**Exclude everything on the no-nudge list.** The config's `no_nudge` list for this vault is {NO_NUDGE_DISPLAY}: skip every file under `{{{{vault_root}}}}/{PROFILE['no_nudge'][0]}/` and drop any item tagged `{PROFILE['no_nudge'][1]}`. The weekly review is a nudge surface (DEC-027, DEC-043); nothing on that list is ever listed here or in the \"Needs attention\" alert.\n\n",
                         "weekly no-nudge paragraph", regex=True)
         if name == "atlas-research":
             text = edit(text, r"### Step 2a — Transcript escalation.*?(?=## Step 3)", "", "research transcript escalation", regex=True)
@@ -453,10 +455,10 @@ def main() -> int:
     dec = fill((kit / "exemplars/decisions/DECISIONS.md").read_text(encoding="utf-8"), values)
     new = []
     entries = [(f"DEC-{dec_base + i:03d}", rule, why) for i, (rule, why, _) in enumerate(constraints)]
-    entries.insert(5, ("DEC-040", f"Layout scheme: {PROFILE['layout_scheme']}", "Chosen in the interview; folder names are in `atlas.config.json`."))
-    entries.insert(6, ("DEC-041", "Scheduler: manual (on-demand only)", "Chosen in the interview. Every job is runnable by hand from `docs/RUNBOOK.md`; nothing is registered."))
-    entries[7] = ("DEC-042", entries[7][1], entries[7][2])
-    entries[8] = ("DEC-043", entries[8][1], entries[8][2])
+    entries.insert(5, ("DEC-041", f"Layout scheme: {PROFILE['layout_scheme']}", "Chosen in the interview; folder names are in `atlas.config.json`."))
+    entries.insert(6, ("DEC-042", "Scheduler: manual (on-demand only)", "Chosen in the interview. Every job is runnable by hand from `docs/RUNBOOK.md`; nothing is registered."))
+    entries[7] = ("DEC-043", entries[7][1], entries[7][2])
+    entries[8] = ("DEC-044", entries[8][1], entries[8][2])
     for did, title, why in entries:
         new.append(f"\n## {did} — {title}\n\n- **Date:** {TODAY}\n- **Source:** Kickoff\n- **Decision:** {title}\n- **Rationale:** {why}\n- **Affects:** every generated skill's `## Guardrails`; `docs/ATLAS-KICKOFF.md` §3\n")
     (repo / "docs/DECISIONS.md").write_text(dec.rstrip("\n") + "\n" + "".join(new), encoding="utf-8")

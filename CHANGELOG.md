@@ -25,6 +25,37 @@ All notable changes to atlas-kit are recorded here. The format follows
   optional notes sidecar for a pasted Copilot recap. Cross-links to Fireflies, Wispr, and
   Gemini records. Ships `exemplars/configs/teams-sources.example.json` and a stdlib test
   suite. `atlas-nightly` runs it fifth.
+- `atlas-zoom-meetings-ingest`: exemplar skill, engine script, and stdlib REST client for
+  Zoom meetings. Three feeders into one script: the official Zoom for Claude connector in
+  an attended session (`--print-window`, then `--input-json`), a `fetch.py` client for
+  unattended runs (a Zoom Marketplace General app with user OAuth and a rotating refresh
+  token, or a server-to-server app), and `.vtt` transcripts downloaded from the Zoom portal
+  into the folders in `zoom-sources.json`. Writes one `raw/zoom/meetings/` record per
+  meeting with the AI Companion summary (`summary_content`, with fallbacks for the
+  deprecated fields), next steps, and attendees. The transcript stays at Zoom when it can
+  be re-fetched and is written in full when it came from a file or is the only content.
+  Cross-links to Fireflies, Wispr, Gemini, and Teams. `atlas-nightly` runs it sixth.
+- `atlas-gong-meetings-ingest`: exemplar skill, engine script, and stdlib REST client for
+  Gong calls. `fetch.py` pages `calls/extensive` with a Gong API key and keeps only calls
+  the owner took part in (`owner_emails` in `gong-sources.json`), filtering before anything
+  is written. The script also reads saved API responses and transcripts downloaded by hand
+  from a call page. Writes one `raw/gong/meetings/` record per call with Gong's brief, key
+  points, next steps (from highlights, since `actionItems` is deprecated), outline, topics,
+  trackers, outcome, and internal and external attendees. Cross-links to the other five
+  meeting ingests, most often Zoom. `atlas-nightly` runs it seventh.
+- DEC-035 (API-backed meeting ingests): stdlib fetchers, credentials only in environment
+  variables or a mode-600 file under `~/.config/atlas/`, owner-scoped before disk, and a
+  no-API path beside every API path. Kickoff interview decisions now start at DEC-036.
+- `exemplars/configs/zoom-sources.example.json` and `gong-sources.example.json`.
+- `atlas-research` transcript escalation covers Gemini, Zoom, and Gong records under the
+  same three-fetch cap.
+
+### Fixed
+
+- `atlas-emerge` and `atlas-synthesize` now read `raw/gemini/`, `raw/teams/`, `raw/zoom/`,
+  and `raw/gong/`. Emerge's source list had omitted the Gemini and Teams folders, so their
+  records never contributed to pattern emergence, and synthesize dropped them from a
+  thread's source list.
 
 ## 0.1.0 - 2026-09-22
 

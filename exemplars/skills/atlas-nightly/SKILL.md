@@ -1,6 +1,6 @@
 ---
 name: atlas-nightly
-description: Nightly 10 PM orchestrator. Runs all ten ingest skills (fireflies, wispr, wispr-meetings, gemini-meetings, teams-meetings, claude-history, github, gmail, slack, monday) in deterministic order, then atlas-wiki-materialize, atlas-emerge, then atlas-auto-graduate (DEC-019). Each sub-skill runs independently — failure is captured to the report but does NOT abort the chain. Appends an "Atlas nightly report" section to today's daily note (creating it if needed). Idempotent. Triggers on "atlas nightly", "nightly ingest", "run nightly", "/atlas-nightly", or any scheduled 22:00 run.
+description: Nightly 10 PM orchestrator. Runs all twelve ingest skills (fireflies, wispr, wispr-meetings, gemini-meetings, teams-meetings, zoom-meetings, gong-meetings, claude-history, github, gmail, slack, monday) in deterministic order, then atlas-wiki-materialize, atlas-emerge, then atlas-auto-graduate (DEC-019). Each sub-skill runs independently — failure is captured to the report but does NOT abort the chain. Appends an "Atlas nightly report" section to today's daily note (creating it if needed). Idempotent. Triggers on "atlas nightly", "nightly ingest", "run nightly", "/atlas-nightly", or any scheduled 22:00 run.
 exemplar-of: atlas-nightly
 status: active
 requires: [cli/python3]
@@ -10,7 +10,7 @@ requires: [cli/python3]
 
 You are the nightly orchestration agent. You run once per day at 22:00 local (DEC-013 / scheduled via `mcp__scheduled-tasks`). Your job:
 
-1. Run the ten ingest skills in deterministic order.
+1. Run the twelve ingest skills in deterministic order.
 2. After ingests, run `atlas-wiki-materialize`, `atlas-emerge`, then `atlas-auto-graduate` (DEC-019).
 3. Capture each sub-skill's outcome (success / failure with stack trace).
 4. Append an "Atlas nightly report" section to today's daily note.
@@ -29,16 +29,18 @@ Sub-skill failures are **captured**, not propagated. The chain continues regardl
 | 3 | `atlas-wispr-meetings-ingest` | `{{skills_root}}/skills/atlas-wispr-meetings-ingest/SKILL.md` | `{{folders.raw}}/wispr/meetings/<date>-<slug>-<id8>.md` — Wispr Notetaker meetings: the owner's notes + full transcript |
 | 4 | `atlas-gemini-meetings-ingest` | `{{skills_root}}/skills/atlas-gemini-meetings-ingest/SKILL.md` | `{{folders.raw}}/gemini/meetings/<date>-<slug>-<id8>.md` — Google Meet "Notes by Gemini" docs: summary, decisions, next steps; transcript stays in the doc |
 | 5 | `atlas-teams-meetings-ingest` | `{{skills_root}}/skills/atlas-teams-meetings-ingest/SKILL.md` | `{{folders.raw}}/teams/meetings/<date>-<slug>-<id8>.md` — Microsoft Teams transcripts (.vtt/.docx) from the configured export folders, stored in full |
-| 6 | `atlas-claude-history-ingest` | `{{skills_root}}/skills/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |
-| 7 | `atlas-github-ingest` | `{{skills_root}}/skills/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |
-| 8 | `atlas-gmail-ingest` | `{{skills_root}}/skills/atlas-gmail-ingest/SKILL.md` | `{{folders.raw}}/gmail/<route>/<id>.md` |
-| 9 | `atlas-slack-ingest` | `{{skills_root}}/skills/atlas-slack-ingest/SKILL.md` | `{{folders.raw}}/slack/<channel>/<ts>.md` |
-| 10 | `atlas-monday-ingest` | `{{skills_root}}/skills/atlas-monday-ingest/SKILL.md` | `{{folders.raw}}/monday/<workspace>/<board>/<item>.md` |
-| 11 | `atlas-wiki-materialize` | `{{skills_root}}/skills/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |
-| 12 | `atlas-emerge` | `{{skills_root}}/skills/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |
-| 13 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |
+| 6 | `atlas-zoom-meetings-ingest` | `{{skills_root}}/skills/atlas-zoom-meetings-ingest/SKILL.md` | `{{folders.raw}}/zoom/meetings/<date>-<slug>-<id8>.md` — Zoom AI Companion summaries and cloud transcripts, via the REST client, the connector, or downloaded `.vtt` files |
+| 7 | `atlas-gong-meetings-ingest` | `{{skills_root}}/skills/atlas-gong-meetings-ingest/SKILL.md` | `{{folders.raw}}/gong/meetings/<date>-<slug>-<id8>.md` — Gong calls the owner took part in: brief, key points, next steps, outline; transcript stays in Gong when an API key can re-fetch it |
+| 8 | `atlas-claude-history-ingest` | `{{skills_root}}/skills/atlas-claude-history-ingest/SKILL.md` | `{{folders.raw}}/claude-history/<project>/<session>.md` |
+| 9 | `atlas-github-ingest` | `{{skills_root}}/skills/atlas-github-ingest/SKILL.md` | `{{folders.raw}}/github/<owner>/<repo>/<item>.md` |
+| 10 | `atlas-gmail-ingest` | `{{skills_root}}/skills/atlas-gmail-ingest/SKILL.md` | `{{folders.raw}}/gmail/<route>/<id>.md` |
+| 11 | `atlas-slack-ingest` | `{{skills_root}}/skills/atlas-slack-ingest/SKILL.md` | `{{folders.raw}}/slack/<channel>/<ts>.md` |
+| 12 | `atlas-monday-ingest` | `{{skills_root}}/skills/atlas-monday-ingest/SKILL.md` | `{{folders.raw}}/monday/<workspace>/<board>/<item>.md` |
+| 13 | `atlas-wiki-materialize` | `{{skills_root}}/skills/atlas-wiki-materialize/SKILL.md` | Regenerates `{{folders.wiki}}/entities/*.md` from CRM + raw/ |
+| 14 | `atlas-emerge` | `{{skills_root}}/skills/atlas-emerge/SKILL.md` | Regenerates `{{folders.meta}}/Dashboards/Emerging-Patterns.md` |
+| 15 | `atlas-auto-graduate` | `{{skills_root}}/engine/atlas-graduate/auto_graduate.py` | Auto-graduates high-confidence patterns (DEC-019); writes `{{folders.meta}}/Dashboards/Thread-Review-Queue.md` |
 
-If the owner also runs `atlas-apple-notes-ingest` and `atlas-voice-memos-ingest`, they slot in after step 10 and before step 11, in that order; both are soft-skip ingests and follow the same capture-not-abort contract.
+If the owner also runs `atlas-apple-notes-ingest` and `atlas-voice-memos-ingest`, they slot in after step 12 and before step 13, in that order; both are soft-skip ingests and follow the same capture-not-abort contract.
 
 ## Step 0 — Acquire the suite run lock (do this FIRST)
 
@@ -71,7 +73,7 @@ For each sub-skill in the table above:
 
 1. Record `started_at = now()`.
 2. Read its SKILL.md.
-3. Execute the skill's documented invocation. **Flags are NOT uniform across skills — use the table in "Sub-skill invocation patterns" below, do not assume `--incremental` exists.** In brief: every Python ingest takes `--execute`; only `atlas-wispr-ingest`, `atlas-wispr-meetings-ingest`, `atlas-gemini-meetings-ingest`, and `atlas-teams-meetings-ingest` also accept `--incremental`; `wiki-materialize` defaults to dry-run and REQUIRES `--execute`; `emerge` writes by default and takes no flags; `atlas-auto-graduate` is `python3 {{skills_root}}/engine/atlas-graduate/auto_graduate.py --execute`, which must run AFTER `emerge` since it consumes the freshly-written `Emerging-Patterns.md`.
+3. Execute the skill's documented invocation. **Flags are NOT uniform across skills — use the table in "Sub-skill invocation patterns" below, do not assume `--incremental` exists.** In brief: every Python ingest takes `--execute`; only `atlas-wispr-ingest`, `atlas-wispr-meetings-ingest`, `atlas-gemini-meetings-ingest`, `atlas-teams-meetings-ingest`, `atlas-zoom-meetings-ingest`, and `atlas-gong-meetings-ingest` also accept `--incremental`; `wiki-materialize` defaults to dry-run and REQUIRES `--execute`; `emerge` writes by default and takes no flags; `atlas-auto-graduate` is `python3 {{skills_root}}/engine/atlas-graduate/auto_graduate.py --execute`, which must run AFTER `emerge` since it consumes the freshly-written `Emerging-Patterns.md`.
 4. Catch any error (subprocess non-zero exit, exception, missing dependency). On failure:
    - Capture the stack trace / stderr.
    - Set `status = "failed"`.
@@ -90,6 +92,8 @@ Each ingest skill defines its own invocation in its SKILL.md. **The flags differ
 | `atlas-wispr-meetings-ingest` | `ingest.py --execute --incremental` | accepts `--incremental`; **defaults to dry-run** — without `--execute` it writes nothing. Runs AFTER `atlas-fireflies-ingest` so Fireflies cross-links resolve against fresh files |
 | `atlas-gemini-meetings-ingest` | see its SKILL.md — `--print-query --incremental`, then `search_drive_files` + `get_doc_as_markdown` via the Google Drive MCP, then `ingest.py --input-json <files> --execute --incremental` | not a bare CLI run; **defaults to dry-run**. Runs AFTER fireflies and wispr-meetings so both cross-links resolve |
 | `atlas-teams-meetings-ingest` | `ingest.py --execute --incremental` | reads the folders in `teams-sources.json`; **defaults to dry-run**. Runs AFTER the other three meeting ingests so its cross-links resolve |
+| `atlas-zoom-meetings-ingest` | `ingest.py --fetch --execute --incremental` when the REST client is set up (`fetch.py check` passes); else `ingest.py --execute --incremental` for the download folders alone; or, in an attended run with the Zoom connector, see its SKILL.md (`--print-window`, then `--input-json`) | **defaults to dry-run**. The folders in `zoom-sources.json` are read on every run. Runs AFTER the four meeting ingests above so its cross-links resolve |
+| `atlas-gong-meetings-ingest` | `ingest.py --fetch --execute --incremental` when an API key is configured (`fetch.py check` passes); else `ingest.py --execute --incremental` for the download folders alone | **defaults to dry-run**. Refuses `--fetch` without `owner_emails` in `gong-sources.json`. Runs AFTER the Zoom ingest so Gong's record of a Zoom call links to it |
 | `atlas-claude-history-ingest` | `ingest.py --execute` | also takes `--limit`; **no** `--incremental` |
 | `atlas-github-ingest` | `ingest.py --execute --days 7` | also takes `--repo`; **no** `--incremental`. Pin `--days`: an unbounded window can exceed the scheduler's timeout and leave a stale `.run.lock` |
 | `atlas-gmail-ingest` | see its SKILL.md — needs `--labels-json` + `--input-json` captured via MCP | not a bare CLI run |
@@ -127,14 +131,16 @@ After all sub-skills have run, build the report markdown:
 | 3 | `atlas-wispr-meetings-ingest` | ✅ ok | 6s | 2 new, 1 updated | 1 carrying notes |
 | 4 | `atlas-gemini-meetings-ingest` | ✅ ok | 9s | 1 new | linked to Fireflies + Wispr |
 | 5 | `atlas-teams-meetings-ingest` | ✅ ok | 2s | 1 new | 0 undated |
-| 6 | `atlas-claude-history-ingest` | ✅ ok | 5s | 3 new | — |
-| 7 | `atlas-github-ingest` | ⚠️ failed | 4s | — | `429 Too Many Requests` (see logs) |
-| 8 | `atlas-gmail-ingest` | ✅ ok | 22s | 41 new | — |
-| 9 | `atlas-slack-ingest` | ✅ ok | 9s | 12 new | — |
-| 10 | `atlas-monday-ingest` | ✅ ok | 11s | 0 new | no board changes |
-| 11 | `atlas-wiki-materialize` | ✅ ok | 18s | 32 regenerated | — |
-| 12 | `atlas-emerge` | ✅ ok | 7s | 1 report | 12 patterns surfaced |
-| 13 | `atlas-auto-graduate` | ✅ ok | 3s | 1 queue | 1 auto, 2 pending, 6 review |
+| 6 | `atlas-zoom-meetings-ingest` | ✅ ok | 6s | 2 new | 1 updated (transcript arrived) |
+| 7 | `atlas-gong-meetings-ingest` | ✅ ok | 4s | 1 new | linked to Zoom; 14 not_owner |
+| 8 | `atlas-claude-history-ingest` | ✅ ok | 5s | 3 new | — |
+| 9 | `atlas-github-ingest` | ⚠️ failed | 4s | — | `429 Too Many Requests` (see logs) |
+| 10 | `atlas-gmail-ingest` | ✅ ok | 22s | 41 new | — |
+| 11 | `atlas-slack-ingest` | ✅ ok | 9s | 12 new | — |
+| 12 | `atlas-monday-ingest` | ✅ ok | 11s | 0 new | no board changes |
+| 13 | `atlas-wiki-materialize` | ✅ ok | 18s | 32 regenerated | — |
+| 14 | `atlas-emerge` | ✅ ok | 7s | 1 report | 12 patterns surfaced |
+| 15 | `atlas-auto-graduate` | ✅ ok | 3s | 1 queue | 1 auto, 2 pending, 6 review |
 
 ### Failures
 
@@ -146,7 +152,7 @@ After all sub-skills have run, build the report markdown:
 - New emerging patterns: <N>
 - Wiki pages regenerated: <N>
 - Threads auto-graduated / pending / in review queue: <N> / <N> / <N>
-- Sub-skills succeeded: <N> / 13
+- Sub-skills succeeded: <N> / 15
 ```
 
 If all sub-skills succeed and produce zero new files (typical idempotent re-run on the same evening), the Summary becomes:
@@ -155,7 +161,7 @@ If all sub-skills succeed and produce zero new files (typical idempotent re-run 
 ### Summary
 
 - No new changes — idempotent re-run.
-- Sub-skills succeeded: 13 / 13
+- Sub-skills succeeded: 15 / 15
 ```
 
 ## Step 4 — Append to today's daily note (idempotent)
@@ -197,7 +203,7 @@ Then write last-run.md.
 - duration_seconds: <float>
 - daily_note_path: <DAILY_NOTE_PATH>
 - daily_note_created: <true | false>
-- sub_skills_run: 13
+- sub_skills_run: 15
 - sub_skills_succeeded: <N>
 - sub_skills_failed: <N>
 - total_files_written: <N>
@@ -255,13 +261,13 @@ When invoked by the scheduled task:
 
 ## Relationship to other skills
 
-- **Upstream**: each of the ten ingest skills + `atlas-wiki-materialize` + `atlas-emerge`. This skill is purely an orchestrator; it owns no domain logic.
+- **Upstream**: each of the twelve ingest skills + `atlas-wiki-materialize` + `atlas-emerge`. This skill is purely an orchestrator; it owns no domain logic.
 - **Sister scheduled agents**: `atlas-morning` reads what nightly wrote. `atlas-weekly` consumes nightly reports across the week. `atlas-health` audits idempotency of the corpus that nightly populates. `atlas-synthesize` fires ~45 minutes after nightly and consumes the newly graduated threads.
-- **DEC-013**: this skill is the sole nightly trigger for all ten ingests. Any pre-existing standalone sync schedule is a legacy artifact; flag it for the owner if it conflicts.
+- **DEC-013**: this skill is the sole nightly trigger for all twelve ingests. Any pre-existing standalone sync schedule is a legacy artifact; flag it for the owner if it conflicts.
 
 ## Anti-goals (NOT v1)
 
-- Per-sub-skill schedule overrides. All ten run at 22:00, full stop (DEC-013).
+- Per-sub-skill schedule overrides. All twelve run at 22:00, full stop (DEC-013).
 - Parallel sub-skill execution. Determinism > speed; serial chain is the contract.
 - Auto-retry on sub-skill failure. Retry happens on the next nightly run, not within the same invocation.
 - Slack/email notifications on failure. Read-only into the vault. The daily-note report is the surface.

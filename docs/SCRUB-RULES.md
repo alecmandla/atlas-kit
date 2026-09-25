@@ -115,7 +115,7 @@ email domain, which is what the routing examples use to teach tier precedence.
 **Fictional products** (for entity seeds): `Ledgerline` (POS / property
 management), `Ledgerline-Cloud` (its hosted reporting tier), `Northstar-BI`
 (a BI platform). Real tools the kit itself depends on (Obsidian, Dataview,
-Templater, Fireflies, Monday.com, Slack, Gmail, GitHub, BigQuery) may be named.
+Templater, Fireflies, Zoom, Gong, Monday.com, Slack, Gmail, GitHub, BigQuery) may be named.
 
 **Fictional threads** (for `#thread/<slug>` examples): `portal-rewrite`,
 `ledgerline-integration`, `northstar-migration`.

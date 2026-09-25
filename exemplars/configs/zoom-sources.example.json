@@ -1,0 +1,14 @@
+{
+  "_doc": "atlas-zoom-meetings-ingest sources. Copy to engine/atlas-zoom-meetings-ingest/zoom-sources.json. Every .vtt under each export folder (recursively) is read as one Zoom meeting transcript. A .md or .txt file with the same name as a transcript is attached as that meeting's notes (paste an AI Companion summary email there). Keys starting with an underscore are ignored.",
+  "_doc_export_dirs": "Absolute or ~-relative folders. Point one at the folder you download cloud transcripts into (the GMT20260910-185700_Recording.transcript.vtt files), and optionally at the desktop client's local recording folder, whose subfolders are named 'YYYY-MM-DD HH.MM.SS <topic>'. Leave the list empty if you only use the Zoom connector or the API.",
+  "export_dirs": [
+    "~/Documents/Zoom-Transcripts"
+  ],
+  "_doc_api": "Only read by fetch.py and ingest.py --fetch, the headless path. auth is user-oauth (a General app you authorized once with fetch.py auth) or server-to-server (an account-level app, usually an admin's). Credentials never go in this file: set ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET (plus ZOOM_ACCOUNT_ID for server-to-server) in the environment, or in ~/.config/atlas/zoom-credentials.json with mode 600. lookback_days re-reads recent meetings because transcripts and summaries arrive after the call ends.",
+  "api": {
+    "auth": "user-oauth",
+    "user_id": "me",
+    "redirect_uri": "http://localhost:8765/callback",
+    "lookback_days": 7
+  }
+}

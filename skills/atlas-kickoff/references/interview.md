@@ -104,7 +104,10 @@ The interview never asks for a path the diagnostic already has.
   Everything else lands in `{{folders.inbox}}/needs-decision`." Slack: "Which channels?"
   Monday: "Which workspaces or boards?" GitHub: "Which owner and repos?" Meetings:
   "Which meeting-title keywords or attendee domains map to which project or client
-  folder?" A source picked with no routing answer gets the example config with the
+  folder?" Zoom: "Connector in sessions, the REST client for unattended runs (needs a
+  Zoom Marketplace app, which may need an admin's permission), downloaded transcripts, or a
+  mix? Which download folder?" Gong: "Will your Gong admin issue an API key, or will you
+  download transcripts by hand? Which folder?" A source picked with no routing answer gets the example config with the
   fictional entries replaced by `{{fill-me}}` markers and a line in manual steps.
 - **Default:** every detected source that has a local-only prerequisite (Claude history,
   dictation) on; MCP-backed sources off until named, because they write a lot on the
@@ -116,9 +119,11 @@ The interview never asks for a path the diagnostic already has.
   to skip." Asked in the same follow-up call as the routing questions, only when a
   meeting or email source was picked; otherwise skipped and left blank.
 - **Feeds:** `owner_email` in the config; `{{owner_email}}` in the meeting-routing
-  owner fallback and wherever an exemplar must match the owner's own address.
-- **Follow-up if vague:** none. A blank answer writes `{{fill-me}}` at each use and a
-  line in manual steps; nothing else depends on it.
+  owner fallback, in `owner_emails` of `gong-sources.json`, and wherever an exemplar must
+  match the owner's own address.
+- **Follow-up if vague:** when Gong was picked, ask once more: the Gong ingest's API and
+  JSON paths refuse to run without it, because a Gong key sees every call in the company
+  (DEC-035). A blank answer writes `{{fill-me}}` at each use and a line in manual steps.
 - **Default:** blank.
 
 ### 2.2b Employer and email domain (optional; same follow-up)

@@ -10,7 +10,7 @@ requires: [cli/python3]
 
 You answer questions and assemble topic briefs **from what is already in the owner's vault** — you never invent facts, and in v1 you never ingest new sources. Every factual claim cites a specific vault note by its `[[id]]`, and a claim with no citation must be clearly framed as your inference. You are the *pull* counterpart to the nightly *push* pipeline: the engine already wrote `{{folders.raw}}/` and the wiki spine; your job is to make it answer.
 
-`cli/ripgrep` is optional: the helper falls back to a pure-Python scan when it is absent. `mcp/fireflies` is optional too: it enables the capped transcript escalation in Step 2a; without it, answer from the summary records on disk.
+`cli/ripgrep` is optional: the helper falls back to a pure-Python scan when it is absent. `mcp/fireflies` is optional too: it enables the capped transcript escalation in Step 2a (as do the Google Drive MCP, the Zoom connector, and the Zoom and Gong `fetch.py` clients for their own records); without them, answer from the summary records on disk.
 
 ## Mental model — read the synthesized layer first, drill to raw last
 
@@ -53,6 +53,16 @@ Meeting evidence on disk is summary-only (DEC-032): the meeting note and its `{{
 1. Take `meeting_id` from the meeting note's (or raw record's) frontmatter.
 2. Fetch via the Fireflies MCP: `fireflies_get_transcript(transcriptId=<meeting_id>)` — returns speakers + sentences.
 3. Quote what you need and cite **the meeting note** (`[[YYYY-MM-DD — Title]]`) as the source — the transcript itself has no vault file to link.
+
+Other meeting records with `transcript_policy: pointer` (or, for Gemini, `transcript_included: false`) escalate the same way through their own source; cite the raw record itself, since those ingests write no separate meeting note:
+
+| Record | Fetch |
+|---|---|
+| `{{folders.raw}}/gemini/meetings/` | Google Drive MCP: `get_doc_as_markdown(document_id=<gemini_doc_id>)`, then read the `# Transcript` tab |
+| `{{folders.raw}}/zoom/meetings/` | Zoom connector: `get_recording_resource` with the `zoom_id` UUID; or `python3 {{skills_root}}/engine/atlas-zoom-meetings-ingest/fetch.py transcript <zoom_id>` (DEC-035) |
+| `{{folders.raw}}/gong/meetings/` | `python3 {{skills_root}}/engine/atlas-gong-meetings-ingest/fetch.py transcript <gong_call_id>` (DEC-035; refuses calls the owner was not on) |
+
+Records with `transcript_policy: file` or `only-content`, and Teams and Wispr records, already hold the transcript on disk: read it there instead of escalating.
 
 **Hard cap: ≤ 3 transcript fetches per question.** Transcripts are large; a broad question must not pull dozens into context. Choose the 1–3 meetings whose summaries look most likely to contain the answer; if the cap isn't enough, say which additional meetings look relevant and let the user ask a narrower question. This is a read-only API call — never write the fetched transcript into the vault, and never touch the fireflies ingest cursor (`state.json`).
 
@@ -133,7 +143,7 @@ tags: [research, research/<slug>]
 - **Callable as a context loader:** other skills can run `search` to load relevant context before acting.
 
 ## Anti-goals (NOT v1)
-- No ingestion / discovery / web fetch — query-only over what exists. (The Step 2a Fireflies transcript escalation is the one sanctioned external read, per DEC-032 — read-only, capped, never persisted.)
+- No ingestion / discovery / web fetch — query-only over what exists. (The Step 2a Fireflies transcript escalation and its Gemini, Zoom, and Gong equivalents are the sanctioned external reads, per DEC-032 and DEC-035 — read-only, capped, never persisted.)
 - No vector DB / embeddings / FTS index — `ripgrep` + layer-weighted ranking + reading the vault, by design; revisit only on a proven, repeated retrieval miss.
 - No automatic spine mutation, no mass note-writing.
 
